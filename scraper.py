@@ -4,64 +4,66 @@ from playwright.async_api import async_playwright
 
 async def scrape_elvebredd():
     async with async_playwright() as p:
-        # Launch browser with custom user-agent & larger viewport
+        # Launch browser with explicit realistic viewport
         browser = await p.chromium.launch(headless=True)
         context = await browser.new_context(
-            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
-            viewport={"width": 1280, "height": 800}
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            viewport={"width": 1400, "height": 900}
         )
         page = await context.new_page()
         
-        print("Navigating to Elvebredd Calculator...")
-        await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="domcontentloaded", timeout=60000)
+        print("Loading Elvebredd Calculator...")
+        await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="networkidle", timeout=60000)
         
-        # Wait for page to fully load JS elements
-        await page.wait_for_timeout(5000)
+        # Wait for dynamic DOM elements to render fully
+        await page.wait_for_timeout(7000)
 
         variants = ["Regular", "N", "M"]
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
-        records = []
+        extracted_rows = []
 
         for variant in variants:
             print(f"Scraping variant: {variant}")
             
+            # Switch variant tab if needed
             if variant != "Regular":
                 try:
-                    # Click N or M toggle button
-                    await page.click(f'button:has-text("{variant}")', timeout=5000)
-                    await page.wait_for_timeout(2000)
+                    btn = page.get_by_role("button", name=variant, exact=True)
+                    if await btn.count() > 0:
+                        await btn.click()
+                        await page.wait_for_timeout(2000)
                 except Exception as e:
-                    print(f"Variant click skipped/failed for {variant}: {e}")
+                    print(f"Variant click failed for {variant}: {e}")
 
-            # Extract elements flexibly
-            cards = await page.query_selector_all("div[class*='wrap'], div[class*='card'], .pg-wrap")
-            
-            # Fallback if container classes shifted: query all pet price text directly
-            if not cards:
-                cards = await page.query_selector_all("body *")
+            # Grab image elements or card containers that wrap pet details
+            pet_cards = await page.query_selector_all("div.grid > div")
+            if not pet_cards:
+                pet_cards = await page.query_selector_all("div[class*='grid'] > div")
 
-            for card in cards:
+            for card in pet_cards:
                 try:
-                    # Look for pet name and value text patterns
-                    text = await card.inner_text()
-                    lines = [line.strip() for line in text.split("\n") if line.strip()]
+                    text_content = await card.inner_text()
+                    lines = [line.strip() for line in text_content.split("\n") if line.strip()]
                     
-                    # Store parsed values if valid structure found
-                    if len(lines) >= 2 and any(char.isdigit() for char in lines[-1]):
-                        name = lines[0]
-                        val = lines[-1]
-                        records.append(f"{today_date},{name},{variant},{val}\n")
+                    # Extract pet name and numeric value from card text block
+                    if len(lines) >= 2:
+                        pet_name = lines[0].replace(",", "")
+                        value = lines[-1].replace(",", "")
+                        
+                        # Verify the value field contains numbers
+                        if any(char.isdigit() for char in value):
+                            extracted_rows.append(f"{today_date},{pet_name},{variant},{value}\n")
                 except Exception:
                     continue
 
-        if records:
-            # Prevent duplicates and append
-            unique_records = list(set(records))
+        if extracted_rows:
+            # Remove potential duplicates in memory
+            unique_rows = sorted(list(set(extracted_rows)))
             with open("history.csv", "a", encoding="utf-8") as f:
-                f.writelines(unique_records)
-            print(f"Successfully appended {len(unique_records)} records!")
+                f.writelines(unique_rows)
+            print(f"Successfully wrote {len(unique_rows)} records to history.csv!")
         else:
-            print("No records extracted. Cloudflare protection or DOM structure change detected.")
+            print("Failed to find pet cards in DOM structure.")
 
         await browser.close()
 
