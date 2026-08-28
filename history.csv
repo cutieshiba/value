@@ -1,2 +1,269 @@
 date,pet_name,variant,value
 
+2026-08-28,0,M,0
+2026-08-28,0,N,0
+2026-08-28,0,Regular,0
+2026-08-28,2D Doggy,M,6.75
+2026-08-28,2D Doggy,N,6.75
+2026-08-28,2D Doggy,Regular,6.75
+2026-08-28,7.5,M,2D Doggy
+2026-08-28,7.5,N,2D Doggy
+2026-08-28,7.5,Regular,2D Doggy
+2026-08-28,Aestus,M,4.5
+2026-08-28,Aestus,N,4.5
+2026-08-28,Aestus,Regular,4.5
+2026-08-28,Albino Monkey,M,16.25
+2026-08-28,Albino Monkey,N,16.25
+2026-08-28,Albino Monkey,Regular,16.25
+2026-08-28,Arctic Dusk Dragon,M,3.5
+2026-08-28,Arctic Dusk Dragon,N,3.5
+2026-08-28,Arctic Dusk Dragon,Regular,3.5
+2026-08-28,Arctic Reindeer,M,49.5
+2026-08-28,Arctic Reindeer,N,49.5
+2026-08-28,Arctic Reindeer,Regular,49.5
+2026-08-28,Aurora Fox,M,3.75
+2026-08-28,Aurora Fox,N,3.75
+2026-08-28,Aurora Fox,Regular,3.75
+2026-08-28,Balloon Unicorn,M,165
+2026-08-28,Balloon Unicorn,N,165
+2026-08-28,Balloon Unicorn,Regular,165
+2026-08-28,Bat Dragon,M,940
+2026-08-28,Bat Dragon,N,940
+2026-08-28,Bat Dragon,Regular,940
+2026-08-28,Black-Chested Pheasant,M,13.75
+2026-08-28,Black-Chested Pheasant,N,13.75
+2026-08-28,Black-Chested Pheasant,Regular,13.75
+2026-08-28,Blazing Lion,M,196
+2026-08-28,Blazing Lion,N,196
+2026-08-28,Blazing Lion,Regular,196
+2026-08-28,Bush Elephant,M,20.5
+2026-08-28,Bush Elephant,N,20.5
+2026-08-28,Bush Elephant,Regular,20.5
+2026-08-28,Caelum Cervi,M,4.5
+2026-08-28,Caelum Cervi,N,4.5
+2026-08-28,Caelum Cervi,Regular,4.5
+2026-08-28,Candicorn,M,9.5
+2026-08-28,Candicorn,N,9.5
+2026-08-28,Candicorn,Regular,9.5
+2026-08-28,Candyfloss Chick,M,19
+2026-08-28,Candyfloss Chick,N,19
+2026-08-28,Candyfloss Chick,Regular,19
+2026-08-28,Cerberus,M,4
+2026-08-28,Cerberus,N,4
+2026-08-28,Cerberus,Regular,4
+2026-08-28,Chocolate Chip Bat Dragon,M,31.5
+2026-08-28,Chocolate Chip Bat Dragon,N,31.5
+2026-08-28,Chocolate Chip Bat Dragon,Regular,31.5
+2026-08-28,Crow,M,175
+2026-08-28,Crow,N,175
+2026-08-28,Crow,Regular,175
+2026-08-28,Cryptid,M,134
+2026-08-28,Cryptid,N,134
+2026-08-28,Cryptid,Regular,134
+2026-08-28,Cupid Dragon,M,6
+2026-08-28,Cupid Dragon,N,6
+2026-08-28,Cupid Dragon,Regular,6
+2026-08-28,Dancing Dragon,M,3.25
+2026-08-28,Dancing Dragon,N,3.25
+2026-08-28,Dancing Dragon,Regular,3.25
+2026-08-28,Diamond Albatross,M,3.75
+2026-08-28,Diamond Albatross,N,3.75
+2026-08-28,Diamond Albatross,Regular,3.75
+2026-08-28,Diamond Amazon,M,5
+2026-08-28,Diamond Amazon,N,5
+2026-08-28,Diamond Amazon,Regular,5
+2026-08-28,Diamond Butterfly,M,64
+2026-08-28,Diamond Butterfly,N,64
+2026-08-28,Diamond Butterfly,Regular,64
+2026-08-28,Diamond Hummingbird,M,3.5
+2026-08-28,Diamond Hummingbird,N,3.5
+2026-08-28,Diamond Hummingbird,Regular,3.5
+2026-08-28,Emperor Gorilla,M,27
+2026-08-28,Emperor Gorilla,N,27
+2026-08-28,Emperor Gorilla,Regular,27
+2026-08-28,Evil Unicorn,M,108.5
+2026-08-28,Evil Unicorn,N,108.5
+2026-08-28,Evil Unicorn,Regular,108.5
+2026-08-28,Fairy Bat Dragon,M,15.5
+2026-08-28,Fairy Bat Dragon,N,15.5
+2026-08-28,Fairy Bat Dragon,Regular,15.5
+2026-08-28,Fallow Deer,M,4
+2026-08-28,Fallow Deer,N,4
+2026-08-28,Fallow Deer,Regular,4
+2026-08-28,Field Mouse,M,5.25
+2026-08-28,Field Mouse,N,5.25
+2026-08-28,Field Mouse,Regular,5.25
+2026-08-28,Frost Dragon,M,326
+2026-08-28,Frost Dragon,N,326
+2026-08-28,Frost Dragon,Regular,326
+2026-08-28,Frost Fury,M,5
+2026-08-28,Frost Fury,N,5
+2026-08-28,Frost Fury,Regular,5
+2026-08-28,Frost Unicorn,M,14.75
+2026-08-28,Frost Unicorn,N,14.75
+2026-08-28,Frost Unicorn,Regular,14.75
+2026-08-28,Frostbite Bear,M,35
+2026-08-28,Frostbite Bear,N,35
+2026-08-28,Frostbite Bear,Regular,35
+2026-08-28,Giant Gold Scarab,M,3.75
+2026-08-28,Giant Gold Scarab,N,3.75
+2026-08-28,Giant Gold Scarab,Regular,3.75
+2026-08-28,Giant Panda,M,218.5
+2026-08-28,Giant Panda,N,218.5
+2026-08-28,Giant Panda,Regular,218.5
+2026-08-28,Giraffe,M,475
+2026-08-28,Giraffe,N,475
+2026-08-28,Giraffe,Regular,475
+2026-08-28,Glacier Kitsune,M,3.5
+2026-08-28,Glacier Kitsune,N,3.5
+2026-08-28,Glacier Kitsune,Regular,3.5
+2026-08-28,Glormy Leo,M,3.75
+2026-08-28,Glormy Leo,N,3.75
+2026-08-28,Glormy Leo,Regular,3.75
+2026-08-28,Grim Dragon,M,29
+2026-08-28,Grim Dragon,N,29
+2026-08-28,Grim Dragon,Regular,29
+2026-08-28,Haetae,M,117
+2026-08-28,Haetae,N,117
+2026-08-28,Haetae,Regular,117
+2026-08-28,Halloween White Ghost Dragon,M,5.5
+2026-08-28,Halloween White Ghost Dragon,N,5.5
+2026-08-28,Halloween White Ghost Dragon,Regular,5.5
+2026-08-28,Hero Gibbon,M,8.75
+2026-08-28,Hero Gibbon,N,8.75
+2026-08-28,Hero Gibbon,Regular,8.75
+2026-08-28,Hot Doggo,M,36
+2026-08-28,Hot Doggo,N,36
+2026-08-28,Hot Doggo,Regular,36
+2026-08-28,Ice Golem,M,3.25
+2026-08-28,Ice Golem,N,3.25
+2026-08-28,Ice Golem,Regular,3.25
+2026-08-28,Jekyll Hydra,M,62
+2026-08-28,Jekyll Hydra,N,62
+2026-08-28,Jekyll Hydra,Regular,62
+2026-08-28,Jousting Horse,M,9
+2026-08-28,Jousting Horse,N,9
+2026-08-28,Jousting Horse,Regular,9
+2026-08-28,Kangaroo,M,17.5
+2026-08-28,Kangaroo,N,17.5
+2026-08-28,Kangaroo,Regular,17.5
+2026-08-28,Kiwi Kiwi,M,3
+2026-08-28,Kiwi Kiwi,N,3
+2026-08-28,Kiwi Kiwi,Regular,3
+2026-08-28,Lava Dragon,M,5.25
+2026-08-28,Lava Dragon,N,5.25
+2026-08-28,Lava Dragon,Regular,5.25
+2026-08-28,Mechapup,M,18
+2026-08-28,Mechapup,N,18
+2026-08-28,Mechapup,Regular,18
+2026-08-28,Mermicorn,M,28
+2026-08-28,Mermicorn,N,28
+2026-08-28,Mermicorn,Regular,28
+2026-08-28,Midnight Dragon,M,5.5
+2026-08-28,Midnight Dragon,N,5.5
+2026-08-28,Midnight Dragon,Regular,5.5
+2026-08-28,Monkey King,M,65
+2026-08-28,Monkey King,N,65
+2026-08-28,Monkey King,Regular,65
+2026-08-28,Moonbeam Peacock,M,16.25
+2026-08-28,Moonbeam Peacock,N,16.25
+2026-08-28,Moonbeam Peacock,Regular,16.25
+2026-08-28,Nessie,M,6.5
+2026-08-28,Nessie,N,6.5
+2026-08-28,Nessie,Regular,6.5
+2026-08-28,Orchid Butterfly,M,103
+2026-08-28,Orchid Butterfly,N,103
+2026-08-28,Orchid Butterfly,Regular,103
+2026-08-28,Owl,M,246.5
+2026-08-28,Owl,N,246.5
+2026-08-28,Owl,Regular,246.5
+2026-08-28,Owlbear,M,4.75
+2026-08-28,Owlbear,N,4.75
+2026-08-28,Owlbear,Regular,4.75
+2026-08-28,Papa Moose,M,5.75
+2026-08-28,Papa Moose,N,5.75
+2026-08-28,Papa Moose,Regular,5.75
+2026-08-28,Parrot,M,196
+2026-08-28,Parrot,N,196
+2026-08-28,Parrot,Regular,196
+2026-08-28,Phantom Dragon,M,9.25
+2026-08-28,Phantom Dragon,N,9.25
+2026-08-28,Phantom Dragon,Regular,9.25
+2026-08-28,Pineapple Owl,M,3
+2026-08-28,Pineapple Owl,N,3
+2026-08-28,Pineapple Owl,Regular,3
+2026-08-28,Pirate Ghost Capuchin Monkey,M,24
+2026-08-28,Pirate Ghost Capuchin Monkey,N,24
+2026-08-28,Pirate Ghost Capuchin Monkey,Regular,24
+2026-08-28,Red Dutch Guinea Pig,M,7.5
+2026-08-28,Red Dutch Guinea Pig,N,7.5
+2026-08-28,Red Dutch Guinea Pig,Regular,7.5
+2026-08-28,Royal Mistletroll,M,15
+2026-08-28,Royal Mistletroll,N,15
+2026-08-28,Royal Mistletroll,Regular,15
+2026-08-28,Sakura Spirit,M,5
+2026-08-28,Sakura Spirit,N,5
+2026-08-28,Sakura Spirit,Regular,5
+2026-08-28,Scorching Kaijunior,M,3
+2026-08-28,Scorching Kaijunior,N,3
+2026-08-28,Scorching Kaijunior,Regular,3
+2026-08-28,Shadow Dragon,M,844
+2026-08-28,Shadow Dragon,N,844
+2026-08-28,Shadow Dragon,Regular,844
+2026-08-28,Shark Puppy,M,12.5
+2026-08-28,Shark Puppy,N,12.5
+2026-08-28,Shark Puppy,Regular,12.5
+2026-08-28,Sign In,M,0
+2026-08-28,Sign In,N,0
+2026-08-28,Sign In,Regular,0
+2026-08-28,Silverback Gorilla,M,23
+2026-08-28,Silverback Gorilla,N,23
+2026-08-28,Silverback Gorilla,Regular,23
+2026-08-28,Solaris,M,4.5
+2026-08-28,Solaris,N,4.5
+2026-08-28,Solaris,Regular,4.5
+2026-08-28,Strawberry Penguin,M,5.5
+2026-08-28,Strawberry Penguin,N,5.5
+2026-08-28,Strawberry Penguin,Regular,5.5
+2026-08-28,Strawberry Shortcake Bat Dragon,M,32.5
+2026-08-28,Strawberry Shortcake Bat Dragon,N,32.5
+2026-08-28,Strawberry Shortcake Bat Dragon,Regular,32.5
+2026-08-28,Strawberry Tortle,M,29
+2026-08-28,Strawberry Tortle,N,29
+2026-08-28,Strawberry Tortle,Regular,29
+2026-08-28,Sugar Axolotl,M,12.5
+2026-08-28,Sugar Axolotl,N,12.5
+2026-08-28,Sugar Axolotl,Regular,12.5
+2026-08-28,Sugar Glider,M,26
+2026-08-28,Sugar Glider,N,26
+2026-08-28,Sugar Glider,Regular,26
+2026-08-28,THEIR OFFER,M,0
+2026-08-28,THEIR OFFER,N,0
+2026-08-28,THEIR OFFER,Regular,0
+2026-08-28,Terms of Service,M,Copyright 2020-2026 Elvebredd. All rights reserved. All in-game assets and trademarks are the property of their respective owners. There are no official values in Adopt Me and we are not affiliated with Uplift Games LLC. Ads served by Playwire. Values are independent of Adopt Me WFL.
+2026-08-28,Terms of Service,N,Copyright 2020-2026 Elvebredd. All rights reserved. All in-game assets and trademarks are the property of their respective owners. There are no official values in Adopt Me and we are not affiliated with Uplift Games LLC. Ads served by Playwire. Values are independent of Adopt Me WFL.
+2026-08-28,Terms of Service,Regular,Copyright 2020-2026 Elvebredd. All rights reserved. All in-game assets and trademarks are the property of their respective owners. There are no official values in Adopt Me and we are not affiliated with Uplift Games LLC. Ads served by Playwire. Values are independent of Adopt Me WFL.
+2026-08-28,Tió De Nadal,M,18
+2026-08-28,Tió De Nadal,N,18
+2026-08-28,Tió De Nadal,Regular,18
+2026-08-28,Tortoiseshell Guinea Pig,M,26
+2026-08-28,Tortoiseshell Guinea Pig,N,26
+2026-08-28,Tortoiseshell Guinea Pig,Regular,26
+2026-08-28,Turtle,M,23
+2026-08-28,Turtle,N,23
+2026-08-28,Turtle,Regular,23
+2026-08-28,Undead Jousting Horse,M,66
+2026-08-28,Undead Jousting Horse,N,66
+2026-08-28,Undead Jousting Horse,Regular,66
+2026-08-28,Vampire Dragon,M,12
+2026-08-28,Vampire Dragon,N,12
+2026-08-28,Vampire Dragon,Regular,12
+2026-08-28,Velocirooster,M,13.5
+2026-08-28,Velocirooster,N,13.5
+2026-08-28,Velocirooster,Regular,13.5
+2026-08-28,Werewolf,M,26
+2026-08-28,Werewolf,N,26
+2026-08-28,Werewolf,Regular,26
+2026-08-28,Winged Tiger,M,14.25
+2026-08-28,Winged Tiger,N,14.25
+2026-08-28,Winged Tiger,Regular,14.25
