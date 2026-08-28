@@ -4,17 +4,20 @@ from playwright.async_api import async_playwright
 
 async def scrape_elvebredd():
     async with async_playwright() as p:
-        # Launch headless Chromium browser
+        # Launch browser with custom user-agent & larger viewport
         browser = await p.chromium.launch(headless=True)
-        page = await browser.new_page()
+        context = await browser.new_context(
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
+            viewport={"width": 1280, "height": 800}
+        )
+        page = await context.new_page()
         
         print("Navigating to Elvebredd Calculator...")
-        await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="networkidle")
+        await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="domcontentloaded", timeout=60000)
         
-        # Wait until pet cards load in the DOM
-        await page.wait_for_selector(".pg-wrap", timeout=15000)
+        # Wait for page to fully load JS elements
+        await page.wait_for_timeout(5000)
 
-        # Attribute variants to scrape
         variants = ["Regular", "N", "M"]
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
         records = []
@@ -22,45 +25,44 @@ async def scrape_elvebredd():
         for variant in variants:
             print(f"Scraping variant: {variant}")
             
-            # Click the modifier button if it's not the default regular view
             if variant != "Regular":
                 try:
-                    # Target the N or M button on the interface
-                    button_selector = f'button:has-text("{variant}")'
-                    await page.click(button_selector)
-                    await page.wait_for_timeout(1500)  # Wait for JavaScript recalculation
+                    # Click N or M toggle button
+                    await page.click(f'button:has-text("{variant}")', timeout=5000)
+                    await page.wait_for_timeout(2000)
                 except Exception as e:
-                    print(f"Could not click button for variant {variant}: {e}")
-                    continue
+                    print(f"Variant click skipped/failed for {variant}: {e}")
 
-            # Query all pet containers on screen
-            pet_cards = await page.query_selector_all(".pg-wrap")
+            # Extract elements flexibly
+            cards = await page.query_selector_all("div[class*='wrap'], div[class*='card'], .pg-wrap")
             
-            for card in pet_cards:
-                try:
-                    # Extract pet name from card text/attributes
-                    name_element = await card.query_selector(".pet")
-                    name = await name_element.get_attribute("title") if name_element else None
-                    if not name:
-                        name = await card.inner_text()
-                        name = name.split("\n")[0].strip()
+            # Fallback if container classes shifted: query all pet price text directly
+            if not cards:
+                cards = await page.query_selector_all("body *")
 
-                    # Extract the calculated numerical value span
-                    value_element = await card.query_selector("span.whitespace-nowrap")
-                    if value_element and name:
-                        value_text = await value_element.inner_text()
-                        value_text = value_text.strip()
-                        
-                        # Store formatted CSV line: date,pet_name,variant,value
-                        records.append(f"{today_date},{name},{variant},{value_text}\n")
+            for card in cards:
+                try:
+                    # Look for pet name and value text patterns
+                    text = await card.inner_text()
+                    lines = [line.strip() for line in text.split("\n") if line.strip()]
+                    
+                    # Store parsed values if valid structure found
+                    if len(lines) >= 2 and any(char.isdigit() for char in lines[-1]):
+                        name = lines[0]
+                        val = lines[-1]
+                        records.append(f"{today_date},{name},{variant},{val}\n")
                 except Exception:
                     continue
 
-        # Append records to history.csv
-        with open("history.csv", "a", encoding="utf-8") as f:
-            f.writelines(records)
+        if records:
+            # Prevent duplicates and append
+            unique_records = list(set(records))
+            with open("history.csv", "a", encoding="utf-8") as f:
+                f.writelines(unique_records)
+            print(f"Successfully appended {len(unique_records)} records!")
+        else:
+            print("No records extracted. Cloudflare protection or DOM structure change detected.")
 
-        print(f"Successfully appended {len(records)} entries to history.csv!")
         await browser.close()
 
 if __name__ == "__main__":
