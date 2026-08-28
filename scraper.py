@@ -4,7 +4,10 @@ from playwright.async_api import async_playwright
 
 async def scrape_elvebredd():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(headless=True)
+        browser = await p.chromium.launch(
+            headless=True,
+            args=["--disable-blink-features=AutomationControlled"]
+        )
         context = await browser.new_context(
             user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
             viewport={"width": 1600, "height": 1000}
@@ -13,61 +16,70 @@ async def scrape_elvebredd():
 
         print("Loading Elvebredd Calculator...")
         await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="domcontentloaded", timeout=60000)
-        await page.wait_for_timeout(5000)
+        await page.wait_for_timeout(6000)
 
-        variants = ["Regular", "N", "M"]
+        # Blocklist for non-pet UI text strings
+        ui_blacklist = {
+            "sign in", "log in", "search", "filter", "calculator", "value", 
+            "regular", "neon", "mega", "values", "adopt me", "home", "contact",
+            "select", "all", "page", "next", "previous", "item", "items"
+        }
+
+        variants = [("Regular", None), ("N", "Neon"), ("M", "Mega")]
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
-        extracted_rows = []
+        extracted_rows = set()
 
-        for variant in variants:
-            print(f"Scraping variant: {variant}")
+        for variant_code, variant_label in variants:
+            print(f"--- Processing Variant: {variant_code} ---")
             
-            if variant != "Regular":
+            # Click variant tab if not Regular
+            if variant_label:
                 try:
-                    btn = page.get_by_role("button", name=variant, exact=True)
-                    if await btn.count() > 0:
-                        await btn.click()
-                        await page.wait_for_timeout(2000)
+                    # Click exact variant toggle button
+                    await page.click(f'button:has-text("{variant_code}")', timeout=5000)
+                    await page.wait_for_timeout(3000)
                 except Exception as e:
-                    print(f"Variant click failed for {variant}: {e}")
+                    print(f"Could not click button for {variant_code}: {e}")
 
-            # Auto-scroll down the page to trigger lazy loading for all pets
-            print("Scrolling page to load full pet inventory...")
-            for scroll_step in range(12):
-                await page.mouse.wheel(0, 2500)
-                await page.wait_for_timeout(800)
-
-            # Scroll back to the top
-            await page.evaluate("window.scrollTo(0, 0)")
-            await page.wait_for_timeout(1000)
-
-            # Extract text lines across all loaded pet cards
-            pet_elements = await page.query_selector_all("p, span, h3, h4, div")
-            text_lines = []
-            for el in pet_elements:
-                try:
-                    txt = (await el.inner_text()).strip()
-                    if txt and "\n" not in txt:
-                        text_lines.append(txt)
-                except Exception:
-                    continue
-
-            # Pair names and values
-            for i in range(len(text_lines) - 1):
-                name = text_lines[i].replace(",", "")
-                val = text_lines[i + 1].replace(",", "")
+            # Scroll incrementally and harvest at each step to catch virtualized items
+            for step in range(15):
+                pet_cards = await page.query_selector_all("div[class*='card'], div[class*='item'], div.grid > div")
                 
-                # Verify numeric value formatting
-                if any(char.isdigit() for char in val) and not any(k in name.lower() for k in ["search", "filter", "calculator", "value", "regular", "neon", "mega"]):
-                    extracted_rows.append(f"{today_date},{name},{variant},{val}\n")
+                for card in pet_cards:
+                    try:
+                        text = await card.inner_text()
+                        lines = [l.strip() for l in text.split("\n") if l.strip()]
+                        
+                        if len(lines) >= 2:
+                            name = lines[0].replace(",", "")
+                            val = lines[-1].replace(",", "")
+                            
+                            # Validation checks
+                            clean_name_lower = name.lower()
+                            if (
+                                any(char.isdigit() for char in val) and 
+                                not any(bad in clean_name_lower for bad in ui_blacklist) and
+                                len(name) > 1
+                            ):
+                                extracted_rows.add(f"{today_date},{name},{variant_code},{val}\n")
+                    except Exception:
+                        continue
+
+                # Scroll down gradually
+                await page.mouse.wheel(0, 1500)
+                await page.wait_for_timeout(1000)
+
+            # Reset scroll to top before switching variant
+            await page.evaluate("window.scrollTo(0, 0)")
+            await page.wait_for_timeout(1500)
 
         if extracted_rows:
-            unique_rows = sorted(list(set(extracted_rows)))
+            sorted_rows = sorted(list(extracted_rows))
             with open("history.csv", "a", encoding="utf-8") as f:
-                f.writelines(unique_rows)
-            print(f"Successfully saved {len(unique_rows)} unique pet entries!")
+                f.writelines(sorted_rows)
+            print(f"Successfully saved {len(sorted_rows)} total pet entries across all variants!")
         else:
-            print("No pet records extracted.")
+            print("No records extracted.")
 
         await browser.close()
 
