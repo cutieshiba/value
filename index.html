@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Adopt Me Pet Value Tracker</title>
+  <!-- Chart.js and PapaParse (CSV parser) -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f8; }
+    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
+    select { padding: 8px; font-size: 16px; margin-bottom: 20px; border-radius: 6px; }
+  </style>
+</head>
+<body>
+
+  <div class="card">
+    <h2>Adopt Me Historical Value Tracker</h2>
+    <label for="petSelect">Choose a Pet: </label>
+    <select id="petSelect" onchange="updateChart()">
+      <!-- Populated dynamically from CSV -->
+    </select>
+    
+    <canvas id="valueChart" width="800" height="400"></canvas>
+  </div>
+
+  <script>
+    let globalData = [];
+    let myChart = null;
+
+    // Fetch and parse the CSV from your repository
+    Papa.parse("history.csv", {
+      download: true,
+      header: true,
+      complete: function(results) {
+        globalData = results.data;
+        populatePetDropdown();
+        updateChart();
+      }
+    });
+
+    function populatePetDropdown() {
+      const pets = [...new Set(globalData.map(item => item.pet_name))].filter(Boolean);
+      const select = document.getElementById("petSelect");
+      pets.forEach(pet => {
+        let opt = document.createElement("option");
+        opt.value = pet;
+        opt.innerHTML = pet;
+        select.appendChild(opt);
+      });
+    }
+
+    function updateChart() {
+      const selectedPet = document.getElementById("petSelect").value;
+      const petFiltered = globalData.filter(item => item.pet_name === selectedPet);
+
+      // Separate data by variants
+      const dates = [...new Set(petFiltered.map(i => i.date))];
+      const regularValues = petFiltered.filter(i => i.variant === 'Regular').map(i => parseFloat(i.value));
+      const neonValues = petFiltered.filter(i => i.variant === 'N').map(i => parseFloat(i.value));
+      const megaValues = petFiltered.filter(i => i.variant === 'M').map(i => parseFloat(i.value));
+
+      const ctx = document.getElementById('valueChart').getContext('2d');
+      if (myChart) myChart.destroy();
+
+      myChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [
+            { label: 'Regular', data: regularValues, borderColor: '#3498db', fill: false },
+            { label: 'Neon (N)', data: neonValues, borderColor: '#2ecc71', fill: false },
+            { label: 'Mega (M)', data: megaValues, borderColor: '#e74c3c', fill: false }
+          ]
+        },
+        options: { responsive: true, scales: { y: { beginAtZero: false } } }
+      });
+    }
+  </script>
+</body>
+</html>
