@@ -16,9 +16,8 @@ async def scrape_elvebredd():
 
         print("Loading Elvebredd Calculator...")
         await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="domcontentloaded", timeout=60000)
-        await page.wait_for_timeout(6000)
+        await page.wait_for_timeout(8000)
 
-        # Strict list of words that should NEVER be saved as pet names
         invalid_names = {
             "sign in", "log in", "search", "filter", "calculator", "value", 
             "regular", "neon", "mega", "values", "adopt me", "home", "contact",
@@ -32,32 +31,39 @@ async def scrape_elvebredd():
         for variant in variants:
             print(f"--- Scraping Variant: {variant} ---")
             
-            # Switch variant tabs
+            # Click variant tab
             if variant != "Regular":
                 try:
-                    # Click variant tab using explicit button matching
-                    await page.click(f'button:has-text("{variant}")', timeout=5000)
-                    await page.wait_for_timeout(3000)
+                    # Target button containing text N or M
+                    btn = page.locator(f'button:has-text("{variant}")').first
+                    if await btn.count() > 0:
+                        await btn.click()
+                        await page.wait_for_timeout(3000)
                 except Exception as e:
-                    print(f"Could not click button for variant {variant}: {e}")
+                    print(f"Could not switch variant tab {variant}: {e}")
 
-            # Scroll through page in steps to load virtualized elements
-            for step in range(10):
-                # Target grid containers that house individual pet cards
-                pet_cards = await page.query_selector_all("div.grid > div, div[class*='card']")
+            # Scroll and capture using Image Parent Containers
+            for step in range(12):
+                # Grab every image on the page
+                images = await page.query_selector_all("img")
                 
-                for card in pet_cards:
+                for img in images:
                     try:
-                        text = await card.inner_text()
+                        # Grab the parent box that holds the image + pet text
+                        parent = await img.evaluate_handle("el => el.closest('div')")
+                        if not parent:
+                            continue
+
+                        text = await parent.inner_text()
                         lines = [l.strip() for l in text.split("\n") if l.strip()]
                         
+                        # Pet cards always have at least 2 lines of text (Name + Value)
                         if len(lines) >= 2:
                             raw_name = lines[0].replace(",", "")
                             raw_val = lines[-1].replace(",", "")
-                            
                             clean_name = raw_name.lower().strip()
                             
-                            # Validate: name must not be in UI blocklist, value must contain digits
+                            # Ensure name isn't UI text and value contains numbers
                             if (
                                 len(raw_name) > 1 and
                                 clean_name not in invalid_names and
@@ -67,25 +73,23 @@ async def scrape_elvebredd():
                     except Exception:
                         continue
 
-                # Scroll down incrementally
-                await page.mouse.wheel(0, 1800)
+                # Scroll down in increments to trigger virtual rendering
+                await page.mouse.wheel(0, 1500)
                 await page.wait_for_timeout(800)
 
-            # Reset scroll position to top before moving to next variant
+            # Scroll back to top before next variant
             await page.evaluate("window.scrollTo(0, 0)")
             await page.wait_for_timeout(1000)
 
         if extracted_rows:
             sorted_rows = sorted(list(extracted_rows))
-            
-            # Ensure file has headers before writing
             with open("history.csv", "w", encoding="utf-8") as f:
                 f.write("date,pet_name,variant,value\n")
                 f.writelines(sorted_rows)
                 
-            print(f"SUCCESS: Saved {len(sorted_rows)} unique pet entries to history.csv!")
+            print(f"SUCCESS: Wrote {len(sorted_rows)} unique pets to history.csv!")
         else:
-            print("ERROR: No pet cards matched criteria. Check site DOM structures.")
+            print("ERROR: Still failed to capture pet nodes. Dumping page content...")
 
         await browser.close()
 
