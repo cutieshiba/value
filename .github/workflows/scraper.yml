@@ -1,21 +1,27 @@
-name: Daily Adopt Me Value Scraper
+name: Daily Elvebredd Scraper
 
 on:
   schedule:
+    # Runs daily at 00:00 UTC
     - cron: '0 0 * * *'
+  # Allows manual runs from the Actions tab
   workflow_dispatch:
 
 jobs:
   scrape:
     runs-on: ubuntu-latest
+
+    permissions:
+      contents: write
+
     steps:
       - name: Check out repository
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v4
+        uses: actions/setup-python@v5
         with:
-          python-version: '3.10'
+          python-version: '3.11'
 
       - name: Install dependencies
         run: |
@@ -23,13 +29,12 @@ jobs:
           pip install -r requirements.txt
           playwright install --with-deps chromium
 
-      - name: Run Scraper Script
+      - name: Run Scraper
         run: python scraper.py
 
-      - name: Commit and Push Updated CSV Data
+      - name: Commit and Push CSV changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "github-actions[bot]@users.noreply.github.com"
           git add history.csv
-          git commit -m "Automated daily value update" || exit 0
-          git push
+          git diff --quiet && git diff --staged --quiet || (git commit -m "Automated value update: $(date -u +'%Y-%m-%d')" && git push)
