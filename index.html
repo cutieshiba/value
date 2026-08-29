@@ -51,19 +51,50 @@
     <!-- Control Panel & Filters -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
       
-      <!-- Pet & Variant Selection Card -->
+      <!-- Pet Selection Card -->
       <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Search Pet & Variant</label>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Search Pet</label>
           <div class="relative">
             <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
-            <input type="text" id="searchInput" placeholder="e.g. Shadow Dragon (M_FR)..." oninput="filterPetList()" 
+            <input type="text" id="searchInput" placeholder="Search pet name..." oninput="filterPetList()" 
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
           </div>
         </div>
 
+        <!-- Variant & Potion Toggles -->
         <div>
-          <select id="petSelect" onchange="onPetChange()" size="12" 
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Variant & Potions</label>
+          <div class="grid grid-cols-4 gap-2 text-xs font-bold">
+            <!-- Mega Toggle -->
+            <button id="toggle-M" onclick="toggleVariant('M')" 
+                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
+              M
+            </button>
+            <!-- Neon Toggle -->
+            <button id="toggle-N" onclick="toggleVariant('N')" 
+                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
+              N
+            </button>
+            <!-- Fly Toggle -->
+            <button id="toggle-F" onclick="togglePotion('F')" 
+                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
+              F
+            </button>
+            <!-- Ride Toggle -->
+            <button id="toggle-R" onclick="togglePotion('R')" 
+                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
+              R
+            </button>
+          </div>
+          <div class="text-[11px] text-slate-500 mt-2 text-center">
+            Current Selected Tag: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
+          </div>
+        </div>
+
+        <!-- Pet List Selection -->
+        <div>
+          <select id="petSelect" onchange="onPetChange()" size="10" 
                   class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
             <!-- Dynamically Populated -->
           </select>
@@ -96,7 +127,7 @@
         <!-- Chart Card -->
         <div class="bg-cardbg p-6 rounded-xl border border-slate-800 shadow-xl space-y-4">
           <div>
-            <h2 id="chartTitle" class="text-xl font-bold text-white">Select a Pet Variant</h2>
+            <h2 id="chartTitle" class="text-xl font-bold text-white">Select a Pet</h2>
             <p id="chartSubtitle" class="text-xs text-slate-400">Historical valuation line graph</p>
           </div>
 
@@ -112,8 +143,13 @@
 
   <script>
     let rawRecords = [];
-    let uniqueItemKeys = [];
+    let uniqueBasePets = [];
     let chartInstance = null;
+
+    // Filter Toggle States
+    let activeType = 'Regular'; // 'Regular', 'N', 'M'
+    let hasFly = false;
+    let hasRide = false;
 
     // 1. Fetch & Parse CSV
     Papa.parse("history.csv", {
@@ -133,50 +169,48 @@
     function processCSVData(rows) {
       if (!rows || rows.length === 0) return;
 
-      // Check if header row exists
       let startIdx = 0;
       if (isNaN(parseFloat(rows[0][rows[0].length - 1]))) {
-        startIdx = 1; // Skip header row
+        startIdx = 1;
       }
 
       rawRecords = [];
-      const itemKeySet = new Set();
+      const basePetSet = new Set();
 
       for (let i = startIdx; i < rows.length; i++) {
         const row = rows[i];
         if (row.length >= 4) {
           const date = row[0].trim();
-          const name = row.slice(1, row.length - 2).join(',').trim(); // Handles names with commas
+          const name = row.slice(1, row.length - 2).join(',').trim();
           const combo = row[row.length - 2].trim();
           const val = parseFloat(row[row.length - 1].trim());
 
           if (name && !isNaN(val)) {
-            // Treat each combination as a unique item
-            const itemKey = `${name} (${combo})`;
-            rawRecords.push({ date, name, combo, itemKey, val });
-            itemKeySet.add(itemKey);
+            rawRecords.push({ date, name, combo, val });
+            basePetSet.add(name);
           }
         }
       }
 
-      uniqueItemKeys = Array.from(itemKeySet).sort();
-      populatePetDropdown(uniqueItemKeys);
+      uniqueBasePets = Array.from(basePetSet).sort();
+      populatePetDropdown(uniqueBasePets);
 
-      if (uniqueItemKeys.length > 0) {
-        document.getElementById('petSelect').value = uniqueItemKeys[0];
+      if (uniqueBasePets.length > 0) {
+        document.getElementById('petSelect').value = uniqueBasePets[0];
+        updateToggleUI();
         updateDashboard();
       }
       lucide.createIcons();
     }
 
-    // 2. Populate Dropdown
-    function populatePetDropdown(items) {
+    // 2. Populate Clean Base Pet List
+    function populatePetDropdown(pets) {
       const select = document.getElementById("petSelect");
       select.innerHTML = "";
-      items.forEach(item => {
+      pets.forEach(pet => {
         const opt = document.createElement("option");
-        opt.value = item;
-        opt.textContent = item;
+        opt.value = pet;
+        opt.textContent = pet;
         opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer text-xs";
         select.appendChild(opt);
       });
@@ -185,7 +219,7 @@
     // 3. Search Filter
     function filterPetList() {
       const query = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = uniqueItemKeys.filter(item => item.toLowerCase().includes(query));
+      const filtered = uniqueBasePets.filter(item => item.toLowerCase().includes(query));
       populatePetDropdown(filtered);
       if (filtered.length > 0) {
         document.getElementById("petSelect").value = filtered[0];
@@ -193,19 +227,75 @@
       }
     }
 
+    // 4. Toggle Handler Functions
+    function toggleVariant(variant) {
+      if (activeType === variant) {
+        activeType = 'Regular'; // Unclicking turns back to Regular
+      } else {
+        activeType = variant;
+      }
+      updateToggleUI();
+      updateDashboard();
+    }
+
+    function togglePotion(potion) {
+      if (potion === 'F') hasFly = !hasFly;
+      if (potion === 'R') hasRide = !hasRide;
+      updateToggleUI();
+      updateDashboard();
+    }
+
+    function getActiveComboTag() {
+      let potionTag = "NP";
+      if (hasFly && hasRide) potionTag = "FR";
+      else if (hasFly) potionTag = "F";
+      else if (hasRide) potionTag = "R";
+
+      return `${activeType}_${potionTag}`;
+    }
+
+    function updateToggleUI() {
+      // Variant Button Styling
+      const btnM = document.getElementById('toggle-M');
+      const btnN = document.getElementById('toggle-N');
+
+      btnM.className = activeType === 'M' 
+        ? "py-2 rounded-lg bg-rose-600 text-white border border-rose-500 transition shadow" 
+        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
+
+      btnN.className = activeType === 'N' 
+        ? "py-2 rounded-lg bg-emerald-600 text-white border border-emerald-500 transition shadow" 
+        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
+
+      // Potion Button Styling
+      const btnF = document.getElementById('toggle-F');
+      const btnR = document.getElementById('toggle-R');
+
+      btnF.className = hasFly 
+        ? "py-2 rounded-lg bg-brand-600 text-white border border-brand-500 transition shadow" 
+        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
+
+      btnR.className = hasRide 
+        ? "py-2 rounded-lg bg-brand-600 text-white border border-brand-500 transition shadow" 
+        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
+
+      document.getElementById('activeComboTag').innerText = getActiveComboTag();
+    }
+
     function onPetChange() {
       updateDashboard();
     }
 
-    // 4. Update Dashboard Charts & Metrics
+    // 5. Update Dashboard Chart & Metrics
     function updateDashboard() {
-      const selectedKey = document.getElementById("petSelect").value;
-      if (!selectedKey) return;
+      const selectedPet = document.getElementById("petSelect").value;
+      if (!selectedPet) return;
 
-      document.getElementById('chartTitle').innerText = selectedKey;
+      const comboTag = getActiveComboTag();
+      document.getElementById('chartTitle').innerText = `${selectedPet} (${comboTag})`;
 
-      // Filter records specifically for this pet variant
-      const records = rawRecords.filter(r => r.itemKey === selectedKey);
+      // Filter for exact pet & combo
+      const records = rawRecords.filter(r => r.name === selectedPet && r.combo === comboTag);
 
       // Sort chronological dates
       records.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -235,6 +325,11 @@
           changeElem.className = "text-2xl font-bold text-slate-300 mt-1";
           changeElem.innerText = `0.0%`;
         }
+      } else {
+        document.getElementById('statCurrent').innerText = "No Data";
+        document.getElementById('statATH').innerText = "--";
+        document.getElementById('statSnapshots').innerText = "0";
+        document.getElementById('statChange').innerText = "--";
       }
 
       // Render Chart
