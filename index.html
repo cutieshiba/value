@@ -40,7 +40,7 @@
           <i data-lucide="trending-up" class="text-brand-500 w-8 h-8"></i>
           Adopt Me Pet Value Analytics
         </h1>
-        <p class="text-slate-400 text-sm mt-1">Real-time market trends & top market movers from Elvebredd</p>
+        <p class="text-slate-400 text-sm mt-1">Real-time market trends & value updates from Elvebredd</p>
       </div>
       <div id="statusBadge" class="self-start md:self-auto px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -48,37 +48,55 @@
       </div>
     </header>
 
-    <!-- Top Movers / Market Leaderboards -->
-    <section class="mb-8 grid grid-cols-1 md:grid-cols-2 gap-6">
-      
-      <!-- Top Gainers Card -->
-      <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl">
-        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-          <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
-            <i data-lucide="arrow-up-right" class="text-emerald-400 w-5 h-5"></i>
-            Top 5 Gainers (Overall)
-          </h3>
-          <span class="text-xs text-slate-500">% Change</span>
+    <!-- Top Movers & Last Updated Section -->
+    <section class="mb-8 space-y-4">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Top Gainers Card -->
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
+              <i data-lucide="arrow-up-right" class="text-emerald-400 w-5 h-5"></i>
+              Top 5 Gainers (Overall)
+            </h3>
+            <span class="text-xs text-slate-500">% Change</span>
+          </div>
+          <div id="topGainersList" class="space-y-2 text-sm">
+            <div class="text-slate-500 text-xs">Calculating metrics...</div>
+          </div>
         </div>
-        <div id="topGainersList" class="space-y-2 text-sm">
-          <div class="text-slate-500 text-xs">Calculating metrics...</div>
+
+        <!-- Top Losers Card -->
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
+              <i data-lucide="arrow-down-right" class="text-rose-400 w-5 h-5"></i>
+              Top 5 Losers (Overall)
+            </h3>
+            <span class="text-xs text-slate-500">% Change</span>
+          </div>
+          <div id="topLosersList" class="space-y-2 text-sm">
+            <div class="text-slate-500 text-xs">Calculating metrics...</div>
+          </div>
         </div>
+
       </div>
 
-      <!-- Top Losers Card -->
-      <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl">
-        <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-          <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
-            <i data-lucide="arrow-down-right" class="text-rose-400 w-5 h-5"></i>
-            Top 5 Losers (Overall)
-          </h3>
-          <span class="text-xs text-slate-500">% Change</span>
+      <!-- Last Updated Info Card Below Top Losers -->
+      <div onclick="openUpdateModal()" class="bg-cardbg/80 hover:bg-cardbg border border-slate-800 hover:border-brand-500/50 p-3.5 rounded-xl transition cursor-pointer flex items-center justify-between shadow-lg group">
+        <div class="flex items-center gap-3">
+          <div class="p-2 rounded-lg bg-brand-500/10 text-brand-400 group-hover:scale-105 transition">
+            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 uppercase font-semibold">Database Last Updated</div>
+            <div id="lastUpdatedTimestamp" class="text-sm font-bold text-white mt-0.5">Fetching latest timestamp...</div>
+          </div>
         </div>
-        <div id="topLosersList" class="space-y-2 text-sm">
-          <div class="text-slate-500 text-xs">Calculating metrics...</div>
-        </div>
+        <span class="text-xs font-semibold text-brand-400 flex items-center gap-1 group-hover:translate-x-1 transition">
+          View 30-Day Audit Log (FR, NFR, MFR) <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </span>
       </div>
-
     </section>
 
     <!-- Control Panel & Filters -->
@@ -103,7 +121,7 @@
           </select>
         </div>
 
-        <!-- Variant & Potion Toggles -->
+        <!-- Full Flexible Search Variant Toggles -->
         <div id="toggleContainer">
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">2. Variant & Potions</label>
           <div class="grid grid-cols-4 gap-2 text-xs font-bold">
@@ -125,7 +143,7 @@
             </button>
           </div>
           <div class="text-[11px] text-slate-500 mt-2 text-center">
-            Target Tag: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
+            Active Tag: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
           </div>
         </div>
 
@@ -139,10 +157,10 @@
         </div>
       </div>
 
-      <!-- Main Analytics Viewport (Width Reduced) -->
+      <!-- Main Analytics Viewport -->
       <div class="lg:col-span-3 space-y-6 flex flex-col items-center">
         
-        <!-- Reduced Width Wrapper for Stats & Chart -->
+        <!-- Reduced Width Container -->
         <div class="w-full max-w-2xl space-y-6">
           
           <!-- Summary Stats Metrics -->
@@ -165,7 +183,7 @@
             </div>
           </div>
 
-          <!-- Chart Card (Reduced Width Container) -->
+          <!-- Chart Card -->
           <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
             <div>
               <h2 id="chartTitle" class="text-lg font-bold text-white">Select Pet & Click Search</h2>
@@ -178,7 +196,7 @@
             </div>
           </div>
 
-          <!-- Horizontal Search History Drawer -->
+          <!-- Search History Drawer (With Live Value Tag) -->
           <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-xl space-y-3">
             <div class="flex items-center justify-between">
               <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
@@ -190,12 +208,57 @@
               </button>
             </div>
 
-            <!-- Scrollable Chips Container -->
+            <!-- Horizontal Scrollable Container -->
             <div id="searchHistoryList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-700">
               <div class="text-xs text-slate-500 py-1">No search history recorded yet.</div>
             </div>
           </div>
 
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <!-- Updates Audit Modal (FR, NFR, MFR Shifts Only) -->
+  <div id="updateModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+    <div class="bg-cardbg border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
+      
+      <!-- Modal Header -->
+      <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
+        <div>
+          <h3 class="text-lg font-bold text-white flex items-center gap-2">
+            <i data-lucide="history" class="text-brand-500 w-5 h-5"></i>
+            Value Audit Log (FR, NFR, MFR Changes)
+          </h3>
+          <p class="text-xs text-slate-400 mt-0.5">Select a date to view version shifts (Previous Value ➔ Current Value)</p>
+        </div>
+        <button onclick="closeUpdateModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800/50 transition">
+          <i data-lucide="x" class="w-5 h-5"></i>
+        </button>
+      </div>
+
+      <!-- Modal Content Body -->
+      <div class="p-5 overflow-y-auto space-y-6 flex-1 scrollbar-thin scrollbar-thumb-slate-700">
+        
+        <!-- Date Buttons -->
+        <div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Update Date (Past 30 Days)</label>
+          <div id="auditDatesList" class="flex flex-wrap gap-2">
+            <span class="text-xs text-slate-500">Extracting updates...</span>
+          </div>
+        </div>
+
+        <!-- Selected Date Audit View -->
+        <div id="auditDetailsSection" class="hidden space-y-3">
+          <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+            <h4 id="selectedAuditDateTitle" class="text-sm font-bold text-brand-400">--</h4>
+            <span id="auditCountBadge" class="text-xs px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-semibold">0 updates</span>
+          </div>
+
+          <div id="auditChangesList" class="space-y-2 text-sm max-h-[300px] overflow-y-auto pr-2">
+            <!-- Dynamically Populated -->
+          </div>
         </div>
 
       </div>
@@ -210,12 +273,15 @@
     let chartInstance = null;
     let selectedPetName = "";
 
-    // Active Selection States
+    // Search Toggle States
     let activeType = 'Regular'; 
     let hasFly = false;
     let hasRide = false;
 
-    // Fetch & Parse CSV
+    // Filter strictly for Audit Log
+    const AUDIT_ALLOWED_VERSIONS = new Set(["Regular_FR", "N_FR", "M_FR"]);
+
+    // Parse CSV
     Papa.parse("history.csv", {
       download: true,
       skipEmptyLines: true,
@@ -261,112 +327,11 @@
       }
 
       uniqueBasePets = Array.from(basePetSet).sort();
+      
       calculateMarketLeaderboards();
+      initLastUpdatedInfo();
       updateToggleUI();
       lucide.createIcons();
-    }
-
-    // Leaderboards
-    function calculateMarketLeaderboards() {
-      const petComboMap = {};
-
-      rawRecords.forEach(r => {
-        const key = `${r.name} (${r.combo})`;
-        if (!petComboMap[key]) petComboMap[key] = [];
-        petComboMap[key].push(r);
-      });
-
-      const metrics = [];
-
-      Object.keys(petComboMap).forEach(key => {
-        const history = petComboMap[key].sort((a,b) => new Date(a.date) - new Date(b.date));
-        if (history.length >= 2) {
-          const startVal = history[0].val;
-          const endVal = history[history.length - 1].val;
-          const pctChange = ((endVal - startVal) / startVal) * 100;
-          metrics.push({ key, startVal, endVal, pctChange });
-        }
-      });
-
-      const gainers = [...metrics].sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
-      const losers = [...metrics].sort((a,b) => a.pctChange - b.pctChange).slice(0, 5);
-
-      renderLeaderboard('topGainersList', gainers, true);
-      renderLeaderboard('topLosersList', losers, false);
-    }
-
-    function renderLeaderboard(elementId, items, isGainer) {
-      const container = document.getElementById(elementId);
-      container.innerHTML = "";
-
-      if (items.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-500">Not enough data points yet.</div>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const div = document.createElement('div');
-        div.className = "flex justify-between items-center py-1.5 border-b border-slate-800/60 last:border-0";
-        
-        const badgeClass = isGainer ? "text-emerald-400 bg-emerald-500/10" : "text-rose-400 bg-rose-500/10";
-        const prefix = item.pctChange > 0 ? "+" : "";
-
-        div.innerHTML = `
-          <span class="text-slate-200 truncate font-medium max-w-[200px]">${item.key}</span>
-          <div class="flex items-center gap-3">
-            <span class="text-xs text-slate-400">${item.endVal.toLocaleString()}</span>
-            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">
-              ${prefix}${item.pctChange.toFixed(1)}%
-            </span>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    // UI Search Controls
-    function populatePetDropdown(pets) {
-      const select = document.getElementById("petSelect");
-      select.innerHTML = "";
-      pets.forEach(pet => {
-        const opt = document.createElement("option");
-        opt.value = pet;
-        opt.textContent = pet;
-        opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer text-xs";
-        select.appendChild(opt);
-      });
-    }
-
-    function filterPetList() {
-      const query = document.getElementById("searchInput").value.trim().toLowerCase();
-      const container = document.getElementById("petSelectContainer");
-
-      if (query.length === 0) {
-        container.classList.add("hidden");
-        return;
-      }
-
-      const filtered = uniqueBasePets.filter(item => item.toLowerCase().includes(query));
-      populatePetDropdown(filtered);
-      
-      if (filtered.length > 0) {
-        container.classList.remove("hidden");
-        document.getElementById("petSelect").value = filtered[0];
-        selectedPetName = filtered[0];
-        updateToggleUI();
-      } else {
-        container.classList.add("hidden");
-      }
-    }
-
-    function onPetSelectClick() {
-      const selected = document.getElementById("petSelect").value;
-      if (selected) {
-        selectedPetName = selected;
-        document.getElementById("searchInput").value = selected;
-        document.getElementById("petSelectContainer").classList.add("hidden");
-        updateToggleUI();
-      }
     }
 
     function toggleVariant(variant) {
@@ -432,7 +397,228 @@
       document.getElementById('activeComboTag').innerText = getActiveComboTag();
     }
 
-    // Triggered when clicking "Search Analytics" button
+    // Market Leaderboards
+    function calculateMarketLeaderboards() {
+      const petComboMap = {};
+
+      rawRecords.forEach(r => {
+        const key = `${r.name} (${r.combo})`;
+        if (!petComboMap[key]) petComboMap[key] = [];
+        petComboMap[key].push(r);
+      });
+
+      const metrics = [];
+
+      Object.keys(petComboMap).forEach(key => {
+        const history = petComboMap[key].sort((a,b) => new Date(a.date) - new Date(b.date));
+        if (history.length >= 2) {
+          const startVal = history[0].val;
+          const endVal = history[history.length - 1].val;
+          const pctChange = ((endVal - startVal) / startVal) * 100;
+          metrics.push({ key, startVal, endVal, pctChange });
+        }
+      });
+
+      const gainers = [...metrics].sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
+      const losers = [...metrics].sort((a,b) => a.pctChange - b.pctChange).slice(0, 5);
+
+      renderLeaderboard('topGainersList', gainers, true);
+      renderLeaderboard('topLosersList', losers, false);
+    }
+
+    function renderLeaderboard(elementId, items, isGainer) {
+      const container = document.getElementById(elementId);
+      container.innerHTML = "";
+
+      if (items.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-500">Not enough data points yet.</div>`;
+        return;
+      }
+
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center py-1.5 border-b border-slate-800/60 last:border-0";
+        
+        const badgeClass = isGainer ? "text-emerald-400 bg-emerald-500/10" : "text-rose-400 bg-rose-500/10";
+        const prefix = item.pctChange > 0 ? "+" : "";
+
+        div.innerHTML = `
+          <span class="text-slate-200 truncate font-medium max-w-[200px]">${item.key}</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-400">${item.endVal.toLocaleString()}</span>
+            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">
+              ${prefix}${item.pctChange.toFixed(1)}%
+            </span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Timestamp & Audit Log
+    function initLastUpdatedInfo() {
+      if (rawRecords.length === 0) return;
+
+      const dates = rawRecords.map(r => new Date(r.date)).sort((a,b) => b - a);
+      const latestDate = dates[0];
+
+      document.getElementById('lastUpdatedTimestamp').innerText = latestDate.toLocaleString('en-US', {
+        dateStyle: 'medium',
+        timeStyle: 'short'
+      });
+    }
+
+    function openUpdateModal() {
+      document.getElementById('updateModal').classList.remove('hidden');
+      render30DayAuditDates();
+    }
+
+    function closeUpdateModal() {
+      document.getElementById('updateModal').classList.add('hidden');
+    }
+
+    function render30DayAuditDates() {
+      const datesContainer = document.getElementById('auditDatesList');
+      datesContainer.innerHTML = "";
+
+      const now = new Date();
+      const thirtyDaysAgo = new Date();
+      thirtyDaysAgo.setDate(now.getDate() - 30);
+
+      // Collect unique update dates
+      const uniqueDates = Array.from(new Set(rawRecords.map(r => r.date)))
+        .filter(d => new Date(d) >= thirtyDaysAgo)
+        .sort((a,b) => new Date(b) - new Date(a));
+
+      if (uniqueDates.length === 0) {
+        datesContainer.innerHTML = `<span class="text-xs text-slate-500">No updates found in the past 30 days.</span>`;
+        return;
+      }
+
+      uniqueDates.forEach((dStr, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 hover:border-brand-500 transition";
+        btn.innerText = dStr;
+        btn.onclick = () => renderAuditForDate(dStr);
+        datesContainer.appendChild(btn);
+
+        if (idx === 0) renderAuditForDate(dStr);
+      });
+    }
+
+    function renderAuditForDate(targetDateStr) {
+      document.getElementById('auditDetailsSection').classList.remove('hidden');
+      document.getElementById('selectedAuditDateTitle').innerText = `Updated on ${targetDateStr}`;
+
+      const changesContainer = document.getElementById('auditChangesList');
+      changesContainer.innerHTML = "";
+
+      // Restrict audit display strictly to FR, NFR, MFR versions
+      const targetRecords = rawRecords.filter(r => r.date === targetDateStr && AUDIT_ALLOWED_VERSIONS.has(r.combo));
+      
+      const changes = [];
+
+      targetRecords.forEach(curr => {
+        const history = rawRecords
+          .filter(r => r.name === curr.name && r.combo === curr.combo && new Date(r.date) < new Date(targetDateStr))
+          .sort((a,b) => new Date(b.date) - new Date(a.date));
+
+        if (history.length > 0) {
+          const prev = history[0];
+          if (prev.val !== curr.val) {
+            changes.push({
+              name: curr.name,
+              combo: curr.combo,
+              prevVal: prev.val,
+              currVal: curr.val,
+              diff: curr.val - prev.val
+            });
+          }
+        }
+      });
+
+      document.getElementById('auditCountBadge').innerText = `${changes.length} Version Changes`;
+
+      if (changes.length === 0) {
+        changesContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No FR, NFR, or MFR changes on this date.</div>`;
+        return;
+      }
+
+      changes.forEach(c => {
+        const item = document.createElement('div');
+        item.className = "p-3 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center text-xs";
+        
+        const isUp = c.diff > 0;
+        const colorClass = isUp ? "text-emerald-400" : "text-rose-400";
+        
+        // Friendly Label Tag Map
+        let versionLabel = "FR";
+        if (c.combo === "N_FR") versionLabel = "NFR";
+        if (c.combo === "M_FR") versionLabel = "MFR";
+
+        item.innerHTML = `
+          <div>
+            <span class="font-bold text-white">${c.name}</span>
+            <span class="text-brand-400 font-bold ml-1">(${versionLabel})</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">${c.prevVal.toLocaleString()}</span>
+            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-500"></i>
+            <span class="font-bold text-white">${c.currVal.toLocaleString()}</span>
+            <span class="font-bold ${colorClass} ml-1">(${isUp ? '+' : ''}${c.diff})</span>
+          </div>
+        `;
+        changesContainer.appendChild(item);
+      });
+
+      lucide.createIcons();
+    }
+
+    // UI Search Action
+    function populatePetDropdown(pets) {
+      const select = document.getElementById("petSelect");
+      select.innerHTML = "";
+      pets.forEach(pet => {
+        const opt = document.createElement("option");
+        opt.value = pet;
+        opt.textContent = pet;
+        opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer text-xs";
+        select.appendChild(opt);
+      });
+    }
+
+    function filterPetList() {
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const container = document.getElementById("petSelectContainer");
+
+      if (query.length === 0) {
+        container.classList.add("hidden");
+        return;
+      }
+
+      const filtered = uniqueBasePets.filter(item => item.toLowerCase().includes(query));
+      populatePetDropdown(filtered);
+      
+      if (filtered.length > 0) {
+        container.classList.remove("hidden");
+        document.getElementById("petSelect").value = filtered[0];
+        selectedPetName = filtered[0];
+        updateToggleUI();
+      } else {
+        container.classList.add("hidden");
+      }
+    }
+
+    function onPetSelectClick() {
+      const selected = document.getElementById("petSelect").value;
+      if (selected) {
+        selectedPetName = selected;
+        document.getElementById("searchInput").value = selected;
+        document.getElementById("petSelectContainer").classList.add("hidden");
+        updateToggleUI();
+      }
+    }
+
     function executeSearch() {
       if (!selectedPetName) {
         selectedPetName = document.getElementById("searchInput").value.trim();
@@ -444,20 +630,24 @@
       }
 
       const comboTag = getActiveComboTag();
-      
-      // Update Dashboard & Log Search History
+      const currentVal = getCurrentVal(selectedPetName, comboTag);
+
       renderDashboard(selectedPetName, comboTag);
-      logSearchHistory(selectedPetName, comboTag);
+      logSearchHistory(selectedPetName, comboTag, currentVal);
     }
 
-    // Search History Management
-    function logSearchHistory(petName, comboTag) {
-      const entry = { petName, comboTag };
+    function getCurrentVal(petName, comboTag) {
+      const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
+      if (records.length === 0) return "--";
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
+      return records[records.length - 1].val.toLocaleString();
+    }
+
+    // History Drawer
+    function logSearchHistory(petName, comboTag, value) {
+      const entry = { petName, comboTag, value };
       
-      // Remove previous duplicate entry if present
       searchHistory = searchHistory.filter(h => !(h.petName === petName && h.comboTag === comboTag));
-      
-      // Add to front of history list
       searchHistory.unshift(entry);
       
       renderSearchHistoryUI();
@@ -501,7 +691,7 @@
         };
 
         chip.innerHTML = `
-          <span>${item.petName} <span class="text-brand-400 font-semibold">(${item.comboTag})</span></span>
+          <span>${item.petName} <span class="text-slate-400 font-normal">(${item.comboTag}):</span> <strong class="text-emerald-400 font-bold">${item.value}</strong></span>
           <button onclick="removeHistoryItem(${index}, event)" class="text-slate-500 hover:text-rose-400 text-xs px-1 font-bold transition">
             ✕
           </button>
@@ -511,7 +701,7 @@
       });
     }
 
-    // Dashboard & Chart Render
+    // Chart & Dashboard Logic
     function renderDashboard(selectedPet, comboTag) {
       document.getElementById('chartTitle').innerText = `${selectedPet} (${comboTag})`;
 
@@ -535,7 +725,6 @@
         changeElem.innerText = `${changePct > 0 ? '+' : ''}${changePct}%`;
         changeElem.className = `text-xl font-bold mt-1 ${changePct > 0 ? 'text-emerald-400' : changePct < 0 ? 'text-rose-400' : 'text-slate-300'}`;
 
-        // Render Chart
         const ctx = document.getElementById('valueChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
 
