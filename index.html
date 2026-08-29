@@ -66,22 +66,22 @@
         <div>
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Variant & Potions</label>
           <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-            <!-- Mega Toggle -->
+            <!-- Mega Toggle (Purple when active) -->
             <button id="toggle-M" onclick="toggleVariant('M')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               M
             </button>
-            <!-- Neon Toggle -->
+            <!-- Neon Toggle (Green when active) -->
             <button id="toggle-N" onclick="toggleVariant('N')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               N
             </button>
-            <!-- Fly Toggle -->
+            <!-- Fly Toggle (Blue when active) -->
             <button id="toggle-F" onclick="togglePotion('F')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               F
             </button>
-            <!-- Ride Toggle -->
+            <!-- Ride Toggle (Red when active) -->
             <button id="toggle-R" onclick="togglePotion('R')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               R
@@ -255,28 +255,29 @@
     }
 
     function updateToggleUI() {
-      // Variant Button Styling
       const btnM = document.getElementById('toggle-M');
       const btnN = document.getElementById('toggle-N');
+      const btnF = document.getElementById('toggle-F');
+      const btnR = document.getElementById('toggle-R');
 
+      // M = Purple when active
       btnM.className = activeType === 'M' 
-        ? "py-2 rounded-lg bg-rose-600 text-white border border-rose-500 transition shadow" 
+        ? "py-2 rounded-lg bg-violet-600 text-white border border-violet-500 transition shadow" 
         : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
 
+      // N = Green when active
       btnN.className = activeType === 'N' 
         ? "py-2 rounded-lg bg-emerald-600 text-white border border-emerald-500 transition shadow" 
         : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
 
-      // Potion Button Styling
-      const btnF = document.getElementById('toggle-F');
-      const btnR = document.getElementById('toggle-R');
-
+      // F = Blue when active
       btnF.className = hasFly 
         ? "py-2 rounded-lg bg-brand-600 text-white border border-brand-500 transition shadow" 
         : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
 
+      // R = Red when active
       btnR.className = hasRide 
-        ? "py-2 rounded-lg bg-brand-600 text-white border border-brand-500 transition shadow" 
+        ? "py-2 rounded-lg bg-red-600 text-white border border-red-500 transition shadow" 
         : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
 
       document.getElementById('activeComboTag').innerText = getActiveComboTag();
