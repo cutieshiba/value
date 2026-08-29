@@ -28,6 +28,28 @@ def load_latest_historical_values(csv_filename):
     return latest_values
 
 
+async def ensure_toggle_state(page, button_selector, target_active):
+    """
+    Helper function to explicitly inspect if a toggle button (Fly/Ride) is active
+    by checking CSS classes/attributes, and clicking ONLY if state needs to change.
+    """
+    try:
+        btn = page.locator(button_selector).first
+        if await btn.is_visible():
+            # Check for active state in classes or aria attributes
+            classes = (await btn.get_attribute("class") or "").lower()
+            aria_pressed = await btn.get_attribute("aria-pressed")
+            
+            # Common active indicators on modern web UIs
+            is_active = "active" in classes or "bg-" in classes or aria_pressed == "true"
+            
+            if is_active != target_active:
+                await btn.click(force=True)
+                await page.wait_for_timeout(600)
+    except Exception as e:
+        print(f"Toggle error for {button_selector}: {e}")
+
+
 async def scrape_elvebredd():
     async with async_playwright() as p:
         browser = await p.chromium.launch(
@@ -73,50 +95,34 @@ async def scrape_elvebredd():
             "NP": (False, False)
         }
 
-        # Track internal state of toggles (default both ON)
-        current_fly = False
-        current_ride = False
-
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
         raw_data = {}
 
         # 2. Extract Data Across All Matrix Combinations
         for variant in variants:
-            if variant != "Regular":
-                try:
-                    tab_btn = page.locator(f'text="{variant}"').first
-                    await tab_btn.click(force=True, timeout=3000)
-                    await page.wait_for_timeout(2000)
-                except Exception as e:
-                    print(f"Variant tab switch note ({variant}): {e}")
+            # Click specific variant tab using exact text matching
+            try:
+                if variant == "Regular":
+                    tab_btn = page.locator("button:has-text('Regular')").first
+                else:
+                    tab_btn = page.locator(f"button:has-text('{variant}')").first
+                
+                if await tab_btn.is_visible():
+                    await tab_btn.click(force=True)
+                    await page.wait_for_timeout(1500)
+            except Exception as e:
+                print(f"Variant tab switch note ({variant}): {e}")
 
             for pot_label, (target_f, target_r) in potion_states.items():
                 combo_tag = f"{variant}_{pot_label}"
-                print(f"Setting potion state: {pot_label} (Fly={target_f}, Ride={target_r})")
+                print(f"Scraping matrix combo: {combo_tag} (Fly={target_f}, Ride={target_r})")
 
-                # Toggle Fly button if state needs to change
-                if current_fly != target_f:
-                    try:
-                        fly_btn = page.locator("button:has-text('Fly'), div:has-text('Fly'), button:has-text('F')").first
-                        if await fly_btn.is_visible():
-                            await fly_btn.click(force=True, timeout=1500)
-                            current_fly = target_f
-                            await page.wait_for_timeout(800)
-                    except Exception as e:
-                        print(f"Fly toggle note: {e}")
+                # Ensure Fly / Ride toggle buttons match exact target state
+                await ensure_toggle_state(page, "button:has-text('Fly'), button:has-text('F')", target_f)
+                await ensure_toggle_state(page, "button:has-text('Ride'), button:has-text('R')", target_r)
+                await page.wait_for_timeout(500)
 
-                # Toggle Ride button if state needs to change
-                if current_ride != target_r:
-                    try:
-                        ride_btn = page.locator("button:has-text('Ride'), div:has-text('Ride'), button:has-text('R')").first
-                        if await ride_btn.is_visible():
-                            await ride_btn.click(force=True, timeout=1500)
-                            current_ride = target_r
-                            await page.wait_for_timeout(800)
-                    except Exception as e:
-                        print(f"Ride toggle note: {e}")
-
-                # Grid Extraction & Centered Scrolling
+                # Scroll down drawer and extract values
                 for step in range(12):
                     cards = await page.query_selector_all("div[class*='grid'] > div, div[class*='card'], div[class*='item']")
                     
@@ -140,14 +146,16 @@ async def scrape_elvebredd():
                                 ])
 
                                 if len(name) > 1 and not is_ui_text and any(char.isdigit() for char in val):
+                                    # Store each variant combination as a distinct entry
                                     raw_data[(name, combo_tag)] = val
                         except Exception:
                             continue
 
                     await page.mouse.move(800, 500)
                     await page.mouse.wheel(0, 1400)
-                    await page.wait_for_timeout(600)
+                    await page.wait_for_timeout(500)
 
+                # Reset drawer scroll back to top for the next potion state loop
                 await page.mouse.move(800, 500)
                 await page.mouse.wheel(0, -20000)
                 await page.wait_for_timeout(800)
@@ -156,38 +164,22 @@ async def scrape_elvebredd():
         csv_filename = "history.csv"
         previous_values = load_latest_historical_values(csv_filename)
 
-        grouped_items = {}
-        for (name, combo_tag), val in raw_data.items():
-            if name not in grouped_items:
-                grouped_items[name] = {}
-            grouped_items[name][combo_tag] = val
-
         rows_to_append = []
 
-        for name, combos_dict in grouped_items.items():
-            unique_scraped_vals = set(combos_dict.values())
-
-            # Static non-changing item check (same value across all matrix slots)
-            if len(unique_scraped_vals) == 1:
-                single_val = list(unique_scraped_vals)[0]
-                combo = "Regular_FR"
-                last_val = previous_values.get((name, combo))
-                
-                if last_val != single_val:
-                    rows_to_append.append(f"{today_date},{name},{combo},{single_val}\n")
-            else:
-                for combo, scraped_val in combos_dict.items():
-                    last_val = previous_values.get((name, combo))
-                    
-                    if last_val != scraped_val:
-                        rows_to_append.append(f"{today_date},{name},{combo},{scraped_val}\n")
+        # Strictly write every updated (name, combo_tag) tuple to history
+        for (name, combo_tag), scraped_val in raw_data.items():
+            last_val = previous_values.get((name, combo_tag))
+            
+            # Log record if value changed or if it's a new entry
+            if last_val != scraped_val:
+                rows_to_append.append(f"{today_date},{name},{combo_tag},{scraped_val}\n")
 
         # 4. Append changed records to history.csv
         if rows_to_append:
             rows_to_append.sort()
             with open(csv_filename, "a", encoding="utf-8") as f:
                 f.writelines(rows_to_append)
-            print(f"SUCCESS: Logged {len(rows_to_append)} value updates to {csv_filename}!")
+            print(f"SUCCESS: Logged {len(rows_to_append)} unique value updates to {csv_filename}!")
         else:
             print("No value changes detected today. CSV remains lightweight!")
 
