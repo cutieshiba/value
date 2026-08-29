@@ -96,25 +96,25 @@
         </div>
 
         <!-- Variant & Potion Toggles -->
-        <div>
+        <div id="toggleContainer">
           <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Variant & Potions</label>
           <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-            <!-- Mega Toggle (Purple) -->
+            <!-- Mega Toggle -->
             <button id="toggle-M" onclick="toggleVariant('M')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               M
             </button>
-            <!-- Neon Toggle (Green) -->
+            <!-- Neon Toggle -->
             <button id="toggle-N" onclick="toggleVariant('N')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               N
             </button>
-            <!-- Fly Toggle (Blue) -->
+            <!-- Fly Toggle -->
             <button id="toggle-F" onclick="togglePotion('F')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               F
             </button>
-            <!-- Ride Toggle (Red) -->
+            <!-- Ride Toggle -->
             <button id="toggle-R" onclick="togglePotion('R')" 
                     class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
               R
@@ -125,8 +125,8 @@
           </div>
         </div>
 
-        <!-- Pet List Selection -->
-        <div>
+        <!-- Pet List Selection (Hidden by default until user searches) -->
+        <div id="petSelectContainer" class="hidden">
           <select id="petSelect" onchange="onPetChange()" size="10" 
                   class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
             <!-- Dynamically Populated -->
@@ -177,6 +177,7 @@
   <script>
     let rawRecords = [];
     let uniqueBasePets = [];
+    let itemCombosMap = {}; // Maps pet/item name -> Set of available combos
     let chartInstance = null;
 
     // Filter Toggle States
@@ -208,6 +209,7 @@
       }
 
       rawRecords = [];
+      itemCombosMap = {};
       const basePetSet = new Set();
 
       for (let i = startIdx; i < rows.length; i++) {
@@ -221,18 +223,18 @@
           if (name && !isNaN(val)) {
             rawRecords.push({ date, name, combo, val });
             basePetSet.add(name);
+
+            if (!itemCombosMap[name]) itemCombosMap[name] = new Set();
+            itemCombosMap[name].add(combo);
           }
         }
       }
 
       uniqueBasePets = Array.from(basePetSet).sort();
-      populatePetDropdown(uniqueBasePets);
       calculateMarketLeaderboards();
 
       if (uniqueBasePets.length > 0) {
-        document.getElementById('petSelect').value = uniqueBasePets[0];
         updateToggleUI();
-        updateDashboard();
       }
       lucide.createIcons();
     }
@@ -308,13 +310,25 @@
       });
     }
 
+    // Only shows scroll list when the user types in search query
     function filterPetList() {
-      const query = document.getElementById("searchInput").value.toLowerCase();
+      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const container = document.getElementById("petSelectContainer");
+
+      if (query.length === 0) {
+        container.classList.add("hidden");
+        return;
+      }
+
       const filtered = uniqueBasePets.filter(item => item.toLowerCase().includes(query));
       populatePetDropdown(filtered);
+      
       if (filtered.length > 0) {
+        container.classList.remove("hidden");
         document.getElementById("petSelect").value = filtered[0];
         updateDashboard();
+      } else {
+        container.classList.add("hidden");
       }
     }
 
@@ -339,7 +353,37 @@
       return `${activeType}_${potionTag}`;
     }
 
+    // Enables/Disables variations based on whether selected item has only 1 combo
     function updateToggleUI() {
+      const selectedPet = document.getElementById("petSelect").value;
+      const combos = itemCombosMap[selectedPet];
+      
+      // Check if item only has 1 single variation (e.g., 'Regular_NP')
+      const isSingleVariation = combos && combos.size === 1 && combos.has("Regular_NP");
+
+      const buttons = ['toggle-M', 'toggle-N', 'toggle-F', 'toggle-R'];
+
+      if (isSingleVariation) {
+        // Force reset active selections
+        activeType = 'Regular';
+        hasFly = false;
+        hasRide = false;
+
+        buttons.forEach(id => {
+          const btn = document.getElementById(id);
+          btn.disabled = true;
+          btn.className = "py-2 rounded-lg bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed transition opacity-50";
+        });
+
+        document.getElementById('activeComboTag').innerText = "Regular_NP (Single Variation)";
+        return;
+      }
+
+      // Re-enable buttons for items with multiple variations
+      buttons.forEach(id => {
+        document.getElementById(id).disabled = false;
+      });
+
       document.getElementById('toggle-M').className = activeType === 'M' 
         ? "py-2 rounded-lg bg-violet-600 text-white border border-violet-500 transition shadow" 
         : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
@@ -359,7 +403,10 @@
       document.getElementById('activeComboTag').innerText = getActiveComboTag();
     }
 
-    function onPetChange() { updateDashboard(); }
+    function onPetChange() { 
+      updateToggleUI();
+      updateDashboard(); 
+    }
 
     // Dashboard Refresh
     function updateDashboard() {
