@@ -1,79 +1,334 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <title>Adopt Me Pet Value Tracker</title>
-  <!-- Chart.js and PapaParse (CSV parser) -->
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elvebredd Analytics - Adopt Me Value Tracker</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Chart.js -->
   <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.3.2/papaparse.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; background-color: #f4f6f8; }
-    .card { background: white; padding: 20px; border-radius: 12px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); }
-    select { padding: 8px; font-size: 16px; margin-bottom: 20px; border-radius: 6px; }
-  </style>
-</head>
-<body>
+  <!-- PapaParse -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <!-- Lucide Icons -->
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-  <div class="card">
-    <h2>Adopt Me Historical Value Tracker</h2>
-    <label for="petSelect">Choose a Pet: </label>
-    <select id="petSelect" onchange="updateChart()">
-      <!-- Populated dynamically from CSV -->
-    </select>
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
+            darkbg: '#0f172a',
+            cardbg: '#1e293b'
+          }
+        }
+      }
+    }
+  </script>
+</head>
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white">
+
+  <div class="max-w-7xl mx-auto px-4 py-8">
     
-    <canvas id="valueChart" width="800" height="400"></canvas>
+    <!-- Top Header Navigation -->
+    <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-800 gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+          <i data-lucide="trending-up" class="text-brand-500 w-8 h-8"></i>
+          Adopt Me Pet Value Analytics
+        </h1>
+        <p class="text-slate-400 text-sm mt-1">Real-time market trends & historical valuation data from Elvebredd</p>
+      </div>
+      <div id="statusBadge" class="self-start md:self-auto px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        Loading CSV Data...
+      </div>
+    </header>
+
+    <!-- Control Panel & Filters -->
+    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
+      
+      <!-- Pet Selection Card -->
+      <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+        <div>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Search & Select Pet</label>
+          <div class="relative">
+            <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+            <input type="text" id="searchInput" placeholder="Search pet name..." oninput="filterPetList()" 
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+          </div>
+        </div>
+
+        <div>
+          <select id="petSelect" onchange="onPetChange()" size="8" 
+                  class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
+            <!-- Dynamically Populated -->
+          </select>
+        </div>
+      </div>
+
+      <!-- Main Analytics Viewport -->
+      <div class="lg:col-span-3 space-y-6">
+        
+        <!-- Summary Stats Metrics -->
+        <div class="grid grid-cols-2 sm:grid-cols-4 gap-4">
+          <div class="bg-cardbg p-4 rounded-xl border border-slate-800">
+            <span class="text-xs font-medium text-slate-400">Current Value</span>
+            <div id="statCurrent" class="text-2xl font-bold text-white mt-1">--</div>
+          </div>
+          <div class="bg-cardbg p-4 rounded-xl border border-slate-800">
+            <span class="text-xs font-medium text-slate-400">All-Time High</span>
+            <div id="statATH" class="text-2xl font-bold text-emerald-400 mt-1">--</div>
+          </div>
+          <div class="bg-cardbg p-4 rounded-xl border border-slate-800">
+            <span class="text-xs font-medium text-slate-400">Overall Change</span>
+            <div id="statChange" class="text-2xl font-bold text-white mt-1">--</div>
+          </div>
+          <div class="bg-cardbg p-4 rounded-xl border border-slate-800">
+            <span class="text-xs font-medium text-slate-400">Recorded Snapshots</span>
+            <div id="statSnapshots" class="text-2xl font-bold text-brand-500 mt-1">--</div>
+          </div>
+        </div>
+
+        <!-- Chart Card -->
+        <div class="bg-cardbg p-6 rounded-xl border border-slate-800 shadow-xl space-y-4">
+          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
+            <div>
+              <h2 id="chartTitle" class="text-xl font-bold text-white">Select a Pet</h2>
+              <p class="text-xs text-slate-400">Historical pricing trend graph</p>
+            </div>
+            
+            <!-- Variant Toggle Chips -->
+            <div class="flex flex-wrap gap-2 text-xs">
+              <button onclick="setVariantFilter('ALL')" id="btn-ALL" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium shadow">All Variants</button>
+              <button onclick="setVariantFilter('Regular')" id="btn-Regular" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Regular</button>
+              <button onclick="setVariantFilter('N')" id="btn-N" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Neon (N)</button>
+              <button onclick="setVariantFilter('M')" id="btn-M" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Mega (M)</button>
+            </div>
+          </div>
+
+          <!-- Chart Area -->
+          <div class="relative h-[400px] w-full">
+            <canvas id="valueChart"></canvas>
+          </div>
+        </div>
+
+      </div>
+    </div>
   </div>
 
   <script>
-    let globalData = [];
-    let myChart = null;
+    let rawRecords = [];
+    let uniquePets = [];
+    let chartInstance = null;
+    let selectedVariant = 'ALL';
 
-    // Fetch and parse the CSV from your repository
+    // Color Palette for Variant Combinations
+    const COLOR_MAP = {
+      'Regular_FR': '#38bdf8', 'Regular_R': '#60a5fa', 'Regular_F': '#818cf8', 'Regular_NP': '#94a3b8',
+      'N_FR': '#34d399', 'N_R': '#10b981', 'N_F': '#059669', 'N_NP': '#047857',
+      'M_FR': '#f43f5e', 'M_R': '#e11d48', 'M_F': '#be123c', 'M_NP': '#9f1239'
+    };
+
+    // 1. Fetch & Parse CSV
     Papa.parse("history.csv", {
       download: true,
-      header: true,
+      skipEmptyLines: true,
       complete: function(results) {
-        globalData = results.data;
-        populatePetDropdown();
-        updateChart();
+        processCSVData(results.data);
+        document.getElementById('statusBadge').className = "self-start md:self-auto px-3 py-1.5 rounded-full bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-semibold flex items-center gap-2";
+        document.getElementById('statusBadge').innerHTML = `<span class="w-2 h-2 rounded-full bg-emerald-400"></span> ${rawRecords.length} Records Loaded`;
+      },
+      error: function() {
+        document.getElementById('statusBadge').className = "px-3 py-1.5 rounded-full bg-rose-500/10 text-rose-400 border border-rose-500/20 text-xs font-semibold";
+        document.getElementById('statusBadge').innerText = "Failed to load history.csv";
       }
     });
 
-    function populatePetDropdown() {
-      const pets = [...new Set(globalData.map(item => item.pet_name))].filter(Boolean);
+    function processCSVData(rows) {
+      if (!rows || rows.length === 0) return;
+
+      // Check if header row exists
+      let startIdx = 0;
+      if (isNaN(parseFloat(rows[0][rows[0].length - 1]))) {
+        startIdx = 1; // Skip header row
+      }
+
+      rawRecords = [];
+      const petSet = new Set();
+
+      for (let i = startIdx; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.length >= 4) {
+          const date = row[0].trim();
+          const name = row.slice(1, row.length - 2).join(',').trim(); // Handles names with commas
+          const combo = row[row.length - 2].trim();
+          const val = parseFloat(row[row.length - 1].trim());
+
+          if (name && !isNaN(val)) {
+            rawRecords.push({ date, name, combo, val });
+            petSet.add(name);
+          }
+        }
+      }
+
+      uniquePets = Array.from(petSet).sort();
+      populatePetDropdown(uniquePets);
+
+      if (uniquePets.length > 0) {
+        document.getElementById('petSelect').value = uniquePets[0];
+        updateDashboard();
+      }
+      lucide.createIcons();
+    }
+
+    // 2. Populate Dropdown
+    function populatePetDropdown(pets) {
       const select = document.getElementById("petSelect");
+      select.innerHTML = "";
       pets.forEach(pet => {
-        let opt = document.createElement("option");
+        const opt = document.createElement("option");
         opt.value = pet;
-        opt.innerHTML = pet;
+        opt.textContent = pet;
+        opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer";
         select.appendChild(opt);
       });
     }
 
-    function updateChart() {
+    // 3. Search Filter
+    function filterPetList() {
+      const query = document.getElementById("searchInput").value.toLowerCase();
+      const filtered = uniquePets.filter(p => p.toLowerCase().includes(query));
+      populatePetDropdown(filtered);
+      if (filtered.length > 0) {
+        document.getElementById("petSelect").value = filtered[0];
+        updateDashboard();
+      }
+    }
+
+    function onPetChange() {
+      updateDashboard();
+    }
+
+    function setVariantFilter(variant) {
+      selectedVariant = variant;
+      ['ALL', 'Regular', 'N', 'M'].forEach(v => {
+        const btn = document.getElementById(`btn-${v}`);
+        if (v === variant) {
+          btn.className = "px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium shadow";
+        } else {
+          btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700";
+        }
+      });
+      updateDashboard();
+    }
+
+    // 4. Update Dashboard Charts & Metrics
+    function updateDashboard() {
       const selectedPet = document.getElementById("petSelect").value;
-      const petFiltered = globalData.filter(item => item.pet_name === selectedPet);
+      if (!selectedPet) return;
 
-      // Separate data by variants
-      const dates = [...new Set(petFiltered.map(i => i.date))];
-      const regularValues = petFiltered.filter(i => i.variant === 'Regular').map(i => parseFloat(i.value));
-      const neonValues = petFiltered.filter(i => i.variant === 'N').map(i => parseFloat(i.value));
-      const megaValues = petFiltered.filter(i => i.variant === 'M').map(i => parseFloat(i.value));
+      document.getElementById('chartTitle').innerText = selectedPet;
 
+      // Filter pet records
+      const petRecords = rawRecords.filter(r => r.name === selectedPet);
+
+      // Extract unique sorted dates
+      const dates = Array.from(new Set(petRecords.map(r => r.date))).sort();
+
+      // Extract combos present for this pet
+      let combos = Array.from(new Set(petRecords.map(r => r.combo)));
+      if (selectedVariant !== 'ALL') {
+        combos = combos.filter(c => c.startsWith(selectedVariant));
+      }
+
+      // Build Time Series datasets with Forward-Filling
+      const datasets = combos.map(combo => {
+        let lastVal = null;
+        const dataPoints = dates.map(d => {
+          const match = petRecords.find(r => r.date === d && r.combo === combo);
+          if (match) {
+            lastVal = match.val;
+            return match.val;
+          }
+          return lastVal; // Forward-fill previous known value if unchanged
+        });
+
+        const color = COLOR_MAP[combo] || '#' + Math.floor(Math.random()*16777215).toString(16);
+
+        return {
+          label: combo,
+          data: dataPoints,
+          borderColor: color,
+          backgroundColor: color + '20',
+          borderWidth: 2,
+          pointRadius: 3,
+          tension: 0.1,
+          spanGaps: true
+        };
+      });
+
+      // Update Summary Cards
+      const allVals = petRecords.map(r => r.val);
+      if (allVals.length > 0) {
+        const currentVal = allVals[allVals.length - 1];
+        const initialVal = allVals[0];
+        const ath = Math.max(...allVals);
+        const changePct = (((currentVal - initialVal) / initialVal) * 100).toFixed(1);
+
+        document.getElementById('statCurrent').innerText = currentVal.toLocaleString();
+        document.getElementById('statATH').innerText = ath.toLocaleString();
+        document.getElementById('statSnapshots').innerText = petRecords.length;
+
+        const changeElem = document.getElementById('statChange');
+        if (changePct > 0) {
+          changeElem.className = "text-2xl font-bold text-emerald-400 mt-1";
+          changeElem.innerText = `+${changePct}%`;
+        } else if (changePct < 0) {
+          changeElem.className = "text-2xl font-bold text-rose-400 mt-1";
+          changeElem.innerText = `${changePct}%`;
+        } else {
+          changeElem.className = "text-2xl font-bold text-slate-300 mt-1";
+          changeElem.innerText = `0.0%`;
+        }
+      }
+
+      // Render Chart
       const ctx = document.getElementById('valueChart').getContext('2d');
-      if (myChart) myChart.destroy();
+      if (chartInstance) chartInstance.destroy();
 
-      myChart = new Chart(ctx, {
+      chartInstance = new Chart(ctx, {
         type: 'line',
-        data: {
-          labels: dates,
-          datasets: [
-            { label: 'Regular', data: regularValues, borderColor: '#3498db', fill: false },
-            { label: 'Neon (N)', data: neonValues, borderColor: '#2ecc71', fill: false },
-            { label: 'Mega (M)', data: megaValues, borderColor: '#e74c3c', fill: false }
-          ]
-        },
-        options: { responsive: true, scales: { y: { beginAtZero: false } } }
+        data: { labels: dates, datasets: datasets },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          interaction: { mode: 'index', intersect: false },
+          plugins: {
+            legend: { position: 'top', labels: { color: '#94a3b8', font: { family: 'sans-serif' } } },
+            tooltip: {
+              backgroundColor: '#0f172a',
+              titleColor: '#f8fafc',
+              bodyColor: '#cbd5e1',
+              borderColor: '#334155',
+              borderWidth: 1
+            }
+          },
+          scales: {
+            x: {
+              grid: { color: '#1e293b' },
+              ticks: { color: '#64748b' }
+            },
+            y: {
+              grid: { color: '#1e293b' },
+              ticks: { color: '#64748b' },
+              beginAtZero: false
+            }
+          }
+        }
       });
     }
   </script>
