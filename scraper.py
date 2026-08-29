@@ -74,8 +74,8 @@ async def scrape_elvebredd():
         }
 
         # Track internal state of toggles (default both ON)
-        current_fly = True
-        current_ride = True
+        current_fly = False
+        current_ride = False
 
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
         raw_data = {}
