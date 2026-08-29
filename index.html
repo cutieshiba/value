@@ -51,19 +51,19 @@
     <!-- Control Panel & Filters -->
     <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
       
-      <!-- Pet Selection Card -->
+      <!-- Pet & Variant Selection Card -->
       <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
         <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Search & Select Pet</label>
+          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">Search Pet & Variant</label>
           <div class="relative">
             <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
-            <input type="text" id="searchInput" placeholder="Search pet name..." oninput="filterPetList()" 
+            <input type="text" id="searchInput" placeholder="e.g. Shadow Dragon (M_FR)..." oninput="filterPetList()" 
                    class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
           </div>
         </div>
 
         <div>
-          <select id="petSelect" onchange="onPetChange()" size="8" 
+          <select id="petSelect" onchange="onPetChange()" size="12" 
                   class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
             <!-- Dynamically Populated -->
           </select>
@@ -95,19 +95,9 @@
 
         <!-- Chart Card -->
         <div class="bg-cardbg p-6 rounded-xl border border-slate-800 shadow-xl space-y-4">
-          <div class="flex flex-col sm:flex-row justify-between items-start sm:items-center gap-4">
-            <div>
-              <h2 id="chartTitle" class="text-xl font-bold text-white">Select a Pet</h2>
-              <p class="text-xs text-slate-400">Historical pricing trend graph</p>
-            </div>
-            
-            <!-- Variant Toggle Chips -->
-            <div class="flex flex-wrap gap-2 text-xs">
-              <button onclick="setVariantFilter('ALL')" id="btn-ALL" class="px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium shadow">All Variants</button>
-              <button onclick="setVariantFilter('Regular')" id="btn-Regular" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Regular</button>
-              <button onclick="setVariantFilter('N')" id="btn-N" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Neon (N)</button>
-              <button onclick="setVariantFilter('M')" id="btn-M" class="px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700">Mega (M)</button>
-            </div>
+          <div>
+            <h2 id="chartTitle" class="text-xl font-bold text-white">Select a Pet Variant</h2>
+            <p id="chartSubtitle" class="text-xs text-slate-400">Historical valuation line graph</p>
           </div>
 
           <!-- Chart Area -->
@@ -122,16 +112,8 @@
 
   <script>
     let rawRecords = [];
-    let uniquePets = [];
+    let uniqueItemKeys = [];
     let chartInstance = null;
-    let selectedVariant = 'ALL';
-
-    // Color Palette for Variant Combinations
-    const COLOR_MAP = {
-      'Regular_FR': '#38bdf8', 'Regular_R': '#60a5fa', 'Regular_F': '#818cf8', 'Regular_NP': '#94a3b8',
-      'N_FR': '#34d399', 'N_R': '#10b981', 'N_F': '#059669', 'N_NP': '#047857',
-      'M_FR': '#f43f5e', 'M_R': '#e11d48', 'M_F': '#be123c', 'M_NP': '#9f1239'
-    };
 
     // 1. Fetch & Parse CSV
     Papa.parse("history.csv", {
@@ -158,7 +140,7 @@
       }
 
       rawRecords = [];
-      const petSet = new Set();
+      const itemKeySet = new Set();
 
       for (let i = startIdx; i < rows.length; i++) {
         const row = rows[i];
@@ -169,31 +151,33 @@
           const val = parseFloat(row[row.length - 1].trim());
 
           if (name && !isNaN(val)) {
-            rawRecords.push({ date, name, combo, val });
-            petSet.add(name);
+            // Treat each combination as a unique item
+            const itemKey = `${name} (${combo})`;
+            rawRecords.push({ date, name, combo, itemKey, val });
+            itemKeySet.add(itemKey);
           }
         }
       }
 
-      uniquePets = Array.from(petSet).sort();
-      populatePetDropdown(uniquePets);
+      uniqueItemKeys = Array.from(itemKeySet).sort();
+      populatePetDropdown(uniqueItemKeys);
 
-      if (uniquePets.length > 0) {
-        document.getElementById('petSelect').value = uniquePets[0];
+      if (uniqueItemKeys.length > 0) {
+        document.getElementById('petSelect').value = uniqueItemKeys[0];
         updateDashboard();
       }
       lucide.createIcons();
     }
 
     // 2. Populate Dropdown
-    function populatePetDropdown(pets) {
+    function populatePetDropdown(items) {
       const select = document.getElementById("petSelect");
       select.innerHTML = "";
-      pets.forEach(pet => {
+      items.forEach(item => {
         const opt = document.createElement("option");
-        opt.value = pet;
-        opt.textContent = pet;
-        opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer";
+        opt.value = item;
+        opt.textContent = item;
+        opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer text-xs";
         select.appendChild(opt);
       });
     }
@@ -201,7 +185,7 @@
     // 3. Search Filter
     function filterPetList() {
       const query = document.getElementById("searchInput").value.toLowerCase();
-      const filtered = uniquePets.filter(p => p.toLowerCase().includes(query));
+      const filtered = uniqueItemKeys.filter(item => item.toLowerCase().includes(query));
       populatePetDropdown(filtered);
       if (filtered.length > 0) {
         document.getElementById("petSelect").value = filtered[0];
@@ -213,75 +197,32 @@
       updateDashboard();
     }
 
-    function setVariantFilter(variant) {
-      selectedVariant = variant;
-      ['ALL', 'Regular', 'N', 'M'].forEach(v => {
-        const btn = document.getElementById(`btn-${v}`);
-        if (v === variant) {
-          btn.className = "px-3 py-1.5 rounded-lg bg-brand-600 text-white font-medium shadow";
-        } else {
-          btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 text-slate-300 hover:bg-slate-700";
-        }
-      });
-      updateDashboard();
-    }
-
     // 4. Update Dashboard Charts & Metrics
     function updateDashboard() {
-      const selectedPet = document.getElementById("petSelect").value;
-      if (!selectedPet) return;
+      const selectedKey = document.getElementById("petSelect").value;
+      if (!selectedKey) return;
 
-      document.getElementById('chartTitle').innerText = selectedPet;
+      document.getElementById('chartTitle').innerText = selectedKey;
 
-      // Filter pet records
-      const petRecords = rawRecords.filter(r => r.name === selectedPet);
+      // Filter records specifically for this pet variant
+      const records = rawRecords.filter(r => r.itemKey === selectedKey);
 
-      // Extract unique sorted dates
-      const dates = Array.from(new Set(petRecords.map(r => r.date))).sort();
+      // Sort chronological dates
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-      // Extract combos present for this pet
-      let combos = Array.from(new Set(petRecords.map(r => r.combo)));
-      if (selectedVariant !== 'ALL') {
-        combos = combos.filter(c => c.startsWith(selectedVariant));
-      }
+      const dates = records.map(r => r.date);
+      const values = records.map(r => r.val);
 
-      // Build Time Series datasets with Forward-Filling
-      const datasets = combos.map(combo => {
-        let lastVal = null;
-        const dataPoints = dates.map(d => {
-          const match = petRecords.find(r => r.date === d && r.combo === combo);
-          if (match) {
-            lastVal = match.val;
-            return match.val;
-          }
-          return lastVal; // Forward-fill previous known value if unchanged
-        });
-
-        const color = COLOR_MAP[combo] || '#' + Math.floor(Math.random()*16777215).toString(16);
-
-        return {
-          label: combo,
-          data: dataPoints,
-          borderColor: color,
-          backgroundColor: color + '20',
-          borderWidth: 2,
-          pointRadius: 3,
-          tension: 0.1,
-          spanGaps: true
-        };
-      });
-
-      // Update Summary Cards
-      const allVals = petRecords.map(r => r.val);
-      if (allVals.length > 0) {
-        const currentVal = allVals[allVals.length - 1];
-        const initialVal = allVals[0];
-        const ath = Math.max(...allVals);
+      // Summary Stats Calculation
+      if (values.length > 0) {
+        const currentVal = values[values.length - 1];
+        const initialVal = values[0];
+        const ath = Math.max(...values);
         const changePct = (((currentVal - initialVal) / initialVal) * 100).toFixed(1);
 
         document.getElementById('statCurrent').innerText = currentVal.toLocaleString();
         document.getElementById('statATH').innerText = ath.toLocaleString();
-        document.getElementById('statSnapshots').innerText = petRecords.length;
+        document.getElementById('statSnapshots').innerText = records.length;
 
         const changeElem = document.getElementById('statChange');
         if (changePct > 0) {
@@ -302,19 +243,32 @@
 
       chartInstance = new Chart(ctx, {
         type: 'line',
-        data: { labels: dates, datasets: datasets },
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Value',
+            data: values,
+            borderColor: '#6366f1',
+            backgroundColor: '#6366f120',
+            borderWidth: 2.5,
+            pointRadius: 4,
+            pointBackgroundColor: '#818cf8',
+            fill: true,
+            tension: 0.15
+          }]
+        },
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          interaction: { mode: 'index', intersect: false },
           plugins: {
-            legend: { position: 'top', labels: { color: '#94a3b8', font: { family: 'sans-serif' } } },
+            legend: { display: false },
             tooltip: {
               backgroundColor: '#0f172a',
               titleColor: '#f8fafc',
               bodyColor: '#cbd5e1',
               borderColor: '#334155',
-              borderWidth: 1
+              borderWidth: 1,
+              displayColors: false
             }
           },
           scales: {
