@@ -48,7 +48,7 @@ async def scroll_and_harvest(page, combo_tag, raw_data, baseline_map, max_scroll
     - If force_full_scroll is True (1st category), scrolls all the way to the bottom to index everything.
     - Otherwise, stops early if 15 consecutive items match the baseline values from the 1st category.
     """
-    # 1. Reset scroll position of the drawer container directly to top
+    # Reset scroll position of the drawer container directly to top
     await page.evaluate("""
         () => {
             const drawer = document.querySelector("div[class*='drawer'], div[class*='modal'], div[class*='scroll'], div[class*='grid']");
@@ -202,7 +202,7 @@ async def scrape_elvebredd():
                     print(f"Baseline created with {len(baseline_map)} total items recorded.")
                     is_first_category = False
 
-        # --- DAILY APPEND & DEDUPLICATION LOGIC ---
+        # --- DEDUPLICATION LOGIC ---
         csv_filename = "history.csv"
         previous_records = load_latest_historical_values(csv_filename)
         
@@ -223,15 +223,16 @@ async def scrape_elvebredd():
                 single_val = list(unique_values)[0]
                 combo_tag = "Regular_NP"
                 
-                prev_date, prev_val = previous_records.get((name, combo_tag), (None, None))
+                _, prev_val = previous_records.get((name, combo_tag), (None, None))
                 
-                # Append ONLY if value is new/changed OR hasn't been logged today yet
-                if prev_val != single_val or prev_date != today_date:
+                # Append ONLY if the item is brand new OR its value has changed
+                if prev_val != single_val:
                     rows_to_append.append(f"{today_date},{name},{combo_tag},{single_val}\n")
             else:
                 for combo_tag, scraped_val in combo_dict.items():
-                    prev_date, prev_val = previous_records.get((name, combo_tag), (None, None))
-                    if prev_val != scraped_val or prev_date != today_date:
+                    _, prev_val = previous_records.get((name, combo_tag), (None, None))
+                    # Append ONLY if the item/variant is brand new OR its value has changed
+                    if prev_val != scraped_val:
                         rows_to_append.append(f"{today_date},{name},{combo_tag},{scraped_val}\n")
 
         # Append new records to history.csv
@@ -239,9 +240,9 @@ async def scrape_elvebredd():
             rows_to_append.sort()
             with open(csv_filename, "a", encoding="utf-8") as f:
                 f.writelines(rows_to_append)
-            print(f"SUCCESS: Appended {len(rows_to_append)} new/updated value records to {csv_filename}!")
+            print(f"SUCCESS: Appended {len(rows_to_append)} changed/new value records to {csv_filename}!")
         else:
-            print("No new pets, items, or value changes detected today. CSV remains up to date!")
+            print("No value changes or new items detected today. Database remains unchanged.")
 
         await browser.close()
 
