@@ -1,9 +1,8 @@
-// Tab 2 Local Pagination & Data State
+// Tab 2 Local Pagination & State
 var gainersLimit = 10;
 var losersLimit = 10;
 var cachedTrendData = [];
 
-// Helper function to safely get rawRecords array
 function getRawRecords() {
   if (window.rawRecords && Array.isArray(window.rawRecords) && window.rawRecords.length > 0) {
     return window.rawRecords;
@@ -14,12 +13,10 @@ function getRawRecords() {
   return [];
 }
 
-// 1. Main Compute Function for Top Gainers & Losers
 function computeMarketTrends() {
   var dataRecords = getRawRecords();
 
   if (dataRecords.length === 0) {
-    // If data isn't ready yet, attempt reload shortly
     setTimeout(computeMarketTrends, 300);
     return;
   }
@@ -66,16 +63,18 @@ function renderGainersAndLosers() {
   var losers = cachedTrendData.filter(function(t) { return t.diff < 0; })
                               .sort(function(a, b) { return a.pct - b.pct; });
 
-  // Render Top Gainers
+  // 1. Render Gainers List
   var gainersContainer = document.getElementById("topGainersList");
+  var gainersBtnContainer = document.getElementById("topGainersBtnContainer");
+
   if (gainersContainer) {
     var visibleGainers = gainers.slice(0, gainersLimit);
-    var gainersHTML = visibleGainers.length === 0 ? 
-      `<div class="text-slate-500 py-2 text-center text-xs">No price gainers detected in current data.</div>` :
+    gainersContainer.innerHTML = visibleGainers.length === 0 ? 
+      `<div class="text-slate-500 py-4 text-center text-xs">No price gainers detected.</div>` :
       visibleGainers.map(function(g) {
-        var petNameEscaped = g.petName.replace(/'/g, "\\'");
+        var safeName = g.petName.replace(/'/g, "\\'");
         return `
-          <div onclick="inspectPetFromBackpack('${petNameEscaped}', '${g.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition mb-2">
+          <div onclick="inspectPetFromBackpack('${safeName}', '${g.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition mb-2">
             <div>
               <div class="font-bold text-white">${g.label}</div>
               <div class="text-[10px] text-slate-400">${g.oldVal} pts ➔ <span class="text-emerald-400 font-bold">${g.newVal} pts</span></div>
@@ -85,26 +84,31 @@ function renderGainersAndLosers() {
         `;
       }).join("");
 
-    if (gainers.length > gainersLimit) {
-      gainersHTML += `
-        <button onclick="loadMoreGainers()" class="w-full py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-slate-700 transition">
-          See More Gainers (${gainers.length - gainersLimit} remaining)
-        </button>
-      `;
+    if (gainersBtnContainer) {
+      if (gainers.length > gainersLimit) {
+        gainersBtnContainer.innerHTML = `
+          <button onclick="loadMoreGainers()" class="w-full py-2 bg-emerald-600/20 hover:bg-emerald-600/30 text-emerald-300 text-xs font-bold rounded-lg border border-emerald-500/30 transition">
+            👇 See More Gainers (${gainers.length - gainersLimit} remaining)
+          </button>
+        `;
+      } else {
+        gainersBtnContainer.innerHTML = "";
+      }
     }
-    gainersContainer.innerHTML = gainersHTML;
   }
 
-  // Render Top Losers
+  // 2. Render Losers List
   var losersContainer = document.getElementById("topLosersList");
+  var losersBtnContainer = document.getElementById("topLosersBtnContainer");
+
   if (losersContainer) {
     var visibleLosers = losers.slice(0, losersLimit);
-    var losersHTML = visibleLosers.length === 0 ? 
-      `<div class="text-slate-500 py-2 text-center text-xs">No price drops detected in current data.</div>` :
+    losersContainer.innerHTML = visibleLosers.length === 0 ? 
+      `<div class="text-slate-500 py-4 text-center text-xs">No price drops detected.</div>` :
       visibleLosers.map(function(l) {
-        var petNameEscaped = l.petName.replace(/'/g, "\\'");
+        var safeName = l.petName.replace(/'/g, "\\'");
         return `
-          <div onclick="inspectPetFromBackpack('${petNameEscaped}', '${l.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-rose-500/40 cursor-pointer transition mb-2">
+          <div onclick="inspectPetFromBackpack('${safeName}', '${l.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-rose-500/40 cursor-pointer transition mb-2">
             <div>
               <div class="font-bold text-white">${l.label}</div>
               <div class="text-[10px] text-slate-400">${l.oldVal} pts ➔ <span class="text-rose-400 font-bold">${l.newVal} pts</span></div>
@@ -114,14 +118,17 @@ function renderGainersAndLosers() {
         `;
       }).join("");
 
-    if (losers.length > losersLimit) {
-      losersHTML += `
-        <button onclick="loadMoreLosers()" class="w-full py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-rose-400 text-xs font-bold rounded-lg border border-slate-700 transition">
-          See More Losers (${losers.length - losersLimit} remaining)
-        </button>
-      `;
+    if (losersBtnContainer) {
+      if (losers.length > losersLimit) {
+        losersBtnContainer.innerHTML = `
+          <button onclick="loadMoreLosers()" class="w-full py-2 bg-rose-600/20 hover:bg-rose-600/30 text-rose-300 text-xs font-bold rounded-lg border border-rose-500/30 transition">
+            👇 See More Losers (${losers.length - losersLimit} remaining)
+          </button>
+        `;
+      } else {
+        losersBtnContainer.innerHTML = "";
+      }
     }
-    losersContainer.innerHTML = losersHTML;
   }
 }
 
@@ -135,7 +142,7 @@ function loadMoreLosers() {
   renderGainersAndLosers();
 }
 
-// 2. Render Snapshot History with Expandable Changes (FR, NFR, MFR)
+// 3. Render Version History (FR, NFR, MFR)
 function renderUpdateHistory() {
   var dataRecords = getRawRecords();
   var historyList = document.getElementById("updateHistoryList");
@@ -188,17 +195,17 @@ function renderUpdateHistory() {
     }
 
     var changesDetailsHTML = changes.length === 0 ? 
-      `<div class="text-slate-500 text-[11px] py-1 italic">No changes in FR, NFR, or MFR values recorded for this snapshot.</div>` :
+      `<div class="text-slate-500 text-[11px] py-1.5 italic">No FR, NFR, or MFR changes on this date.</div>` :
       changes.map(function(c) {
         var isGain = c.diff > 0;
         var colorClass = isGain ? 'text-emerald-400' : 'text-rose-400';
         var sign = isGain ? '+' : '';
         var formattedCombo = c.combo.replace('Regular_', '');
-        var petNameEscaped = c.name.replace(/'/g, "\\'");
+        var safeName = c.name.replace(/'/g, "\\'");
 
         return `
-          <div onclick="inspectPetFromBackpack('${petNameEscaped}', '${c.combo}')" class="flex items-center justify-between bg-slate-950/70 p-2 rounded border border-slate-800 hover:border-brand-500/40 cursor-pointer transition text-[11px] my-1">
-            <span class="font-bold text-white">${c.name} <span class="text-slate-400">(${formattedCombo})</span></span>
+          <div onclick="inspectPetFromBackpack('${safeName}', '${c.combo}')" class="flex items-center justify-between bg-slate-950/80 p-2 rounded border border-slate-800 hover:border-brand-500/50 cursor-pointer transition text-[11px] my-1">
+            <span class="font-bold text-white">${c.name} <span class="text-brand-400">(${formattedCombo})</span></span>
             <span>
               <span class="text-slate-400">${c.oldVal} pts</span> ➔ 
               <strong class="${colorClass}">${c.newVal} pts</strong> 
@@ -211,15 +218,15 @@ function renderUpdateHistory() {
     return `
       <div class="border-b border-slate-800/80 last:border-0 py-2">
         <button onclick="toggleDateExpand('${idx}')" class="w-full flex items-center justify-between text-left focus:outline-none group">
-          <span class="text-slate-300 font-medium group-hover:text-white transition">
+          <span class="text-slate-200 font-bold group-hover:text-brand-400 transition text-sm">
             📅 Snapshot Date: <strong class="text-white">${dateStr}</strong>
           </span>
           <div class="flex items-center gap-2">
-            <span class="text-slate-400 text-[11px] bg-slate-800 px-2 py-0.5 rounded">${changes.length} core changes</span>
-            <span id="expandIcon-${idx}" class="text-slate-400 text-xs font-bold transition-transform">▶</span>
+            <span class="text-slate-300 text-[11px] bg-slate-800 px-2 py-0.5 rounded font-semibold border border-slate-700">${changes.length} core changes</span>
+            <span id="expandIcon-${idx}" class="text-brand-400 text-xs font-bold">▼ Click to Expand</span>
           </div>
         </button>
-        <div id="dateDetails-${idx}" class="hidden mt-2 pl-2 border-l-2 border-brand-500/40 space-y-1">
+        <div id="dateDetails-${idx}" class="hidden mt-2 pl-2 border-l-2 border-brand-500 space-y-1">
           ${changesDetailsHTML}
         </div>
       </div>
@@ -234,15 +241,14 @@ function toggleDateExpand(idx) {
   if (details) {
     if (details.classList.contains('hidden')) {
       details.classList.remove('hidden');
-      if (icon) icon.innerText = "▼";
+      if (icon) icon.innerText = "▲ Collapse";
     } else {
       details.classList.add('hidden');
-      if (icon) icon.innerText = "▶";
+      if (icon) icon.innerText = "▼ Click to Expand";
     }
   }
 }
 
-// 3. Auto-run triggers when DOM or Tab is active
 document.addEventListener("DOMContentLoaded", function() {
   computeMarketTrends();
   renderUpdateHistory();
