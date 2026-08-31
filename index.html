@@ -29,6 +29,7 @@
 
   <div class="max-w-7xl mx-auto px-4 py-8">
     
+    <!-- Top Header Navigation -->
     <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-800 gap-4">
       <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
@@ -43,6 +44,7 @@
       </div>
     </header>
 
+    <!-- Navigation Tabs -->
     <nav class="flex border-b border-slate-800 mb-8 space-x-2 overflow-x-auto">
       <button id="tabBtn-1" onclick="switchTab(1)" class="py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap">
         <i data-lucide="search" class="w-4 h-4"></i>
@@ -58,6 +60,7 @@
       </button>
     </nav>
 
+    <!-- ================= TAB 1: VALUE CHECKER & GRAPH ================= -->
     <div id="tabContent-1" class="space-y-6">
       <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
@@ -77,7 +80,7 @@
             </select>
           </div>
 
-          <div id="toggleContainer">
+          <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">2. Variant & Potions</label>
             <div class="grid grid-cols-4 gap-2 text-xs font-bold">
               <button id="toggle-M" onclick="toggleVariant('M')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
@@ -107,8 +110,8 @@
               <div id="statATH" class="text-xl font-bold text-emerald-400 mt-1">--</div>
             </div>
             <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
-              <span class="text-xs font-medium text-slate-400">Overall Change</span>
-              <div id="statChange" class="text-xl font-bold text-white mt-1">--</div>
+              <span class="text-xs font-medium text-slate-400">Market Trend</span>
+              <div id="statTrend" class="text-xl font-bold text-white mt-1">--</div>
             </div>
             <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
               <span class="text-xs font-medium text-slate-400">Snapshots</span>
@@ -129,6 +132,7 @@
       </div>
     </div>
 
+    <!-- ================= TAB 2: MARKET ANALYSIS ================= -->
     <div id="tabContent-2" class="space-y-6 hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
@@ -142,9 +146,11 @@
       </div>
     </div>
 
+    <!-- ================= TAB 3: BACKPACK & OFFER SUGGESTER ================= -->
     <div id="tabContent-3" class="space-y-6 hidden">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
         
+        <!-- Inventory Management -->
         <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
           <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
             <i data-lucide="backpack" class="text-brand-500 w-5 h-5"></i>
@@ -189,6 +195,7 @@
           </div>
         </div>
 
+        <!-- Target Pet & Offer Suggester -->
         <div class="lg:col-span-2 space-y-6">
           <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
             <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
@@ -209,33 +216,16 @@
               </div>
 
               <div>
-                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant</label>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant & Potions</label>
                 <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
-                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
-                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
-                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
-                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
+                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
+                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">N</button>
+                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">F</button>
+                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">R</button>
                 </div>
-              </div>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800 pt-3">
-              <div>
-                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Demand Factor</label>
-                <select id="targetDemandSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200">
-                  <option value="high" selected>High Demand (+10% Overpay needed)</option>
-                  <option value="medium">Medium Demand (Base Value)</option>
-                  <option value="low">Low Demand (-10% Underpay acceptable)</option>
-                </select>
-              </div>
-
-              <div>
-                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Future Market Trajectory</label>
-                <select id="targetTrajectorySelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200">
-                  <option value="rising" selected>📈 Rising (+10% Growth factor)</option>
-                  <option value="stable">➡️ Stable Market</option>
-                  <option value="dropping">📉 Dropping (-15% Value decay)</option>
-                </select>
+                <div class="text-[11px] text-slate-500 mt-1 text-center">
+                  Active Tag: <span id="targetActiveTag" class="text-brand-400 font-semibold">Regular_NP</span>
+                </div>
               </div>
             </div>
 
@@ -244,12 +234,18 @@
             </button>
           </div>
 
-          <div id="targetValSummary" class="text-xs text-slate-400 hidden px-2 flex justify-between">
-            <span>Base Target Value: <strong id="dispBaseVal" class="text-white">0</strong></span>
-            <span>Adjusted Market Value (Demand + Future): <strong id="dispAdjVal" class="text-emerald-400">0</strong></span>
+          <!-- Target Info Summary -->
+          <div id="targetValSummary" class="text-xs text-slate-400 hidden px-2 flex justify-between items-center bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
+            <span class="flex items-center gap-2">
+              Target Value: <strong id="dispBaseVal" class="text-white text-sm">0</strong>
+            </span>
+            <span id="targetTrendBadge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300">
+              --
+            </span>
           </div>
 
           <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <!-- Win Offer -->
             <div class="bg-cardbg p-4 rounded-xl border border-emerald-500/30 flex flex-col space-y-3">
               <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
@@ -261,6 +257,7 @@
               </div>
             </div>
 
+            <!-- Fair Offer -->
             <div class="bg-cardbg p-4 rounded-xl border border-blue-500/30 flex flex-col space-y-3">
               <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1">
@@ -272,6 +269,7 @@
               </div>
             </div>
 
+            <!-- Overpay Offer -->
             <div class="bg-cardbg p-4 rounded-xl border border-amber-500/30 flex flex-col space-y-3">
               <div class="flex items-center justify-between border-b border-slate-800 pb-2">
                 <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
@@ -291,7 +289,7 @@
   </div>
 
   <script>
-    // State Stores
+    // Global State
     let rawRecords = [];
     let uniqueBasePets = [];
     let chartInstance = null;
@@ -300,9 +298,10 @@
     let activeType = 'Regular', hasFly = false, hasRide = false;
     let backpack = JSON.parse(localStorage.getItem('user_backpack') || '[]');
     let bpSelectedPet = "", bpActiveType = 'Regular', bpHasFly = false, bpHasRide = false;
+    
+    // Target Selection State
     let targetSelectedPet = "", targetActiveType = 'Regular', targetHasFly = false, targetHasRide = false;
 
-    // Tab Switching
     function switchTab(tabIndex) {
       [1, 2, 3].forEach(i => {
         document.getElementById(`tabContent-${i}`).classList.add('hidden');
@@ -312,7 +311,7 @@
       document.getElementById(`tabBtn-${tabIndex}`).className = "py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap";
     }
 
-    // CSV Parse
+    // CSV Parsing
     Papa.parse("history.csv", {
       download: true,
       skipEmptyLines: true,
@@ -350,12 +349,25 @@
       lucide.createIcons();
     }
 
-    // Helpers
+    // Helper Functions
     function getCurrentVal(petName, comboTag) {
       const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
       if (records.length === 0) return 0;
       records.sort((a, b) => new Date(a.date) - new Date(b.date));
       return records[records.length - 1].val;
+    }
+
+    function calculatePetTrend(petName, comboTag) {
+      const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
+      if (records.length < 2) return { text: "➡️ Stable", color: "text-slate-400", bg: "bg-slate-800" };
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const oldest = records[0].val;
+      const latest = records[records.length - 1].val;
+
+      if (latest > oldest * 1.03) return { text: "📈 Rising", color: "text-emerald-400", bg: "bg-emerald-500/10 border border-emerald-500/30" };
+      if (latest < oldest * 0.97) return { text: "📉 Dropping", color: "text-rose-400", bg: "bg-rose-500/10 border border-rose-500/30" };
+      return { text: "➡️ Stable", color: "text-slate-300", bg: "bg-slate-800" };
     }
 
     function getComboTag(type, fly, ride) {
@@ -366,7 +378,7 @@
       return `${type}_${potionTag}`;
     }
 
-    // Tab 1 Toggles
+    // Tab 1 Options
     function toggleVariant(v) { activeType = activeType === v ? 'Regular' : v; updateToggleUI(); }
     function togglePotion(p) { if (p === 'F') hasFly = !hasFly; if (p === 'R') hasRide = !hasRide; updateToggleUI(); }
     function updateToggleUI() {
@@ -413,6 +425,11 @@
         document.getElementById('statCurrent').innerText = values[values.length - 1];
         document.getElementById('statATH').innerText = Math.max(...values);
         document.getElementById('statSnapshots').innerText = records.length;
+        
+        const trend = calculatePetTrend(selectedPet, comboTag);
+        const trendElem = document.getElementById('statTrend');
+        trendElem.innerText = trend.text;
+        trendElem.className = `text-xl font-bold mt-1 ${trend.color}`;
 
         const ctx = document.getElementById('valueChart').getContext('2d');
         if (chartInstance) chartInstance.destroy();
@@ -479,11 +496,13 @@
       }
       list.innerHTML = "";
       backpack.forEach(item => {
+        const trend = calculatePetTrend(item.name, item.combo);
         list.innerHTML += `
           <div class="flex items-center justify-between bg-slate-800 p-2 rounded text-xs">
-            <div>
+            <div class="flex items-center gap-1.5">
               <span class="font-bold text-white">${item.name}</span>
-              <span class="text-[10px] text-brand-400 ml-1">(${item.combo})</span>
+              <span class="text-[10px] text-brand-400">(${item.combo})</span>
+              <span class="text-[10px] ${trend.color}">${trend.text.split(' ')[0]}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-emerald-400 font-semibold">${item.val} pts</span>
@@ -494,9 +513,35 @@
       });
     }
 
-    // Target Selection
-    function toggleTargetVariant(v) { targetActiveType = targetActiveType === v ? 'Regular' : v; }
-    function toggleTargetPotion(p) { if (p === 'F') targetHasFly = !targetHasFly; if (p === 'R') targetHasRide = !targetHasRide; }
+    // Interactive Target Buttons
+    function toggleTargetVariant(v) {
+      targetActiveType = targetActiveType === v ? 'Regular' : v;
+      updateTargetButtonUI();
+    }
+
+    function toggleTargetPotion(p) {
+      if (p === 'F') targetHasFly = !targetHasFly;
+      if (p === 'R') targetHasRide = !targetHasRide;
+      updateTargetButtonUI();
+    }
+
+    function updateTargetButtonUI() {
+      const btnM = document.getElementById('target-toggle-M');
+      const btnN = document.getElementById('target-toggle-N');
+      const btnF = document.getElementById('target-toggle-F');
+      const btnR = document.getElementById('target-toggle-R');
+
+      const activeClass = "bg-brand-600 text-white border-brand-500";
+      const inactiveClass = "bg-slate-800 text-slate-400 border-slate-700";
+
+      btnM.className = `py-2 rounded border transition ${targetActiveType === 'M' ? activeClass : inactiveClass}`;
+      btnN.className = `py-2 rounded border transition ${targetActiveType === 'N' ? activeClass : inactiveClass}`;
+      btnF.className = `py-2 rounded border transition ${targetHasFly ? activeClass : inactiveClass}`;
+      btnR.className = `py-2 rounded border transition ${targetHasRide ? activeClass : inactiveClass}`;
+
+      document.getElementById('targetActiveTag').innerText = getComboTag(targetActiveType, targetHasFly, targetHasRide);
+    }
+
     function filterTargetList() {
       const q = document.getElementById("targetSearchInput").value.trim().toLowerCase();
       const container = document.getElementById("targetSelectContainer");
@@ -511,13 +556,14 @@
       });
       container.classList.remove("hidden");
     }
+
     function onTargetSelectClick() {
       targetSelectedPet = document.getElementById("targetSelect").value;
       document.getElementById("targetSearchInput").value = targetSelectedPet;
       document.getElementById("targetSelectContainer").classList.add("hidden");
     }
 
-    // Offer Suggestion Engine (Incorporating Demand & Trajectory)
+    // Offer Generator Logic
     function generateOfferSuggestions() {
       if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
       if (!targetSelectedPet) return alert("Select target pet!");
@@ -525,27 +571,21 @@
 
       const combo = getComboTag(targetActiveType, targetHasFly, targetHasRide);
       const baseVal = getCurrentVal(targetSelectedPet, combo);
+      const trend = calculatePetTrend(targetSelectedPet, combo);
 
-      // Multipliers
-      const demand = document.getElementById("targetDemandSelect").value;
-      const trajectory = document.getElementById("targetTrajectorySelect").value;
-
-      let demandMult = demand === 'high' ? 1.10 : (demand === 'low' ? 0.90 : 1.0);
-      let trajMult = trajectory === 'rising' ? 1.10 : (trajectory === 'dropping' ? 0.85 : 1.0);
-
-      const adjustedTargetValue = baseVal * demandMult * trajMult;
-
-      // Update Summary UI
+      // Display Target Summary with Trend Indicator
       document.getElementById("targetValSummary").classList.remove("hidden");
-      document.getElementById("dispBaseVal").innerText = baseVal;
-      document.getElementById("dispAdjVal").innerText = adjustedTargetValue.toFixed(1);
+      document.getElementById("dispBaseVal").innerText = baseVal + " pts";
+      
+      const badge = document.getElementById("targetTrendBadge");
+      badge.innerText = `Market Trend: ${trend.text}`;
+      badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
 
-      // Offer Calculations
+      // Calculate Offers
       const sortedBackpack = [...backpack].sort((a, b) => b.val - a.val);
-
-      renderOfferBox("winOfferContainer", sortedBackpack, adjustedTargetValue * 0.92);
-      renderOfferBox("fairOfferContainer", sortedBackpack, adjustedTargetValue * 1.0);
-      renderOfferBox("loseOfferContainer", sortedBackpack, adjustedTargetValue * 1.08);
+      renderOfferBox("winOfferContainer", sortedBackpack, baseVal * 0.95);
+      renderOfferBox("fairOfferContainer", sortedBackpack, baseVal * 1.0);
+      renderOfferBox("loseOfferContainer", sortedBackpack, baseVal * 1.08);
     }
 
     function renderOfferBox(containerId, items, targetVal) {
@@ -565,7 +605,13 @@
         return;
       }
 
-      let offerHTML = offer.map(i => `<div class="bg-slate-900 p-1.5 rounded flex justify-between"><span>${i.name}</span><span class="text-emerald-400">${i.val}</span></div>`).join("");
+      let offerHTML = offer.map(i => `
+        <div class="bg-slate-900 p-1.5 rounded flex justify-between items-center">
+          <span>${i.name} <span class="text-[10px] text-brand-400">(${i.combo})</span></span>
+          <span class="text-emerald-400 font-semibold">${i.val}</span>
+        </div>
+      `).join("");
+
       box.innerHTML = `
         ${offerHTML}
         <div class="pt-2 border-t border-slate-800 text-right font-bold text-slate-300">
