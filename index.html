@@ -25,7 +25,6 @@
     }
   </script>
   <style>
-    /* Dynamic Active Color Styles */
     .btn-m-active { background-color: #a855f7 !important; color: #ffffff !important; border-color: #c084fc !important; }
     .btn-n-active { background-color: #22c55e !important; color: #ffffff !important; border-color: #4ade80 !important; }
     .btn-f-active { background-color: #3b82f6 !important; color: #ffffff !important; border-color: #60a5fa !important; }
@@ -59,7 +58,7 @@
       </button>
       <button id="tabBtn-2" onclick="switchTab(2)" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap">
         <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-        Tab 2: Market Analysis
+        Tab 2: Market Analysis & Updates
       </button>
       <button id="tabBtn-3" onclick="switchTab(3)" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap">
         <i data-lucide="backpack" class="w-4 h-4"></i>
@@ -139,16 +138,40 @@
       </div>
     </div>
 
-    <!-- ================= TAB 2: MARKET ANALYSIS ================= -->
+    <!-- ================= TAB 2: MARKET ANALYSIS & UPDATES ================= -->
     <div id="tabContent-2" class="space-y-6 hidden">
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <!-- Top Gainers -->
         <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
-          <h3 class="font-bold text-white mb-4">Top Market Gainers</h3>
-          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1"></div>
+          <h3 class="font-bold text-white mb-1 flex items-center gap-2">
+            <i data-lucide="trending-up" class="text-emerald-400 w-5 h-5"></i> Top Market Gainers
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">Pets with highest valuation growth across snapshots</p>
+          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700">
+            <div class="text-slate-500 py-4 text-center text-xs">Processing gainers...</div>
+          </div>
         </div>
+
+        <!-- Top Losers -->
         <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
-          <h3 class="font-bold text-white mb-4">Top Market Losers</h3>
-          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1"></div>
+          <h3 class="font-bold text-white mb-1 flex items-center gap-2">
+            <i data-lucide="trending-down" class="text-rose-400 w-5 h-5"></i> Top Market Losers
+          </h3>
+          <p class="text-xs text-slate-400 mb-4">Pets experiencing price drops across snapshots</p>
+          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700">
+            <div class="text-slate-500 py-4 text-center text-xs">Processing losers...</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Update History Log -->
+      <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-3">
+        <h3 class="font-bold text-white flex items-center gap-2">
+          <i data-lucide="history" class="text-brand-400 w-5 h-5"></i> CSV Update History Log
+        </h3>
+        <p class="text-xs text-slate-400">Snapshot dates and data log points imported from history.csv</p>
+        <div id="updateHistoryList" class="space-y-2 text-xs border border-slate-800 p-3 rounded-lg bg-slate-900/50 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-slate-700">
+          <div class="text-slate-500 py-2 text-center">Loading snapshot dates...</div>
         </div>
       </div>
     </div>
@@ -355,8 +378,102 @@
 
       uniqueBasePets = Array.from(basePetSet).sort();
       document.getElementById('statusBadge').innerText = `${rawRecords.length} Records Loaded`;
+      
       renderBackpackUI();
+      computeMarketTrends();
+      renderUpdateHistory();
       lucide.createIcons();
+    }
+
+    // Tab 2: Market Trend Computation (Gainers, Losers, Update Logs)
+    function computeMarketTrends() {
+      const petGroupMap = {};
+
+      rawRecords.forEach(r => {
+        const key = `${r.name} (${r.combo})`;
+        if (!petGroupMap[key]) petGroupMap[key] = [];
+        petGroupMap[key].push(r);
+      });
+
+      const trendData = [];
+
+      Object.keys(petGroupMap).forEach(key => {
+        const list = petGroupMap[key];
+        if (list.length >= 2) {
+          list.sort((a, b) => new Date(a.date) - new Date(b.date));
+          const oldVal = list[0].val;
+          const newVal = list[list.length - 1].val;
+          const diff = newVal - oldVal;
+          const pct = oldVal !== 0 ? (diff / oldVal) * 100 : 0;
+
+          trendData.push({
+            label: key,
+            petName: list[0].name,
+            combo: list[0].combo,
+            oldVal,
+            newVal,
+            diff,
+            pct
+          });
+        }
+      });
+
+      const gainers = trendData.filter(t => t.diff > 0).sort((a, b) => b.pct - a.pct).slice(0, 10);
+      const losers = trendData.filter(t => t.diff < 0).sort((a, b) => a.pct - b.pct).slice(0, 10);
+
+      const gainersContainer = document.getElementById("topGainersList");
+      if (gainers.length === 0) {
+        gainersContainer.innerHTML = `<div class="text-slate-500 py-2 text-center text-xs">No price gainers detected in historical snapshots.</div>`;
+      } else {
+        gainersContainer.innerHTML = gainers.map(g => `
+          <div onclick="inspectPetFromBackpack('${g.petName}', '${g.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition">
+            <div>
+              <div class="font-bold text-white">${g.label}</div>
+              <div class="text-[10px] text-slate-400">${g.oldVal} pts ➔ <span class="text-emerald-400 font-bold">${g.newVal} pts</span></div>
+            </div>
+            <div class="text-right">
+              <span class="px-2 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 rounded-md text-xs font-bold">+${g.pct.toFixed(1)}%</span>
+            </div>
+          </div>
+        `).join("");
+      }
+
+      const losersContainer = document.getElementById("topLosersList");
+      if (losers.length === 0) {
+        losersContainer.innerHTML = `<div class="text-slate-500 py-2 text-center text-xs">No price drops detected in historical snapshots.</div>`;
+      } else {
+        losersContainer.innerHTML = losers.map(l => `
+          <div onclick="inspectPetFromBackpack('${l.petName}', '${l.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-rose-500/40 cursor-pointer transition">
+            <div>
+              <div class="font-bold text-white">${l.label}</div>
+              <div class="text-[10px] text-slate-400">${l.oldVal} pts ➔ <span class="text-rose-400 font-bold">${l.newVal} pts</span></div>
+            </div>
+            <div class="text-right">
+              <span class="px-2 py-1 bg-rose-500/10 text-rose-400 border border-rose-500/20 rounded-md text-xs font-bold">${l.pct.toFixed(1)}%</span>
+            </div>
+          </div>
+        `).join("");
+      }
+    }
+
+    function renderUpdateHistory() {
+      const dates = Array.from(new Set(rawRecords.map(r => r.date))).sort((a, b) => new Date(b) - new Date(a));
+      const historyList = document.getElementById("updateHistoryList");
+
+      if (dates.length === 0) {
+        historyList.innerHTML = `<div class="text-slate-500 text-center py-2">No snapshot dates logged.</div>`;
+        return;
+      }
+
+      historyList.innerHTML = dates.map(d => {
+        const count = rawRecords.filter(r => r.date === d).length;
+        return `
+          <div class="flex items-center justify-between py-1.5 border-b border-slate-800/60 last:border-0">
+            <span class="text-slate-300 font-medium">📅 Snapshot Date: <strong class="text-white">${d}</strong></span>
+            <span class="text-slate-400 text-[11px]">${count} records tracked</span>
+          </div>
+        `;
+      }).join("");
     }
 
     // Value & Trend Helpers
@@ -474,7 +591,7 @@
       }
     }
 
-    // Inspect Backpack Item in Tab 1 Value Checker
+    // Inspect Pet from Tab 2 or Backpack in Tab 1
     function inspectPetFromBackpack(petName, comboTag) {
       selectedPetName = petName;
       document.getElementById("searchInput").value = petName;
