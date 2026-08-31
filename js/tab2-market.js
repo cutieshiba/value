@@ -1,16 +1,33 @@
-// Tab 2 Local Pagination State
+// Tab 2 Local Pagination & Data State
 var gainersLimit = 10;
 var losersLimit = 10;
 var cachedTrendData = [];
 
-// Compute Top Gainers & Losers with "See More" Pagination
+// Helper function to safely get rawRecords array
+function getRawRecords() {
+  if (window.rawRecords && Array.isArray(window.rawRecords) && window.rawRecords.length > 0) {
+    return window.rawRecords;
+  }
+  if (typeof rawRecords !== 'undefined' && Array.isArray(rawRecords) && rawRecords.length > 0) {
+    return rawRecords;
+  }
+  return [];
+}
+
+// 1. Main Compute Function for Top Gainers & Losers
 function computeMarketTrends() {
-  var dataRecords = window.rawRecords || (typeof rawRecords !== 'undefined' ? rawRecords : []);
-  if (!dataRecords || dataRecords.length === 0) return;
+  var dataRecords = getRawRecords();
+
+  if (dataRecords.length === 0) {
+    // If data isn't ready yet, attempt reload shortly
+    setTimeout(computeMarketTrends, 300);
+    return;
+  }
 
   var petGroupMap = {};
 
   dataRecords.forEach(function(r) {
+    if (!r.name || !r.combo || r.val === undefined) return;
     var key = `${r.name} (${r.combo})`;
     if (!petGroupMap[key]) petGroupMap[key] = [];
     petGroupMap[key].push(r);
@@ -49,15 +66,16 @@ function renderGainersAndLosers() {
   var losers = cachedTrendData.filter(function(t) { return t.diff < 0; })
                               .sort(function(a, b) { return a.pct - b.pct; });
 
-  // 1. Render Top Gainers
+  // Render Top Gainers
   var gainersContainer = document.getElementById("topGainersList");
   if (gainersContainer) {
     var visibleGainers = gainers.slice(0, gainersLimit);
     var gainersHTML = visibleGainers.length === 0 ? 
-      `<div class="text-slate-500 py-2 text-center text-xs">No price gainers detected.</div>` :
+      `<div class="text-slate-500 py-2 text-center text-xs">No price gainers detected in current data.</div>` :
       visibleGainers.map(function(g) {
+        var petNameEscaped = g.petName.replace(/'/g, "\\'");
         return `
-          <div onclick="inspectPetFromBackpack('${g.petName.replace(/'/g, "\\'")}', '${g.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition mb-2">
+          <div onclick="inspectPetFromBackpack('${petNameEscaped}', '${g.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-emerald-500/40 cursor-pointer transition mb-2">
             <div>
               <div class="font-bold text-white">${g.label}</div>
               <div class="text-[10px] text-slate-400">${g.oldVal} pts ➔ <span class="text-emerald-400 font-bold">${g.newVal} pts</span></div>
@@ -69,7 +87,7 @@ function renderGainersAndLosers() {
 
     if (gainers.length > gainersLimit) {
       gainersHTML += `
-        <button onclick="loadMoreGainers()" class="w-full py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-slate-700 transition flex items-center justify-center gap-1">
+        <button onclick="loadMoreGainers()" class="w-full py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-emerald-400 text-xs font-bold rounded-lg border border-slate-700 transition">
           See More Gainers (${gainers.length - gainersLimit} remaining)
         </button>
       `;
@@ -77,15 +95,16 @@ function renderGainersAndLosers() {
     gainersContainer.innerHTML = gainersHTML;
   }
 
-  // 2. Render Top Losers
+  // Render Top Losers
   var losersContainer = document.getElementById("topLosersList");
   if (losersContainer) {
     var visibleLosers = losers.slice(0, losersLimit);
     var losersHTML = visibleLosers.length === 0 ? 
-      `<div class="text-slate-500 py-2 text-center text-xs">No price drops detected.</div>` :
+      `<div class="text-slate-500 py-2 text-center text-xs">No price drops detected in current data.</div>` :
       visibleLosers.map(function(l) {
+        var petNameEscaped = l.petName.replace(/'/g, "\\'");
         return `
-          <div onclick="inspectPetFromBackpack('${l.petName.replace(/'/g, "\\'")}', '${l.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-rose-500/40 cursor-pointer transition mb-2">
+          <div onclick="inspectPetFromBackpack('${petNameEscaped}', '${l.combo}')" class="flex items-center justify-between bg-slate-900/60 p-2.5 rounded-lg border border-slate-800 hover:border-rose-500/40 cursor-pointer transition mb-2">
             <div>
               <div class="font-bold text-white">${l.label}</div>
               <div class="text-[10px] text-slate-400">${l.oldVal} pts ➔ <span class="text-rose-400 font-bold">${l.newVal} pts</span></div>
@@ -97,7 +116,7 @@ function renderGainersAndLosers() {
 
     if (losers.length > losersLimit) {
       losersHTML += `
-        <button onclick="loadMoreLosers()" class="w-full py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-rose-400 text-xs font-bold rounded-lg border border-slate-700 transition flex items-center justify-center gap-1">
+        <button onclick="loadMoreLosers()" class="w-full py-2 mt-2 bg-slate-800 hover:bg-slate-700 text-rose-400 text-xs font-bold rounded-lg border border-slate-700 transition">
           See More Losers (${losers.length - losersLimit} remaining)
         </button>
       `;
@@ -116,13 +135,20 @@ function loadMoreLosers() {
   renderGainersAndLosers();
 }
 
-// 3. Render Expandable Version Update History (FR, NFR, MFR)
+// 2. Render Snapshot History with Expandable Changes (FR, NFR, MFR)
 function renderUpdateHistory() {
-  var dataRecords = window.rawRecords || (typeof rawRecords !== 'undefined' ? rawRecords : []);
+  var dataRecords = getRawRecords();
   var historyList = document.getElementById("updateHistoryList");
   if (!historyList) return;
 
+  if (dataRecords.length === 0) {
+    historyList.innerHTML = `<div class="text-slate-500 text-center py-2">Loading snapshot data...</div>`;
+    setTimeout(renderUpdateHistory, 300);
+    return;
+  }
+
   var dates = Array.from(new Set(dataRecords.map(function(r) { return r.date; })))
+                   .filter(Boolean)
                    .sort(function(a, b) { return new Date(b) - new Date(a); });
 
   if (dates.length === 0) {
@@ -130,7 +156,6 @@ function renderUpdateHistory() {
     return;
   }
 
-  // Allowed combos filter
   var targetCombos = ['Regular_FR', 'N_FR', 'M_FR'];
 
   historyList.innerHTML = dates.map(function(dateStr, idx) {
@@ -146,23 +171,21 @@ function renderUpdateHistory() {
       dateRecords.forEach(function(curr) {
         if (targetCombos.indexOf(curr.combo) !== -1) {
           var matchPrev = prevRecords.find(function(p) { 
-            return p.name.toLowerCase() === curr.name.toLowerCase() && p.combo === curr.combo; 
+            return p.name && curr.name && p.name.toLowerCase() === curr.name.toLowerCase() && p.combo === curr.combo; 
           });
 
-          if (matchPrev && matchPrev.val !== curr.val) {
+          if (matchPrev && Number(matchPrev.val) !== Number(curr.val)) {
             changes.push({
               name: curr.name,
               combo: curr.combo,
-              oldVal: matchPrev.val,
-              newVal: curr.val,
-              diff: curr.val - matchPrev.val
+              oldVal: Number(matchPrev.val),
+              newVal: Number(curr.val),
+              diff: Number(curr.val) - Number(matchPrev.val)
             });
           }
         }
       });
     }
-
-    var changesCount = changes.length;
 
     var changesDetailsHTML = changes.length === 0 ? 
       `<div class="text-slate-500 text-[11px] py-1 italic">No changes in FR, NFR, or MFR values recorded for this snapshot.</div>` :
@@ -171,9 +194,10 @@ function renderUpdateHistory() {
         var colorClass = isGain ? 'text-emerald-400' : 'text-rose-400';
         var sign = isGain ? '+' : '';
         var formattedCombo = c.combo.replace('Regular_', '');
+        var petNameEscaped = c.name.replace(/'/g, "\\'");
 
         return `
-          <div onclick="inspectPetFromBackpack('${c.name.replace(/'/g, "\\'")}', '${c.combo}')" class="flex items-center justify-between bg-slate-950/70 p-2 rounded border border-slate-800 hover:border-brand-500/40 cursor-pointer transition text-[11px] my-1">
+          <div onclick="inspectPetFromBackpack('${petNameEscaped}', '${c.combo}')" class="flex items-center justify-between bg-slate-950/70 p-2 rounded border border-slate-800 hover:border-brand-500/40 cursor-pointer transition text-[11px] my-1">
             <span class="font-bold text-white">${c.name} <span class="text-slate-400">(${formattedCombo})</span></span>
             <span>
               <span class="text-slate-400">${c.oldVal} pts</span> ➔ 
@@ -191,7 +215,7 @@ function renderUpdateHistory() {
             📅 Snapshot Date: <strong class="text-white">${dateStr}</strong>
           </span>
           <div class="flex items-center gap-2">
-            <span class="text-slate-400 text-[11px] bg-slate-800 px-2 py-0.5 rounded">${changesCount} core changes</span>
+            <span class="text-slate-400 text-[11px] bg-slate-800 px-2 py-0.5 rounded">${changes.length} core changes</span>
             <span id="expandIcon-${idx}" class="text-slate-400 text-xs font-bold transition-transform">▶</span>
           </div>
         </button>
@@ -203,7 +227,6 @@ function renderUpdateHistory() {
   }).join("");
 }
 
-// 4. Toggle Accordion Details
 function toggleDateExpand(idx) {
   var details = document.getElementById(`dateDetails-${idx}`);
   var icon = document.getElementById(`expandIcon-${idx}`);
@@ -218,3 +241,9 @@ function toggleDateExpand(idx) {
     }
   }
 }
+
+// 3. Auto-run triggers when DOM or Tab is active
+document.addEventListener("DOMContentLoaded", function() {
+  computeMarketTrends();
+  renderUpdateHistory();
+});
