@@ -25,7 +25,7 @@
     }
   </script>
   <style>
-    /* Variant & Potion Button Active Color Themes */
+    /* Dynamic Active Color Styles */
     .btn-m-active { background-color: #a855f7 !important; color: #ffffff !important; border-color: #c084fc !important; }
     .btn-n-active { background-color: #22c55e !important; color: #ffffff !important; border-color: #4ade80 !important; }
     .btn-f-active { background-color: #3b82f6 !important; color: #ffffff !important; border-color: #60a5fa !important; }
@@ -90,10 +90,10 @@
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">2. Variant & Potions</label>
             <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-              <button id="toggle-M" onclick="toggleVariant('M')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
-              <button id="toggle-N" onclick="toggleVariant('N')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">N</button>
-              <button id="toggle-F" onclick="togglePotion('F')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">F</button>
-              <button id="toggle-R" onclick="togglePotion('R')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">R</button>
+              <button type="button" id="toggle-M" onclick="toggleVariant('M')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
+              <button type="button" id="toggle-N" onclick="toggleVariant('N')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">N</button>
+              <button type="button" id="toggle-F" onclick="togglePotion('F')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">F</button>
+              <button type="button" id="toggle-R" onclick="togglePotion('R')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">R</button>
             </div>
             <div class="text-[11px] text-slate-500 mt-2 text-center">
               Active Variant: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
@@ -179,10 +179,10 @@
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Variant & Potions</label>
             <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-              <button id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">M</button>
-              <button id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">N</button>
-              <button id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">F</button>
-              <button id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">R</button>
+              <button type="button" id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">M</button>
+              <button type="button" id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">N</button>
+              <button type="button" id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">F</button>
+              <button type="button" id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">R</button>
             </div>
           </div>
 
@@ -225,10 +225,10 @@
               <div>
                 <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant & Potions</label>
                 <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
-                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">M</button>
-                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">N</button>
-                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">F</button>
-                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">R</button>
+                  <button type="button" id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">M</button>
+                  <button type="button" id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">N</button>
+                  <button type="button" id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">F</button>
+                  <button type="button" id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">R</button>
                 </div>
                 <div class="text-[11px] text-slate-500 mt-1 text-center">
                   Active Tag: <span id="targetActiveTag" class="text-brand-400 font-semibold">Regular_NP</span>
@@ -359,7 +359,7 @@
       lucide.createIcons();
     }
 
-    // Helpers
+    // Value & Trend Helpers
     function getCurrentVal(petName, comboTag) {
       const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
       if (records.length === 0) return 0;
@@ -388,23 +388,31 @@
       return `${type}_${potionTag}`;
     }
 
-    function updateButtonStyling(prefix, activeType, fly, ride) {
+    // Dynamic Button Class Updater
+    function updateButtonStyling(prefix, currentType, fly, ride) {
       const btnM = document.getElementById(`${prefix}-toggle-M`);
       const btnN = document.getElementById(`${prefix}-toggle-N`);
       const btnF = document.getElementById(`${prefix}-toggle-F`);
       const btnR = document.getElementById(`${prefix}-toggle-R`);
 
-      const defaultClass = "bg-slate-800 text-slate-400 border-slate-700";
+      const defaultClass = "py-2 rounded border transition bg-slate-800 text-slate-400 border-slate-700";
 
-      btnM.className = `py-2 rounded border transition ${activeType === 'M' ? 'btn-m-active' : defaultClass}`;
-      btnN.className = `py-2 rounded border transition ${activeType === 'N' ? 'btn-n-active' : defaultClass}`;
-      btnF.className = `py-2 rounded border transition ${fly ? 'btn-f-active' : defaultClass}`;
-      btnR.className = `py-2 rounded border transition ${ride ? 'btn-r-active' : defaultClass}`;
+      if (btnM) btnM.className = currentType === 'M' ? "py-2 rounded border transition btn-m-active" : defaultClass;
+      if (btnN) btnN.className = currentType === 'N' ? "py-2 rounded border transition btn-n-active" : defaultClass;
+      if (btnF) btnF.className = fly ? "py-2 rounded border transition btn-f-active" : defaultClass;
+      if (btnR) btnR.className = ride ? "py-2 rounded border transition btn-r-active" : defaultClass;
     }
 
     // Tab 1 Handlers
-    function toggleVariant(v) { activeType = activeType === v ? 'Regular' : v; updateToggleUI(); }
-    function togglePotion(p) { if (p === 'F') hasFly = !hasFly; if (p === 'R') hasRide = !hasRide; updateToggleUI(); }
+    function toggleVariant(v) { 
+      activeType = activeType === v ? 'Regular' : v; 
+      updateToggleUI(); 
+    }
+    function togglePotion(p) { 
+      if (p === 'F') hasFly = !hasFly; 
+      if (p === 'R') hasRide = !hasRide; 
+      updateToggleUI(); 
+    }
     function updateToggleUI() {
       updateButtonStyling('toggle', activeType, hasFly, hasRide);
       document.getElementById('activeComboTag').innerText = getComboTag(activeType, hasFly, hasRide);
@@ -466,12 +474,11 @@
       }
     }
 
-    // Redirect Clicked Backpack Pet to Tab 1 Value Checker
+    // Inspect Backpack Item in Tab 1 Value Checker
     function inspectPetFromBackpack(petName, comboTag) {
       selectedPetName = petName;
       document.getElementById("searchInput").value = petName;
 
-      // Extract combo state
       const parts = comboTag.split('_');
       activeType = parts[0] || 'Regular';
       const potions = parts[1] || 'NP';
@@ -483,9 +490,16 @@
       renderDashboard(petName, comboTag);
     }
 
-    // Backpack Management
-    function toggleBpVariant(v) { bpActiveType = bpActiveType === v ? 'Regular' : v; updateButtonStyling('bp-toggle', bpActiveType, bpHasFly, bpHasRide); }
-    function toggleBpPotion(p) { if (p === 'F') bpHasFly = !bpHasFly; if (p === 'R') bpHasRide = !bpHasRide; updateButtonStyling('bp-toggle', bpActiveType, bpHasFly, bpHasRide); }
+    // Backpack Management Handlers
+    function toggleBpVariant(v) { 
+      bpActiveType = bpActiveType === v ? 'Regular' : v; 
+      updateButtonStyling('bp-toggle', bpActiveType, bpHasFly, bpHasRide); 
+    }
+    function toggleBpPotion(p) { 
+      if (p === 'F') bpHasFly = !bpHasFly; 
+      if (p === 'R') bpHasRide = !bpHasRide; 
+      updateButtonStyling('bp-toggle', bpActiveType, bpHasFly, bpHasRide); 
+    }
     
     function filterBpPetList() {
       const q = document.getElementById("bpSearchInput").value.trim().toLowerCase();
@@ -557,7 +571,7 @@
       });
     }
 
-    // Interactive Target Buttons
+    // Target Pet Option Toggle Handlers
     function toggleTargetVariant(v) {
       targetActiveType = targetActiveType === v ? 'Regular' : v;
       updateButtonStyling('target-toggle', targetActiveType, targetHasFly, targetHasRide);
@@ -604,7 +618,6 @@
 
       if (baseVal === 0) return alert("Selected target pet variant has no valid price data.");
 
-      // Display Target Summary
       document.getElementById("targetValSummary").classList.remove("hidden");
       document.getElementById("dispBaseVal").innerText = baseVal + " pts";
       
@@ -612,7 +625,6 @@
       badge.innerText = `Market Trend: ${trend.text}`;
       badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
 
-      // Calculate Combinations
       const allCombos = getAllCombinations(backpack);
 
       const winOffers = allCombos.filter(c => c.totalVal >= baseVal * 0.85 && c.totalVal <= baseVal * 0.96);
