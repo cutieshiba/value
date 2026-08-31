@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Elvebredd Analytics - Adopt Me Value Tracker</title>
+  <title>Elvebredd Analytics & Trading Hub</title>
   
   <!-- Tailwind CSS -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -34,13 +34,13 @@
   <div class="max-w-7xl mx-auto px-4 py-8">
     
     <!-- Top Header Navigation -->
-    <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-8 border-b border-slate-800 gap-4">
+    <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-800 gap-4">
       <div>
         <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
           <i data-lucide="trending-up" class="text-brand-500 w-8 h-8"></i>
-          Adopt Me Pet Value Analytics
+          Adopt Me Pet Value Hub
         </h1>
-        <p class="text-slate-400 text-sm mt-1">Real-time market trends & value updates from Elvebredd</p>
+        <p class="text-slate-400 text-sm mt-1">Real-time valuation, market trends, and smart offer generator</p>
       </div>
       <div id="statusBadge" class="self-start md:self-auto px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold flex items-center gap-2">
         <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
@@ -48,132 +48,69 @@
       </div>
     </header>
 
-    <!-- Top Movers & Last Updated Section -->
-    <section class="mb-8 space-y-4">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <!-- Main Tab Navigation Controls -->
+    <nav class="flex border-b border-slate-800 mb-8 space-x-2 overflow-x-auto">
+      <button id="tabBtn-1" onclick="switchTab(1)" class="py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap">
+        <i data-lucide="search" class="w-4 h-4"></i>
+        Tab 1: Value Checker & Graph
+      </button>
+      <button id="tabBtn-2" onclick="switchTab(2)" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+        Tab 2: Market Analysis
+      </button>
+      <button id="tabBtn-3" onclick="switchTab(3)" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap">
+        <i data-lucide="backpack" class="w-4 h-4"></i>
+        Tab 3: Backpack & Offer Suggester
+      </button>
+    </nav>
+
+    <!-- ================= TAB 1: VALUE CHECKER & GRAPH ================= -->
+    <div id="tabContent-1" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
         
-        <!-- Top Gainers Card -->
-        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
-          <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
-              <i data-lucide="arrow-up-right" class="text-emerald-400 w-5 h-5"></i>
-              Top Gainers
-            </h3>
-            <span class="text-xs text-slate-500">% Change</span>
-          </div>
-          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
-            <div class="text-slate-500 text-xs">Calculating metrics...</div>
-          </div>
-          <div id="topGainersFooter" class="mt-4 pt-3 border-t border-slate-800 text-center hidden">
-            <button onclick="loadMoreGainers()" class="text-xs font-bold text-brand-400 hover:text-brand-300 py-1 px-3 rounded bg-slate-800 hover:bg-slate-700 transition">
-              See More Gainers
-            </button>
-          </div>
-        </div>
-
-        <!-- Top Losers Card -->
-        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
-          <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
-            <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
-              <i data-lucide="arrow-down-right" class="text-rose-400 w-5 h-5"></i>
-              Top Losers
-            </h3>
-            <span class="text-xs text-slate-500">% Change</span>
-          </div>
-          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
-            <div class="text-slate-500 text-xs">Calculating metrics...</div>
-          </div>
-          <div id="topLosersFooter" class="mt-4 pt-3 border-t border-slate-800 text-center hidden">
-            <button onclick="loadMoreLosers()" class="text-xs font-bold text-brand-400 hover:text-brand-300 py-1 px-3 rounded bg-slate-800 hover:bg-slate-700 transition">
-              See More Losers
-            </button>
-          </div>
-        </div>
-
-      </div>
-
-      <!-- Last Updated Info Card Below Top Losers -->
-      <div onclick="openUpdateModal()" class="bg-cardbg/80 hover:bg-cardbg border border-slate-800 hover:border-brand-500/50 p-3.5 rounded-xl transition cursor-pointer flex items-center justify-between shadow-lg group">
-        <div class="flex items-center gap-3">
-          <div class="p-2 rounded-lg bg-brand-500/10 text-brand-400 group-hover:scale-105 transition">
-            <i data-lucide="calendar-clock" class="w-5 h-5"></i>
-          </div>
+        <!-- Controls & Selection -->
+        <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
           <div>
-            <div class="text-xs text-slate-400 uppercase font-semibold">Database Last Updated</div>
-            <div id="lastUpdatedTimestamp" class="text-sm font-bold text-white mt-0.5">Fetching latest timestamp...</div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">1. Search Pet</label>
+            <div class="relative">
+              <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+              <input type="text" id="searchInput" placeholder="Type pet name..." oninput="filterPetList()" 
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+            </div>
           </div>
-        </div>
-        <span class="text-xs font-semibold text-brand-400 flex items-center gap-1 group-hover:translate-x-1 transition">
-          View 30-Day Audit Log (FR, NFR, MFR) <i data-lucide="chevron-right" class="w-4 h-4"></i>
-        </span>
-      </div>
-    </section>
 
-    <!-- Control Panel & Filters -->
-    <div class="grid grid-cols-1 lg:grid-cols-4 gap-6 mb-8">
-      
-      <!-- Pet Selection Card -->
-      <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
-        <div>
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">1. Search & Select Pet</label>
-          <div class="relative">
-            <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
-            <input type="text" id="searchInput" placeholder="Search pet name..." oninput="filterPetList()" 
-                   class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+          <!-- Pet Select Dropdown -->
+          <div id="petSelectContainer" class="hidden">
+            <select id="petSelect" onchange="onPetSelectClick()" size="6" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
+            </select>
           </div>
-        </div>
 
-        <!-- Pet List Selection -->
-        <div id="petSelectContainer" class="hidden">
-          <select id="petSelect" onchange="onPetSelectClick()" size="8" 
-                  class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
-            <!-- Dynamically Populated -->
-          </select>
-        </div>
-
-        <!-- Full Flexible Search Variant Toggles -->
-        <div id="toggleContainer">
-          <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">2. Variant & Potions</label>
-          <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-            <button id="toggle-M" onclick="toggleVariant('M')" 
-                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
-              M
-            </button>
-            <button id="toggle-N" onclick="toggleVariant('N')" 
-                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
-              N
-            </button>
-            <button id="toggle-F" onclick="togglePotion('F')" 
-                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
-              F
-            </button>
-            <button id="toggle-R" onclick="togglePotion('R')" 
-                    class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">
-              R
-            </button>
+          <!-- Variant Toggles -->
+          <div id="toggleContainer">
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">2. Variant & Potions</label>
+            <div class="grid grid-cols-4 gap-2 text-xs font-bold">
+              <button id="toggle-M" onclick="toggleVariant('M')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
+              <button id="toggle-N" onclick="toggleVariant('N')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">N</button>
+              <button id="toggle-F" onclick="togglePotion('F')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">F</button>
+              <button id="toggle-R" onclick="togglePotion('R')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">R</button>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-2 text-center">
+              Active Variant: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
+            </div>
           </div>
-          <div class="text-[11px] text-slate-500 mt-2 text-center">
-            Active Tag: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
-          </div>
-        </div>
 
-        <!-- Search Action Button -->
-        <div>
-          <button id="executeSearchBtn" onclick="executeSearch()" 
-                  class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg transition shadow-lg flex items-center justify-center gap-2 text-sm">
-            <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
-            Search Analytics
+          <!-- Action Button -->
+          <button id="executeSearchBtn" onclick="executeSearch()" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg transition shadow-lg flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="line-chart" class="w-4 h-4"></i>
+            Check Pet Value
           </button>
         </div>
-      </div>
 
-      <!-- Main Analytics Viewport -->
-      <div id="analyticsViewport" class="lg:col-span-3 space-y-6 flex flex-col items-center">
-        
-        <!-- Reduced Width Container -->
-        <div class="w-full max-w-2xl space-y-6">
+        <!-- Main Graph Viewport -->
+        <div class="lg:col-span-3 space-y-6">
           
-          <!-- Summary Stats Metrics -->
+          <!-- Key Pet Stats -->
           <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
             <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
               <span class="text-xs font-medium text-slate-400">Current Value</span>
@@ -193,89 +130,269 @@
             </div>
           </div>
 
-          <!-- Chart Card -->
+          <!-- Line Chart Viewport -->
           <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
             <div>
-              <h2 id="chartTitle" class="text-lg font-bold text-white">Select Pet & Click Search</h2>
-              <p id="chartSubtitle" class="text-xs text-slate-400">Historical valuation line graph</p>
+              <h2 id="chartTitle" class="text-lg font-bold text-white">Select Pet & Click Check Value</h2>
+              <p id="chartSubtitle" class="text-xs text-slate-400">Historical market trajectory line graph</p>
             </div>
-
-            <!-- Chart Area -->
             <div class="relative h-[320px] w-full">
               <canvas id="valueChart"></canvas>
             </div>
           </div>
 
-          <!-- Search History Drawer (With Live Value Tag) -->
+          <!-- History Drawer -->
           <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-xl space-y-3">
             <div class="flex items-center justify-between">
               <h3 class="text-xs font-bold uppercase tracking-wider text-slate-400 flex items-center gap-1.5">
                 <i data-lucide="history" class="w-4 h-4 text-brand-500"></i>
-                Recent Search History
+                Recent Searches
               </h3>
-              <button onclick="clearAllHistory()" class="text-[11px] text-rose-400 hover:text-rose-300 transition">
-                Clear All
-              </button>
+              <button onclick="clearAllHistory()" class="text-[11px] text-rose-400 hover:text-rose-300 transition">Clear All</button>
             </div>
-
-            <!-- Horizontal Scrollable Container -->
             <div id="searchHistoryList" class="flex gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-slate-700">
-              <div class="text-xs text-slate-500 py-1">No search history recorded yet.</div>
+              <div class="text-xs text-slate-500 py-1">No recent searches recorded yet.</div>
             </div>
           </div>
 
         </div>
+      </div>
+    </div>
+
+    <!-- ================= TAB 2: MARKET ANALYSIS ================= -->
+    <div id="tabContent-2" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        
+        <!-- Top Gainers Card -->
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
+              <i data-lucide="arrow-up-right" class="text-emerald-400 w-5 h-5"></i>
+              Top Market Gainers
+            </h3>
+            <span class="text-xs text-slate-500">% Change</span>
+          </div>
+          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
+            <div class="text-slate-500 text-xs">Calculating gains...</div>
+          </div>
+          <div id="topGainersFooter" class="mt-4 pt-3 border-t border-slate-800 text-center hidden">
+            <button onclick="loadMoreGainers()" class="text-xs font-bold text-brand-400 hover:text-brand-300 py-1.5 px-4 rounded bg-slate-800 hover:bg-slate-700 transition">
+              See More Gainers
+            </button>
+          </div>
+        </div>
+
+        <!-- Top Losers Card -->
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
+          <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
+            <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
+              <i data-lucide="arrow-down-right" class="text-rose-400 w-5 h-5"></i>
+              Top Market Losers
+            </h3>
+            <span class="text-xs text-slate-500">% Change</span>
+          </div>
+          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
+            <div class="text-slate-500 text-xs">Calculating drops...</div>
+          </div>
+          <div id="topLosersFooter" class="mt-4 pt-3 border-t border-slate-800 text-center hidden">
+            <button onclick="loadMoreLosers()" class="text-xs font-bold text-brand-400 hover:text-brand-300 py-1.5 px-4 rounded bg-slate-800 hover:bg-slate-700 transition">
+              See More Losers
+            </button>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Audit Log Banner -->
+      <div onclick="openUpdateModal()" class="bg-cardbg border border-slate-800 hover:border-brand-500/50 p-4 rounded-xl transition cursor-pointer flex items-center justify-between shadow-lg group">
+        <div class="flex items-center gap-3">
+          <div class="p-2.5 rounded-lg bg-brand-500/10 text-brand-400 group-hover:scale-105 transition">
+            <i data-lucide="calendar-clock" class="w-6 h-6"></i>
+          </div>
+          <div>
+            <div class="text-xs text-slate-400 uppercase font-semibold">Database Updates Audit Log</div>
+            <div id="lastUpdatedTimestamp" class="text-sm font-bold text-white mt-0.5">Fetching timestamp...</div>
+          </div>
+        </div>
+        <span class="text-xs font-semibold text-brand-400 flex items-center gap-1 group-hover:translate-x-1 transition">
+          View 30-Day Audit Log (FR, NFR, MFR) <i data-lucide="chevron-right" class="w-4 h-4"></i>
+        </span>
+      </div>
+    </div>
+
+    <!-- ================= TAB 3: BACKPACK & OFFER SUGGESTER ================= -->
+    <div id="tabContent-3" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <!-- Inventory Management Panel -->
+        <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+            <i data-lucide="backpack" class="text-brand-500 w-5 h-5"></i>
+            Manage Your Backpack
+          </h3>
+          <p class="text-xs text-slate-400">Save owned pets here to automatically calculate trade offers.</p>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Add Pet to Inventory</label>
+            <div class="relative">
+              <input type="text" id="bpSearchInput" placeholder="Search pet..." oninput="filterBpPetList()" 
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            </div>
+            <div id="bpPetSelectContainer" class="hidden mt-1">
+              <select id="bpPetSelect" onchange="onBpPetSelectClick()" size="5" 
+                      class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 scrollbar-thin scrollbar-thumb-slate-700">
+              </select>
+            </div>
+          </div>
+
+          <!-- Backpack Variant Toggles -->
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Variant & Potions</label>
+            <div class="grid grid-cols-4 gap-2 text-xs font-bold">
+              <button id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
+              <button id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
+              <button id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
+              <button id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
+            </div>
+          </div>
+
+          <button onclick="addToBackpack()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add to Backpack
+          </button>
+
+          <!-- Current Backpack Inventory List -->
+          <div class="border-t border-slate-800 pt-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase text-slate-400">Your Inventory</span>
+              <button onclick="clearBackpack()" class="text-[10px] text-rose-400 hover:text-rose-300">Clear All</button>
+            </div>
+            <div id="backpackItemsList" class="space-y-1.5 max-h-60 overflow-y-auto pr-1 text-xs scrollbar-thin scrollbar-thumb-slate-700">
+              <div class="text-slate-500 py-2">Backpack is empty. Add items above!</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Target Pet & Suggestion Dashboard -->
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <i data-lucide="sparkles" class="text-amber-400 w-5 h-5"></i>
+              Offer Suggester Engine
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Pet You Want</label>
+                <input type="text" id="targetSearchInput" placeholder="Target pet name..." oninput="filterTargetList()"
+                       class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                <div id="targetSelectContainer" class="hidden mt-1">
+                  <select id="targetSelect" onchange="onTargetSelectClick()" size="4"
+                          class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 scrollbar-thin scrollbar-thumb-slate-700">
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant</label>
+                <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
+                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
+                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
+                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
+                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
+                </div>
+              </div>
+            </div>
+
+            <button onclick="generateOfferSuggestions()" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-lg">
+              <i data-lucide="wand-2" class="w-4 h-4"></i> Generate Trade Offers From Backpack
+            </button>
+          </div>
+
+          <!-- Trade Suggestions Output Section -->
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            
+            <!-- Win / Underpay Offer -->
+            <div class="bg-cardbg p-4 rounded-xl border border-emerald-500/30 flex flex-col space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="trending-up" class="w-4 h-4"></i> Win Offer
+                </span>
+                <span id="winPctTag" class="text-[10px] bg-emerald-500/10 text-emerald-400 px-1.5 py-0.5 rounded font-bold">~92% Value</span>
+              </div>
+              <div id="winOfferContainer" class="flex-1 text-xs space-y-2">
+                <div class="text-slate-500 py-4 text-center">Enter target & click generate.</div>
+              </div>
+            </div>
+
+            <!-- Fair Offer -->
+            <div class="bg-cardbg p-4 rounded-xl border border-blue-500/30 flex flex-col space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="scale" class="w-4 h-4"></i> Fair Offer
+                </span>
+                <span id="fairPctTag" class="text-[10px] bg-blue-500/10 text-blue-400 px-1.5 py-0.5 rounded font-bold">~100% Value</span>
+              </div>
+              <div id="fairOfferContainer" class="flex-1 text-xs space-y-2">
+                <div class="text-slate-500 py-4 text-center">Enter target & click generate.</div>
+              </div>
+            </div>
+
+            <!-- Overpay / Small Lose Offer -->
+            <div class="bg-cardbg p-4 rounded-xl border border-amber-500/30 flex flex-col space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="zap" class="w-4 h-4"></i> Overpay Offer
+                </span>
+                <span id="losePctTag" class="text-[10px] bg-amber-500/10 text-amber-400 px-1.5 py-0.5 rounded font-bold">~108% Value</span>
+              </div>
+              <div id="loseOfferContainer" class="flex-1 text-xs space-y-2">
+                <div class="text-slate-500 py-4 text-center">Enter target & click generate.</div>
+              </div>
+            </div>
+
+          </div>
+        </div>
 
       </div>
     </div>
+
   </div>
 
-  <!-- Updates Audit Modal (FR, NFR, MFR Shifts Only) -->
+  <!-- Audit Modal -->
   <div id="updateModal" class="fixed inset-0 bg-slate-950/80 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
     <div class="bg-cardbg border border-slate-800 rounded-2xl w-full max-w-3xl max-h-[85vh] flex flex-col shadow-2xl overflow-hidden">
-      
-      <!-- Modal Header -->
       <div class="p-5 border-b border-slate-800 flex items-center justify-between bg-slate-900/50">
         <div>
           <h3 class="text-lg font-bold text-white flex items-center gap-2">
             <i data-lucide="history" class="text-brand-500 w-5 h-5"></i>
             Value Audit Log (FR, NFR, MFR Changes)
           </h3>
-          <p class="text-xs text-slate-400 mt-0.5">Select a date to view version shifts (Previous Value ➔ Current Value)</p>
+          <p class="text-xs text-slate-400 mt-0.5">Select date to inspect shift values</p>
         </div>
         <button onclick="closeUpdateModal()" class="text-slate-400 hover:text-white p-2 rounded-lg bg-slate-800/50 transition">
           <i data-lucide="x" class="w-5 h-5"></i>
         </button>
       </div>
 
-      <!-- Modal Content Body -->
       <div class="p-5 overflow-y-auto space-y-6 flex-1 scrollbar-thin scrollbar-thumb-slate-700">
-        
-        <!-- Date Buttons -->
         <div>
-          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Update Date (Past 30 Days)</label>
-          <div id="auditDatesList" class="flex flex-wrap gap-2">
-            <span class="text-xs text-slate-500">Extracting updates...</span>
-          </div>
+          <label class="block text-xs font-bold uppercase text-slate-400 mb-2">Select Date (Past 30 Days)</label>
+          <div id="auditDatesList" class="flex flex-wrap gap-2"></div>
         </div>
 
-        <!-- Selected Date Audit View -->
         <div id="auditDetailsSection" class="hidden space-y-3">
           <div class="flex items-center justify-between border-b border-slate-800 pb-2">
             <h4 id="selectedAuditDateTitle" class="text-sm font-bold text-brand-400">--</h4>
             <span id="auditCountBadge" class="text-xs px-2 py-0.5 rounded bg-brand-500/10 text-brand-400 font-semibold">0 updates</span>
           </div>
-
-          <div id="auditChangesList" class="space-y-2 text-sm max-h-[300px] overflow-y-auto pr-2">
-            <!-- Dynamically Populated -->
-          </div>
+          <div id="auditChangesList" class="space-y-2 text-sm max-h-[300px] overflow-y-auto pr-2"></div>
         </div>
-
       </div>
     </div>
   </div>
 
   <script>
+    // State Stores
     let rawRecords = [];
     let uniqueBasePets = [];
     let itemCombosMap = {};
@@ -283,22 +400,43 @@
     let chartInstance = null;
     let selectedPetName = "";
 
-    // Search Toggle States
+    // Tab 1 Toggles
     let activeType = 'Regular'; 
     let hasFly = false;
     let hasRide = false;
 
-    // Leaderboard Pagination State
+    // Leaderboard State
     let allGainers = [];
     let allLosers = [];
     let gainersDisplayed = 0;
     let losersDisplayed = 0;
     const PAGE_SIZE = 20;
 
-    // Filter strictly for Audit Log
+    // Tab 3 Backpack State
+    let backpack = JSON.parse(localStorage.getItem('user_backpack') || '[]');
+    let bpSelectedPet = "";
+    let bpActiveType = 'Regular', bpHasFly = false, bpHasRide = false;
+
+    // Tab 3 Target State
+    let targetSelectedPet = "";
+    let targetActiveType = 'Regular', targetHasFly = false, targetHasRide = false;
+
     const AUDIT_ALLOWED_VERSIONS = new Set(["Regular_FR", "N_FR", "M_FR"]);
 
-    // Parse CSV
+    // Tab Switching Logic
+    function switchTab(tabIndex) {
+      [1, 2, 3].forEach(i => {
+        document.getElementById(`tabContent-${i}`).classList.add('hidden');
+        const btn = document.getElementById(`tabBtn-${i}`);
+        btn.className = "py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap";
+      });
+
+      document.getElementById(`tabContent-${tabIndex}`).classList.remove('hidden');
+      const activeBtn = document.getElementById(`tabBtn-${tabIndex}`);
+      activeBtn.className = "py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap";
+    }
+
+    // CSV Parse
     Papa.parse("history.csv", {
       download: true,
       skipEmptyLines: true,
@@ -317,9 +455,7 @@
       if (!rows || rows.length === 0) return;
 
       let startIdx = 0;
-      if (isNaN(parseFloat(rows[0][rows[0].length - 1]))) {
-        startIdx = 1;
-      }
+      if (isNaN(parseFloat(rows[0][rows[0].length - 1]))) startIdx = 1;
 
       rawRecords = [];
       itemCombosMap = {};
@@ -336,7 +472,6 @@
           if (name && !isNaN(val)) {
             rawRecords.push({ date, name, combo, val });
             basePetSet.add(name);
-
             if (!itemCombosMap[name]) itemCombosMap[name] = new Set();
             itemCombosMap[name].add(combo);
           }
@@ -344,23 +479,16 @@
       }
 
       uniqueBasePets = Array.from(basePetSet).sort();
-      
       calculateMarketLeaderboards();
       initLastUpdatedInfo();
       updateToggleUI();
+      renderBackpackUI();
       lucide.createIcons();
     }
 
-    function toggleVariant(variant) {
-      activeType = (activeType === variant) ? 'Regular' : variant;
-      updateToggleUI();
-    }
-
-    function togglePotion(potion) {
-      if (potion === 'F') hasFly = !hasFly;
-      if (potion === 'R') hasRide = !hasRide;
-      updateToggleUI();
-    }
+    // Tab 1 Search Logic
+    function toggleVariant(variant) { activeType = (activeType === variant) ? 'Regular' : variant; updateToggleUI(); }
+    function togglePotion(potion) { if (potion === 'F') hasFly = !hasFly; if (potion === 'R') hasRide = !hasRide; updateToggleUI(); }
 
     function getActiveComboTag() {
       let potionTag = "NP";
@@ -371,408 +499,70 @@
     }
 
     function updateToggleUI() {
-      const combos = itemCombosMap[selectedPetName];
-      const isSingleVariation = combos && combos.size === 1 && combos.has("Regular_NP");
+      const combo = getActiveComboTag();
+      document.getElementById('activeComboTag').innerText = combo;
 
-      const buttons = ['toggle-M', 'toggle-N', 'toggle-F', 'toggle-R'];
-
-      if (isSingleVariation) {
-        activeType = 'Regular';
-        hasFly = false;
-        hasRide = false;
-
-        buttons.forEach(id => {
-          const btn = document.getElementById(id);
-          btn.disabled = true;
-          btn.className = "py-2 rounded-lg bg-slate-900 text-slate-600 border border-slate-800 cursor-not-allowed transition opacity-50";
-        });
-
-        document.getElementById('activeComboTag').innerText = "Regular_NP (Single Variation)";
-        return;
-      }
-
-      buttons.forEach(id => {
-        document.getElementById(id).disabled = false;
+      ['M','N'].forEach(v => {
+        document.getElementById(`toggle-${v}`).className = activeType === v 
+          ? "py-2 rounded-lg bg-violet-600 text-white font-bold" 
+          : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700";
       });
-
-      document.getElementById('toggle-M').className = activeType === 'M' 
-        ? "py-2 rounded-lg bg-violet-600 text-white border border-violet-500 transition shadow" 
-        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
-
-      document.getElementById('toggle-N').className = activeType === 'N' 
-        ? "py-2 rounded-lg bg-emerald-600 text-white border border-emerald-500 transition shadow" 
-        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
-
-      document.getElementById('toggle-F').className = hasFly 
-        ? "py-2 rounded-lg bg-brand-600 text-white border border-brand-500 transition shadow" 
-        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
-
-      document.getElementById('toggle-R').className = hasRide 
-        ? "py-2 rounded-lg bg-red-600 text-white border border-red-500 transition shadow" 
-        : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition";
-
-      document.getElementById('activeComboTag').innerText = getActiveComboTag();
-    }
-
-    // Market Leaderboards
-    function calculateMarketLeaderboards() {
-      const petComboMap = {};
-
-      rawRecords.forEach(r => {
-        const key = `${r.name} (${r.combo})`;
-        if (!petComboMap[key]) petComboMap[key] = [];
-        petComboMap[key].push(r);
-      });
-
-      const metrics = [];
-
-      Object.keys(petComboMap).forEach(key => {
-        const history = petComboMap[key].sort((a,b) => new Date(a.date) - new Date(b.date));
-        if (history.length >= 2) {
-          const startVal = history[0].val;
-          const endVal = history[history.length - 1].val;
-          const pctChange = ((endVal - startVal) / startVal) * 100;
-          const name = history[0].name;
-          const combo = history[0].combo;
-          metrics.push({ key, name, combo, startVal, endVal, pctChange });
-        }
-      });
-
-      allGainers = [...metrics].filter(m => m.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
-      allLosers = [...metrics].filter(m => m.pctChange < 0).sort((a,b) => a.pctChange - b.pctChange);
-
-      document.getElementById('topGainersList').innerHTML = "";
-      document.getElementById('topLosersList').innerHTML = "";
-      gainersDisplayed = 0;
-      losersDisplayed = 0;
-
-      loadMoreGainers();
-      loadMoreLosers();
-    }
-
-    function loadMoreGainers() {
-      const container = document.getElementById('topGainersList');
-      const nextBatch = allGainers.slice(gainersDisplayed, gainersDisplayed + PAGE_SIZE);
-      
-      appendLeaderboardItems(container, nextBatch, true);
-      gainersDisplayed += nextBatch.length;
-
-      const footer = document.getElementById('topGainersFooter');
-      if (gainersDisplayed < allGainers.length) {
-        footer.classList.remove('hidden');
-      } else {
-        footer.classList.add('hidden');
-      }
-    }
-
-    function loadMoreLosers() {
-      const container = document.getElementById('topLosersList');
-      const nextBatch = allLosers.slice(losersDisplayed, losersDisplayed + PAGE_SIZE);
-
-      appendLeaderboardItems(container, nextBatch, false);
-      losersDisplayed += nextBatch.length;
-
-      const footer = document.getElementById('topLosersFooter');
-      if (losersDisplayed < allLosers.length) {
-        footer.classList.remove('hidden');
-      } else {
-        footer.classList.add('hidden');
-      }
-    }
-
-    function appendLeaderboardItems(container, items, isGainer) {
-      if (container.children.length === 1 && container.children[0].innerText.includes("Calculating")) {
-        container.innerHTML = "";
-      }
-
-      if (items.length === 0 && container.children.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-500 py-2">No items found.</div>`;
-        return;
-      }
-
-      items.forEach(item => {
-        const div = document.createElement('div');
-        div.className = "flex justify-between items-center py-1.5 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/40 px-2 rounded cursor-pointer transition group";
-        
-        const badgeClass = isGainer ? "text-emerald-400 bg-emerald-500/10" : "text-rose-400 bg-rose-500/10";
-        const prefix = item.pctChange > 0 ? "+" : "";
-
-        div.onclick = () => selectAndNavigateToPet(item.name, item.combo);
-
-        div.innerHTML = `
-          <span class="text-slate-200 group-hover:text-brand-400 truncate font-medium max-w-[180px]">${item.key}</span>
-          <div class="flex items-center gap-3">
-            <span class="text-xs text-slate-400">${item.endVal.toLocaleString()}</span>
-            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">
-              ${prefix}${item.pctChange.toFixed(1)}%
-            </span>
-          </div>
-        `;
-        container.appendChild(div);
-      });
-    }
-
-    function selectAndNavigateToPet(petName, comboTag) {
-      selectedPetName = petName;
-      document.getElementById("searchInput").value = petName;
-
-      const parts = comboTag.split('_');
-      activeType = parts[0] || 'Regular';
-      hasFly = parts[1] ? parts[1].includes('F') : false;
-      hasRide = parts[1] ? parts[1].includes('R') : false;
-
-      updateToggleUI();
-      executeSearch();
-
-      document.getElementById('analyticsViewport').scrollIntoView({ behavior: 'smooth' });
-    }
-
-    // Timestamp & Audit Log
-    function initLastUpdatedInfo() {
-      if (rawRecords.length === 0) return;
-
-      const dates = rawRecords.map(r => new Date(r.date)).sort((a,b) => b - a);
-      const latestDate = dates[0];
-
-      document.getElementById('lastUpdatedTimestamp').innerText = latestDate.toLocaleString('en-US', {
-        dateStyle: 'medium',
-        timeStyle: 'short'
-      });
-    }
-
-    function openUpdateModal() {
-      document.getElementById('updateModal').classList.remove('hidden');
-      render30DayAuditDates();
-    }
-
-    function closeUpdateModal() {
-      document.getElementById('updateModal').classList.add('hidden');
-    }
-
-    function render30DayAuditDates() {
-      const datesContainer = document.getElementById('auditDatesList');
-      datesContainer.innerHTML = "";
-
-      const now = new Date();
-      const thirtyDaysAgo = new Date();
-      thirtyDaysAgo.setDate(now.getDate() - 30);
-
-      const uniqueDates = Array.from(new Set(rawRecords.map(r => r.date)))
-        .filter(d => new Date(d) >= thirtyDaysAgo)
-        .sort((a,b) => new Date(b) - new Date(a));
-
-      if (uniqueDates.length === 0) {
-        datesContainer.innerHTML = `<span class="text-xs text-slate-500">No updates found in the past 30 days.</span>`;
-        return;
-      }
-
-      uniqueDates.forEach((dStr, idx) => {
-        const btn = document.createElement('button');
-        btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-medium text-slate-200 hover:border-brand-500 transition";
-        btn.innerText = dStr;
-        btn.onclick = () => renderAuditForDate(dStr);
-        datesContainer.appendChild(btn);
-
-        if (idx === 0) renderAuditForDate(dStr);
-      });
-    }
-
-    function renderAuditForDate(targetDateStr) {
-      document.getElementById('auditDetailsSection').classList.remove('hidden');
-      document.getElementById('selectedAuditDateTitle').innerText = `Updated on ${targetDateStr}`;
-
-      const changesContainer = document.getElementById('auditChangesList');
-      changesContainer.innerHTML = "";
-
-      const targetRecords = rawRecords.filter(r => r.date === targetDateStr && AUDIT_ALLOWED_VERSIONS.has(r.combo));
-      
-      const changes = [];
-
-      targetRecords.forEach(curr => {
-        const history = rawRecords
-          .filter(r => r.name === curr.name && r.combo === curr.combo && new Date(r.date) < new Date(targetDateStr))
-          .sort((a,b) => new Date(b.date) - new Date(a.date));
-
-        if (history.length > 0) {
-          const prev = history[0];
-          if (prev.val !== curr.val) {
-            changes.push({
-              name: curr.name,
-              combo: curr.combo,
-              prevVal: prev.val,
-              currVal: curr.val,
-              diff: curr.val - prev.val
-            });
-          }
-        }
-      });
-
-      document.getElementById('auditCountBadge').innerText = `${changes.length} Version Changes`;
-
-      if (changes.length === 0) {
-        changesContainer.innerHTML = `<div class="text-xs text-slate-500 py-2">No FR, NFR, or MFR changes on this date.</div>`;
-        return;
-      }
-
-      changes.forEach(c => {
-        const item = document.createElement('div');
-        item.className = "p-3 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center text-xs";
-        
-        const isUp = c.diff > 0;
-        const colorClass = isUp ? "text-emerald-400" : "text-rose-400";
-        
-        let versionLabel = "FR";
-        if (c.combo === "N_FR") versionLabel = "NFR";
-        if (c.combo === "M_FR") versionLabel = "MFR";
-
-        item.innerHTML = `
-          <div>
-            <span class="font-bold text-white">${c.name}</span>
-            <span class="text-brand-400 font-bold ml-1">(${versionLabel})</span>
-          </div>
-          <div class="flex items-center gap-2">
-            <span class="text-slate-400">${c.prevVal.toLocaleString()}</span>
-            <i data-lucide="arrow-right" class="w-3.5 h-3.5 text-slate-500"></i>
-            <span class="font-bold text-white">${c.currVal.toLocaleString()}</span>
-            <span class="font-bold ${colorClass} ml-1">(${isUp ? '+' : ''}${c.diff})</span>
-          </div>
-        `;
-        changesContainer.appendChild(item);
-      });
-
-      lucide.createIcons();
-    }
-
-    // UI Search Action
-    function populatePetDropdown(pets) {
-      const select = document.getElementById("petSelect");
-      select.innerHTML = "";
-      pets.forEach(pet => {
-        const opt = document.createElement("option");
-        opt.value = pet;
-        opt.textContent = pet;
-        opt.className = "py-1 px-2 rounded hover:bg-slate-800 cursor-pointer text-xs";
-        select.appendChild(opt);
-      });
+      document.getElementById('toggle-F').className = hasFly ? "py-2 rounded-lg bg-brand-600 text-white font-bold" : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700";
+      document.getElementById('toggle-R').className = hasRide ? "py-2 rounded-lg bg-red-600 text-white font-bold" : "py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700";
     }
 
     function filterPetList() {
-      const query = document.getElementById("searchInput").value.trim().toLowerCase();
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
       const container = document.getElementById("petSelectContainer");
-
-      if (query.length === 0) {
-        container.classList.add("hidden");
-        return;
-      }
-
-      const filtered = uniqueBasePets.filter(item => item.toLowerCase().includes(query));
-      populatePetDropdown(filtered);
+      if (!q) { container.classList.add("hidden"); return; }
+      const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
       
+      const select = document.getElementById("petSelect");
+      select.innerHTML = "";
+      filtered.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        opt.className = "py-1 px-2 text-xs rounded hover:bg-slate-800 cursor-pointer";
+        select.appendChild(opt);
+      });
+
       if (filtered.length > 0) {
         container.classList.remove("hidden");
-        document.getElementById("petSelect").value = filtered[0];
+        select.value = filtered[0];
         selectedPetName = filtered[0];
-        updateToggleUI();
       } else {
         container.classList.add("hidden");
       }
     }
 
     function onPetSelectClick() {
-      const selected = document.getElementById("petSelect").value;
-      if (selected) {
-        selectedPetName = selected;
-        document.getElementById("searchInput").value = selected;
+      const sel = document.getElementById("petSelect").value;
+      if (sel) {
+        selectedPetName = sel;
+        document.getElementById("searchInput").value = sel;
         document.getElementById("petSelectContainer").classList.add("hidden");
-        updateToggleUI();
       }
     }
 
     function executeSearch() {
-      if (!selectedPetName) {
-        selectedPetName = document.getElementById("searchInput").value.trim();
-      }
+      if (!selectedPetName) selectedPetName = document.getElementById("searchInput").value.trim();
+      if (!selectedPetName) return alert("Select a pet first!");
 
-      if (!selectedPetName) {
-        alert("Please select or search for a pet/item first.");
-        return;
-      }
-
-      const comboTag = getActiveComboTag();
-      const currentVal = getCurrentVal(selectedPetName, comboTag);
-
-      renderDashboard(selectedPetName, comboTag);
-      logSearchHistory(selectedPetName, comboTag, currentVal);
+      const combo = getActiveComboTag();
+      const currVal = getCurrentVal(selectedPetName, combo);
+      renderDashboard(selectedPetName, combo);
+      logSearchHistory(selectedPetName, combo, currVal);
     }
 
     function getCurrentVal(petName, comboTag) {
       const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
-      if (records.length === 0) return "--";
+      if (records.length === 0) return 0;
       records.sort((a, b) => new Date(a.date) - new Date(b.date));
-      return records[records.length - 1].val.toLocaleString();
+      return records[records.length - 1].val;
     }
 
-    // History Drawer
-    function logSearchHistory(petName, comboTag, value) {
-      const entry = { petName, comboTag, value };
-      
-      searchHistory = searchHistory.filter(h => !(h.petName === petName && h.comboTag === comboTag));
-      searchHistory.unshift(entry);
-      
-      renderSearchHistoryUI();
-    }
-
-    function removeHistoryItem(index, event) {
-      event.stopPropagation();
-      searchHistory.splice(index, 1);
-      renderSearchHistoryUI();
-    }
-
-    function clearAllHistory() {
-      searchHistory = [];
-      renderSearchHistoryUI();
-    }
-
-    function renderSearchHistoryUI() {
-      const container = document.getElementById("searchHistoryList");
-      container.innerHTML = "";
-
-      if (searchHistory.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-500 py-1">No search history recorded yet.</div>`;
-        return;
-      }
-
-      searchHistory.forEach((item, index) => {
-        const chip = document.createElement("div");
-        chip.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs font-medium text-slate-200 whitespace-nowrap hover:border-brand-500 cursor-pointer transition flex-shrink-0 group";
-        chip.onclick = () => {
-          selectedPetName = item.petName;
-          document.getElementById("searchInput").value = item.petName;
-          
-          const parts = item.comboTag.split('_');
-          activeType = parts[0] || 'Regular';
-          hasFly = parts[1] ? parts[1].includes('F') : false;
-          hasRide = parts[1] ? parts[1].includes('R') : false;
-          
-          updateToggleUI();
-          renderDashboard(item.petName, item.comboTag);
-        };
-
-        chip.innerHTML = `
-          <span>${item.petName} <span class="text-slate-400 font-normal">(${item.comboTag}):</span> <strong class="text-emerald-400 font-bold">${item.value}</strong></span>
-          <button onclick="removeHistoryItem(${index}, event)" class="text-slate-500 hover:text-rose-400 text-xs px-1 font-bold transition">
-            ✕
-          </button>
-        `;
-
-        container.appendChild(chip);
-      });
-    }
-
-    // Chart & Dashboard Logic
     function renderDashboard(selectedPet, comboTag) {
       document.getElementById('chartTitle').innerText = `${selectedPet} (${comboTag})`;
-
       const records = rawRecords.filter(r => r.name.toLowerCase() === selectedPet.toLowerCase() && r.combo === comboTag);
       records.sort((a, b) => new Date(a.date) - new Date(b.date));
 
@@ -800,46 +590,394 @@
           type: 'line',
           data: {
             labels: dates,
-            datasets: [
-              {
-                label: 'Value',
-                data: values,
-                borderColor: '#6366f1',
-                backgroundColor: '#6366f115',
-                borderWidth: 2.5,
-                fill: true,
-                tension: 0.15
-              }
-            ]
+            datasets: [{
+              label: 'Value',
+              data: values,
+              borderColor: '#6366f1',
+              backgroundColor: '#6366f115',
+              borderWidth: 2.5,
+              fill: true,
+              tension: 0.15
+            }]
           },
           options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: {
-              legend: { display: false },
-              tooltip: {
-                backgroundColor: '#0f172a',
-                titleColor: '#f8fafc',
-                bodyColor: '#cbd5e1',
-                borderColor: '#334155',
-                borderWidth: 1
-              }
-            },
+            plugins: { legend: { display: false } },
             scales: {
               x: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } },
-              y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' }, beginAtZero: false }
+              y: { grid: { color: '#1e293b' }, ticks: { color: '#64748b' } }
             }
           }
         });
-
       } else {
         document.getElementById('statCurrent').innerText = "No Data";
         document.getElementById('statATH').innerText = "--";
         document.getElementById('statSnapshots').innerText = "0";
         document.getElementById('statChange').innerText = "--";
-        
         if (chartInstance) chartInstance.destroy();
       }
+    }
+
+    function logSearchHistory(petName, comboTag, value) {
+      searchHistory = searchHistory.filter(h => !(h.petName === petName && h.comboTag === comboTag));
+      searchHistory.unshift({ petName, comboTag, value });
+      renderSearchHistoryUI();
+    }
+
+    function clearAllHistory() { searchHistory = []; renderSearchHistoryUI(); }
+
+    function renderSearchHistoryUI() {
+      const container = document.getElementById("searchHistoryList");
+      container.innerHTML = "";
+      if (searchHistory.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-500 py-1">No recent searches recorded yet.</div>`;
+        return;
+      }
+      searchHistory.forEach((item) => {
+        const chip = document.createElement("div");
+        chip.className = "flex items-center gap-2 px-3 py-1.5 rounded-lg bg-slate-900 border border-slate-700 text-xs text-slate-200 cursor-pointer hover:border-brand-500 transition flex-shrink-0";
+        chip.onclick = () => {
+          selectedPetName = item.petName;
+          document.getElementById("searchInput").value = item.petName;
+          renderDashboard(item.petName, item.comboTag);
+        };
+        chip.innerHTML = `<span>${item.petName} (${item.comboTag}): <strong class="text-emerald-400">${item.value.toLocaleString()}</strong></span>`;
+        container.appendChild(chip);
+      });
+    }
+
+    // Tab 2: Market Analysis Leaderboards
+    function calculateMarketLeaderboards() {
+      const petComboMap = {};
+      rawRecords.forEach(r => {
+        const key = `${r.name} (${r.combo})`;
+        if (!petComboMap[key]) petComboMap[key] = [];
+        petComboMap[key].push(r);
+      });
+
+      const metrics = [];
+      Object.keys(petComboMap).forEach(key => {
+        const history = petComboMap[key].sort((a,b) => new Date(a.date) - new Date(b.date));
+        if (history.length >= 2) {
+          const startVal = history[0].val;
+          const endVal = history[history.length - 1].val;
+          const pctChange = ((endVal - startVal) / startVal) * 100;
+          metrics.push({ key, name: history[0].name, combo: history[0].combo, startVal, endVal, pctChange });
+        }
+      });
+
+      allGainers = [...metrics].filter(m => m.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
+      allLosers = [...metrics].filter(m => m.pctChange < 0).sort((a,b) => a.pctChange - b.pctChange);
+
+      document.getElementById('topGainersList').innerHTML = "";
+      document.getElementById('topLosersList').innerHTML = "";
+      gainersDisplayed = 0; losersDisplayed = 0;
+
+      loadMoreGainers();
+      loadMoreLosers();
+    }
+
+    function loadMoreGainers() {
+      const container = document.getElementById('topGainersList');
+      const nextBatch = allGainers.slice(gainersDisplayed, gainersDisplayed + PAGE_SIZE);
+      appendLeaderboardItems(container, nextBatch, true);
+      gainersDisplayed += nextBatch.length;
+      document.getElementById('topGainersFooter').classList.toggle('hidden', gainersDisplayed >= allGainers.length);
+    }
+
+    function loadMoreLosers() {
+      const container = document.getElementById('topLosersList');
+      const nextBatch = allLosers.slice(losersDisplayed, losersDisplayed + PAGE_SIZE);
+      appendLeaderboardItems(container, nextBatch, false);
+      losersDisplayed += nextBatch.length;
+      document.getElementById('topLosersFooter').classList.toggle('hidden', losersDisplayed >= allLosers.length);
+    }
+
+    function appendLeaderboardItems(container, items, isGainer) {
+      items.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "flex justify-between items-center py-1.5 border-b border-slate-800/60 hover:bg-slate-800/40 px-2 rounded cursor-pointer transition";
+        div.onclick = () => {
+          switchTab(1);
+          selectedPetName = item.name;
+          document.getElementById("searchInput").value = item.name;
+          renderDashboard(item.name, item.combo);
+        };
+        const badgeClass = isGainer ? "text-emerald-400 bg-emerald-500/10" : "text-rose-400 bg-rose-500/10";
+        div.innerHTML = `
+          <span class="text-slate-200 truncate font-medium max-w-[180px]">${item.key}</span>
+          <div class="flex items-center gap-3">
+            <span class="text-xs text-slate-400">${item.endVal.toLocaleString()}</span>
+            <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">${item.pctChange > 0 ? '+' : ''}${item.pctChange.toFixed(1)}%</span>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    function initLastUpdatedInfo() {
+      if (rawRecords.length === 0) return;
+      const dates = rawRecords.map(r => new Date(r.date)).sort((a,b) => b - a);
+      document.getElementById('lastUpdatedTimestamp').innerText = dates[0].toLocaleString('en-US', { dateStyle: 'medium', timeStyle: 'short' });
+    }
+
+    function openUpdateModal() { document.getElementById('updateModal').classList.remove('hidden'); render30DayAuditDates(); }
+    function closeUpdateModal() { document.getElementById('updateModal').classList.add('hidden'); }
+
+    function render30DayAuditDates() {
+      const container = document.getElementById('auditDatesList');
+      container.innerHTML = "";
+      const now = new Date(); const thirtyAgo = new Date(); thirtyAgo.setDate(now.getDate() - 30);
+
+      const uniqueDates = Array.from(new Set(rawRecords.map(r => r.date)))
+        .filter(d => new Date(d) >= thirtyAgo)
+        .sort((a,b) => new Date(b) - new Date(a));
+
+      uniqueDates.forEach((dStr, idx) => {
+        const btn = document.createElement('button');
+        btn.className = "px-3 py-1.5 rounded-lg bg-slate-800 border border-slate-700 text-xs font-medium hover:border-brand-500";
+        btn.innerText = dStr;
+        btn.onclick = () => renderAuditForDate(dStr);
+        container.appendChild(btn);
+        if (idx === 0) renderAuditForDate(dStr);
+      });
+    }
+
+    function renderAuditForDate(targetDateStr) {
+      document.getElementById('auditDetailsSection').classList.remove('hidden');
+      document.getElementById('selectedAuditDateTitle').innerText = `Updated on ${targetDateStr}`;
+      const container = document.getElementById('auditChangesList');
+      container.innerHTML = "";
+
+      const targetRecords = rawRecords.filter(r => r.date === targetDateStr && AUDIT_ALLOWED_VERSIONS.has(r.combo));
+      const changes = [];
+
+      targetRecords.forEach(curr => {
+        const history = rawRecords.filter(r => r.name === curr.name && r.combo === curr.combo && new Date(r.date) < new Date(targetDateStr))
+          .sort((a,b) => new Date(b.date) - new Date(a.date));
+        if (history.length > 0 && history[0].val !== curr.val) {
+          changes.push({ name: curr.name, combo: curr.combo, prevVal: history[0].val, currVal: curr.val, diff: curr.val - history[0].val });
+        }
+      });
+
+      document.getElementById('auditCountBadge').innerText = `${changes.length} Changes`;
+      changes.forEach(c => {
+        const item = document.createElement('div');
+        item.className = "p-2.5 rounded-lg bg-slate-900 border border-slate-800 flex justify-between items-center text-xs";
+        item.innerHTML = `
+          <div><span class="font-bold text-white">${c.name}</span> <span class="text-brand-400 font-bold">(${c.combo})</span></div>
+          <div class="flex items-center gap-2">
+            <span class="text-slate-400">${c.prevVal}</span> → <span class="font-bold text-white">${c.currVal}</span>
+            <span class="font-bold ${c.diff > 0 ? 'text-emerald-400':'text-rose-400'}">(${c.diff > 0 ? '+':''}${c.diff})</span>
+          </div>
+        `;
+        container.appendChild(item);
+      });
+    }
+
+    // ================= TAB 3 BACKPACK & OFFER SUGGESTER =================
+    function toggleBpVariant(v) { bpActiveType = (bpActiveType === v) ? 'Regular' : v; updateBpToggleUI(); }
+    function toggleBpPotion(p) { if(p === 'F') bpHasFly = !bpHasFly; if(p === 'R') bpHasRide = !bpHasRide; updateBpToggleUI(); }
+    
+    function getBpComboTag() {
+      let pot = "NP"; if(bpHasFly && bpHasRide) pot = "FR"; else if(bpHasFly) pot = "F"; else if(bpHasRide) pot = "R";
+      return `${bpActiveType}_${pot}`;
+    }
+
+    function updateBpToggleUI() {
+      ['M','N'].forEach(v => {
+        document.getElementById(`bp-toggle-${v}`).className = bpActiveType === v ? "py-1.5 rounded bg-violet-600 text-white" : "py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700";
+      });
+      document.getElementById('bp-toggle-F').className = bpHasFly ? "py-1.5 rounded bg-brand-600 text-white" : "py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700";
+      document.getElementById('bp-toggle-R').className = bpHasRide ? "py-1.5 rounded bg-red-600 text-white" : "py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700";
+    }
+
+    function filterBpPetList() {
+      const q = document.getElementById("bpSearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("bpPetSelectContainer");
+      if (!q) { container.classList.add("hidden"); return; }
+      const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
+      const select = document.getElementById("bpPetSelect");
+      select.innerHTML = "";
+      filtered.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p; opt.className = "py-1 px-2 text-xs rounded hover:bg-slate-800 cursor-pointer";
+        select.appendChild(opt);
+      });
+      if (filtered.length > 0) {
+        container.classList.remove("hidden");
+        select.value = filtered[0];
+        bpSelectedPet = filtered[0];
+      }
+    }
+
+    function onBpPetSelectClick() {
+      bpSelectedPet = document.getElementById("bpPetSelect").value;
+      document.getElementById("bpSearchInput").value = bpSelectedPet;
+      document.getElementById("bpPetSelectContainer").classList.add("hidden");
+    }
+
+    function addToBackpack() {
+      if (!bpSelectedPet) bpSelectedPet = document.getElementById("bpSearchInput").value.trim();
+      if (!bpSelectedPet) return alert("Select a pet to add.");
+
+      const combo = getBpComboTag();
+      const val = getCurrentVal(bpSelectedPet, combo);
+
+      backpack.push({ id: Date.now(), name: bpSelectedPet, combo, val });
+      localStorage.setItem('user_backpack', JSON.stringify(backpack));
+      renderBackpackUI();
+    }
+
+    function removeFromBackpack(id) {
+      backpack = backpack.filter(i => i.id !== id);
+      localStorage.setItem('user_backpack', JSON.stringify(backpack));
+      renderBackpackUI();
+    }
+
+    function clearBackpack() {
+      backpack = [];
+      localStorage.setItem('user_backpack', JSON.stringify(backpack));
+      renderBackpackUI();
+    }
+
+    function renderBackpackUI() {
+      const container = document.getElementById("backpackItemsList");
+      container.innerHTML = "";
+      if (backpack.length === 0) {
+        container.innerHTML = `<div class="text-slate-500 py-2">Backpack is empty. Add items above!</div>`;
+        return;
+      }
+
+      backpack.forEach(item => {
+        const div = document.createElement('div');
+        div.className = "flex items-center justify-between p-2 rounded bg-slate-900 border border-slate-800";
+        div.innerHTML = `
+          <div>
+            <span class="font-bold text-white">${item.name}</span>
+            <span class="text-slate-400 text-[11px]">(${item.combo})</span>
+          </div>
+          <div class="flex items-center gap-2">
+            <span class="font-bold text-emerald-400">${item.val.toLocaleString()}</span>
+            <button onclick="removeFromBackpack(${item.id})" class="text-slate-500 hover:text-rose-400 font-bold">✕</button>
+          </div>
+        `;
+        container.appendChild(div);
+      });
+    }
+
+    // Target Pet Toggles
+    function toggleTargetVariant(v) { targetActiveType = (targetActiveType === v) ? 'Regular' : v; updateTargetToggleUI(); }
+    function toggleTargetPotion(p) { if(p === 'F') targetHasFly = !targetHasFly; if(p === 'R') targetHasRide = !targetHasRide; updateTargetToggleUI(); }
+
+    function getTargetComboTag() {
+      let pot = "NP"; if(targetHasFly && targetHasRide) pot = "FR"; else if(targetHasFly) pot = "F"; else if(targetHasRide) pot = "R";
+      return `${targetActiveType}_${pot}`;
+    }
+
+    function updateTargetToggleUI() {
+      ['M','N'].forEach(v => {
+        document.getElementById(`target-toggle-${v}`).className = targetActiveType === v ? "py-2 rounded bg-violet-600 text-white font-bold" : "py-2 rounded bg-slate-800 text-slate-400 border border-slate-700";
+      });
+      document.getElementById('target-toggle-F').className = targetHasFly ? "py-2 rounded bg-brand-600 text-white font-bold" : "py-2 rounded bg-slate-800 text-slate-400 border border-slate-700";
+      document.getElementById('target-toggle-R').className = targetHasRide ? "py-2 rounded bg-red-600 text-white font-bold" : "py-2 rounded bg-slate-800 text-slate-400 border border-slate-700";
+    }
+
+    function filterTargetList() {
+      const q = document.getElementById("targetSearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("targetSelectContainer");
+      if (!q) { container.classList.add("hidden"); return; }
+      const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
+      const select = document.getElementById("targetSelect");
+      select.innerHTML = "";
+      filtered.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p; opt.className = "py-1 px-2 text-xs rounded hover:bg-slate-800 cursor-pointer";
+        select.appendChild(opt);
+      });
+      if (filtered.length > 0) {
+        container.classList.remove("hidden");
+        select.value = filtered[0];
+        targetSelectedPet = filtered[0];
+      }
+    }
+
+    function onTargetSelectClick() {
+      targetSelectedPet = document.getElementById("targetSelect").value;
+      document.getElementById("targetSearchInput").value = targetSelectedPet;
+      document.getElementById("targetSelectContainer").classList.add("hidden");
+    }
+
+    // Offer Generation Engine
+    function generateOfferSuggestions() {
+      if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
+      if (!targetSelectedPet) return alert("Enter a target pet you want to offer for.");
+
+      if (backpack.length === 0) return alert("Your backpack is empty! Add pets to your inventory first.");
+
+      const combo = getTargetComboTag();
+      const targetVal = getCurrentVal(targetSelectedPet, combo);
+
+      if (targetVal === 0) return alert("Target pet has 0 or missing value in history database.");
+
+      const sortedBackpack = [...backpack].sort((a,b) => b.val - a.val);
+
+      renderOfferCard("winOfferContainer", findCombination(sortedBackpack, targetVal * 0.92), targetVal, "Win");
+      renderOfferCard("fairOfferContainer", findCombination(sortedBackpack, targetVal * 1.00), targetVal, "Fair");
+      renderOfferCard("loseOfferContainer", findCombination(sortedBackpack, targetVal * 1.08), targetVal, "Overpay");
+    }
+
+    function findCombination(items, targetVal) {
+      let bestCombo = [];
+      let minDiff = Infinity;
+
+      function backtrack(startIndex, currentCombo, currentSum) {
+        const diff = Math.abs(currentSum - targetVal);
+        if (diff < minDiff) {
+          minDiff = diff;
+          bestCombo = [...currentCombo];
+        }
+
+        if (currentSum >= targetVal || currentCombo.length >= 6) return;
+
+        for (let i = startIndex; i < items.length; i++) {
+          currentCombo.push(items[i]);
+          backtrack(i + 1, currentCombo, currentSum + items[i].val);
+          currentCombo.pop();
+        }
+      }
+
+      backtrack(0, [], 0);
+      return bestCombo;
+    }
+
+    function renderOfferCard(containerId, comboItems, targetVal, type) {
+      const container = document.getElementById(containerId);
+      container.innerHTML = "";
+
+      if (!comboItems || comboItems.length === 0) {
+        container.innerHTML = `<div class="text-slate-500 py-4 text-center">No suitable combo in backpack.</div>`;
+        return;
+      }
+
+      const totalVal = comboItems.reduce((acc, i) => acc + i.val, 0);
+      const diffPct = (((totalVal - targetVal) / targetVal) * 100).toFixed(1);
+
+      const summary = document.createElement('div');
+      summary.className = "p-2 rounded bg-slate-900 border border-slate-800 text-center font-bold text-slate-200 mb-2";
+      summary.innerHTML = `Total: <span class="text-white">${totalVal.toLocaleString()}</span> <span class="text-[11px] ${totalVal >= targetVal ? 'text-amber-400':'text-emerald-400'}">(${totalVal >= targetVal ? '+':''}${diffPct}%)</span>`;
+      container.appendChild(summary);
+
+      comboItems.forEach(item => {
+        const itemRow = document.createElement('div');
+        itemRow.className = "flex justify-between items-center p-1.5 bg-slate-900/60 rounded border border-slate-800/80";
+        itemRow.innerHTML = `
+          <span class="text-slate-300 font-medium">${item.name} <span class="text-[10px] text-slate-500">(${item.combo})</span></span>
+          <span class="font-bold text-slate-200">${item.val.toLocaleString()}</span>
+        `;
+        container.appendChild(itemRow);
+      });
     }
   </script>
 </body>
