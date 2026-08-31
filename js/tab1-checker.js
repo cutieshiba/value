@@ -1,116 +1,184 @@
-// Global Application State
-let rawRecords = [];
-let uniqueBasePets = [];
+// Tab 1 Local State
+let chartInstance = null;
+let selectedPetName = "";
+let activeType = 'Regular'; // 'Regular', 'M', or 'N'
+let hasFly = false; 
+let hasRide = false;
 
-// Shared Utility: Determine Combo Tag
-function getComboTag(type, fly, ride) {
-  let potionTag = "NP";
-  if (fly && ride) potionTag = "FR";
-  else if (fly) potionTag = "F";
-  else if (ride) potionTag = "R";
-  return `${type}_${potionTag}`;
+// 1. Variant Toggle (Mega / Neon)
+function toggleVariant(v) { 
+  // Toggle off if clicked twice, otherwise set variant
+  activeType = (activeType === v) ? 'Regular' : v; 
+  updateToggleUI(); 
 }
 
-// Direct Hardcoded Button Style Manager
-function updateButtonStyling(prefix, currentType, fly, ride) {
-  const btnM = document.getElementById(`${prefix}-toggle-M`);
-  const btnN = document.getElementById(`${prefix}-toggle-N`);
-  const btnF = document.getElementById(`${prefix}-toggle-F`);
-  const btnR = document.getElementById(`${prefix}-toggle-R`);
-
-  // Default Inactive Style (Dark Slate)
-  const defaultStyle = "background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;";
-
-  // Active Hardcoded Color Styles
-  const mStyle = "background-color: #a855f7; color: #ffffff; border: 1px solid #c084fc; font-weight: bold;";
-  const nStyle = "background-color: #22c55e; color: #ffffff; border: 1px solid #4ade80; font-weight: bold;";
-  const fStyle = "background-color: #3b82f6; color: #ffffff; border: 1px solid #60a5fa; font-weight: bold;";
-  const rStyle = "background-color: #ec4899; color: #ffffff; border: 1px solid #f472b6; font-weight: bold;";
-
-  if (btnM) btnM.style.cssText = currentType === 'M' ? mStyle : defaultStyle;
-  if (btnN) btnN.style.cssText = currentType === 'N' ? nStyle : defaultStyle;
-  if (btnF) btnF.style.cssText = fly ? fStyle : defaultStyle;
-  if (btnR) btnR.style.cssText = ride ? rStyle : defaultStyle;
+// 2. Potion Toggle (Fly / Ride)
+function togglePotion(p) { 
+  if (p === 'F') hasFly = !hasFly; 
+  if (p === 'R') hasRide = !hasRide; 
+  updateToggleUI(); 
 }
 
-// Tab Switch Routing
-function switchTab(tabIndex) {
-  [1, 2, 3].forEach(i => {
-    const content = document.getElementById(`tabContent-${i}`);
-    const btn = document.getElementById(`tabBtn-${i}`);
-    if (content) content.classList.add('hidden');
-    if (btn) {
-      btn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid transparent; color: #94a3b8;";
+// 3. Directly Apply Hardcoded Styles to Tab 1 Buttons
+function updateToggleUI() {
+  if (typeof updateButtonStyling === 'function') {
+    // Calls updateButtonStyling in app.js targeting "toggle-M", "toggle-N", "toggle-F", "toggle-R"
+    updateButtonStyling('toggle', activeType, hasFly, hasRide);
+  }
+
+  // Update combo tag display label if present
+  const tagDisplay = document.getElementById('activeComboTag');
+  if (tagDisplay && typeof getComboTag === 'function') {
+    tagDisplay.innerText = getComboTag(activeType, hasFly, hasRide);
+  }
+}
+
+// 4. Search Bar Filtering & Dropdown
+function filterPetList() {
+  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+  const container = document.getElementById("petSelectContainer");
+  const select = document.getElementById("petSelect");
+
+  if (!query) { 
+    if (container) container.classList.add("hidden"); 
+    return; 
+  }
+
+  if (typeof uniqueBasePets !== 'undefined' && select) {
+    const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(query));
+    select.innerHTML = "";
+    
+    filtered.forEach(p => {
+      const opt = document.createElement("option");
+      opt.value = p; 
+      opt.textContent = p;
+      select.appendChild(opt);
+    });
+
+    if (container && filtered.length > 0) {
+      container.classList.remove("hidden");
     }
-  });
-
-  const activeContent = document.getElementById(`tabContent-${tabIndex}`);
-  const activeBtn = document.getElementById(`tabBtn-${tabIndex}`);
-
-  if (activeContent) activeContent.classList.remove('hidden');
-  if (activeBtn) {
-    activeBtn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid #6366f1; color: #818cf8;";
   }
 }
 
-// Global Valuation Helpers
-function getCurrentVal(petName, comboTag) {
-  const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
-  if (records.length === 0) return 0;
-  records.sort((a, b) => new Date(a.date) - new Date(b.date));
-  return records[records.length - 1].val;
+// 5. Select Pet from Dropdown
+function onPetSelectClick() {
+  const select = document.getElementById("petSelect");
+  if (!select || !select.value) return;
+
+  selectedPetName = select.value;
+  document.getElementById("searchInput").value = selectedPetName;
+  
+  const container = document.getElementById("petSelectContainer");
+  if (container) container.classList.add("hidden");
 }
 
-function calculatePetTrend(petName, comboTag) {
-  const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
-  if (records.length < 2) return { text: "➡️ Stable", color: "color: #94a3b8;" };
-  records.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const oldest = records[0].val;
-  const latest = records[records.length - 1].val;
-
-  if (latest > oldest * 1.03) return { text: "📈 Rising", color: "color: #34d399;" };
-  if (latest < oldest * 0.97) return { text: "📉 Dropping", color: "color: #f87171;" };
-  return { text: "➡️ Stable", color: "color: #cbd5e1;" };
-}
-
-// CSV Parser Initialization
-Papa.parse("history.csv", {
-  download: true,
-  skipEmptyLines: true,
-  complete: function(results) { processCSVData(results.data); },
-  error: function() {
-    document.getElementById('statusBadge').innerText = "Failed to load history.csv";
+// 6. Execute Search & Trigger Dashboard
+function executeSearch() {
+  if (!selectedPetName) {
+    selectedPetName = document.getElementById("searchInput").value.trim();
   }
-});
+  
+  if (!selectedPetName) {
+    alert("Please select or enter a pet name!");
+    return;
+  }
 
-function processCSVData(rows) {
-  if (!rows || rows.length === 0) return;
-  let startIdx = isNaN(parseFloat(rows[0][rows[0].length - 1])) ? 1 : 0;
+  const combo = getComboTag(activeType, hasFly, hasRide);
+  renderDashboard(selectedPetName, combo);
+}
 
-  rawRecords = [];
-  const basePetSet = new Set();
+// 7. Render Dashboard Stats and Value Chart
+function renderDashboard(petName, comboTag) {
+  const titleElem = document.getElementById('chartTitle');
+  if (titleElem) titleElem.innerText = `${petName} (${comboTag})`;
 
-  for (let i = startIdx; i < rows.length; i++) {
-    const row = rows[i];
-    if (row.length >= 4) {
-      const date = row[0].trim();
-      const name = row.slice(1, row.length - 2).join(',').trim();
-      const combo = row[row.length - 2].trim();
-      const val = parseFloat(row[row.length - 1].trim());
+  if (typeof rawRecords === 'undefined') return;
 
-      if (name && !isNaN(val)) {
-        rawRecords.push({ date, name, combo, val });
-        basePetSet.add(name);
+  const records = rawRecords.filter(r => 
+    r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag
+  );
+
+  records.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+  const dates = records.map(r => r.date);
+  const values = records.map(r => r.val);
+
+  if (values.length > 0) {
+    // Populate Stat Counters
+    const statCurr = document.getElementById('statCurrent');
+    const statAth = document.getElementById('statATH');
+    const statSnaps = document.getElementById('statSnapshots');
+
+    if (statCurr) statCurr.innerText = values[values.length - 1];
+    if (statAth) statAth.innerText = Math.max(...values);
+    if (statSnaps) statSnaps.innerText = records.length;
+    
+    // Populate Trend Badge
+    if (typeof calculatePetTrend === 'function') {
+      const trend = calculatePetTrend(petName, comboTag);
+      const trendElem = document.getElementById('statTrend');
+      if (trendElem) {
+        trendElem.innerText = trend.text;
+        trendElem.style.cssText = `font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; ${trend.color}`;
       }
     }
-  }
 
-  uniqueBasePets = Array.from(basePetSet).sort();
-  document.getElementById('statusBadge').innerText = `${rawRecords.length} Records Loaded`;
-  
-  if (typeof renderBackpackUI === 'function') renderBackpackUI();
-  if (typeof computeMarketTrends === 'function') computeMarketTrends();
-  if (typeof renderUpdateHistory === 'function') renderUpdateHistory();
-  if (window.lucide) lucide.createIcons();
+    // Render Line Chart (Chart.js)
+    const chartCanvas = document.getElementById('valueChart');
+    if (chartCanvas && window.Chart) {
+      const ctx = chartCanvas.getContext('2d');
+      if (chartInstance) chartInstance.destroy();
+
+      chartInstance = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: dates,
+          datasets: [{
+            label: 'Value',
+            data: values,
+            borderColor: '#6366f1',
+            backgroundColor: 'rgba(99, 102, 241, 0.1)',
+            fill: true,
+            tension: 0.2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: { display: false }
+          },
+          scales: {
+            x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
+            y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
+          }
+        }
+      });
+    }
+  } else {
+    alert(`No price history found for ${petName} [${comboTag}]`);
+  }
 }
+
+// 8. Inspect Action Triggered from Backpack (Tab 2 Routing)
+function inspectPetFromBackpack(petName, comboTag) {
+  selectedPetName = petName;
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) searchInput.value = petName;
+
+  const parts = comboTag.split('_');
+  activeType = parts[0] || 'Regular';
+  const potions = parts[1] || 'NP';
+  hasFly = potions.includes('F');
+  hasRide = potions.includes('R');
+
+  updateToggleUI();
+  if (typeof switchTab === 'function') switchTab(1);
+  renderDashboard(petName, comboTag);
+}
+
+// 9. Initialize Button States on Load
+document.addEventListener("DOMContentLoaded", () => {
+  updateToggleUI();
+});
