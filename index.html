@@ -224,83 +224,141 @@
     <div id="updateHistoryList" class="space-y-2 text-xs border border-slate-800 p-3 rounded-lg bg-slate-900/50 max-h-[350px] overflow-y-auto"></div>
   </div>
 </div>
-    <!-- TAB 3 markup -->
-    <div id="tabContent-3" class="space-y-6 hidden">
-      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
-        <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
-          <h3 class="text-sm font-bold uppercase text-white flex items-center gap-2"><i data-lucide="backpack" class="text-brand-500 w-5 h-5"></i> Manage Your Backpack</h3>
-          <p class="text-xs text-slate-400">Save owned pets here. Click any pet in your backpack to view its value chart!</p>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Add Pet to Inventory</label>
-            <input type="text" id="bpSearchInput" placeholder="Search pet..." oninput="filterBpPetList()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-            <div id="bpPetSelectContainer" class="hidden mt-1"><select id="bpPetSelect" onchange="onBpPetSelectClick()" size="5" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200"></select></div>
+  <!-- TAB 3: Backpack & Smart Offer Generator -->
+<div id="tabContent-3" class="space-y-6 hidden">
+  <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+
+    <!-- My Backpack Section -->
+    <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+      <div class="flex items-center justify-between border-b border-slate-800 pb-3">
+        <div>
+          <h2 class="text-base font-bold text-white flex items-center gap-2">
+            <i data-lucide="backpack" class="text-brand-400 w-5 h-5"></i> My Backpack
+          </h2>
+          <p class="text-xs text-slate-400">Add inventory pets to auto-calculate trade offers</p>
+        </div>
+        <button onclick="clearBackpack()" class="text-xs text-rose-400 hover:text-rose-300 font-medium">
+          Clear All
+        </button>
+      </div>
+
+      <!-- Add to Backpack Form Controls -->
+      <div class="space-y-3">
+        <!-- Variant & Potion Controls -->
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+            <button id="bp-toggle-N" onclick="toggleBpVariant('N')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Neon (N)</button>
+            <button id="bp-toggle-M" onclick="toggleBpVariant('M')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Mega (M)</button>
           </div>
-          <div>
-            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Variant & Potions</label>
-            <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-              <button type="button" id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
-              <button type="button" id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
-              <button type="button" id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
-              <button type="button" id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
-            </div>
-          </div>
-          <button onclick="addToBackpack()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5"><i data-lucide="plus" class="w-4 h-4"></i> Add to Backpack</button>
-          <div class="border-t border-slate-800 pt-3">
-            <div class="flex items-center justify-between mb-2">
-              <span class="text-xs font-bold uppercase text-slate-400">Your Inventory</span>
-              <button onclick="clearBackpack()" class="text-[10px] text-rose-400 hover:text-rose-300">Clear All</button>
-            </div>
-            <div id="backpackItemsList" class="space-y-1.5 max-h-60 overflow-y-auto border border-slate-800 p-2 rounded-lg bg-slate-900/50"></div>
+          <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+            <button id="bp-toggle-F" onclick="toggleBpPotion('F')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Fly (F)</button>
+            <button id="bp-toggle-R" onclick="toggleBpPotion('R')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Ride (R)</button>
           </div>
         </div>
 
-        <div class="lg:col-span-2 space-y-6">
-          <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
-            <h3 class="text-sm font-bold uppercase text-white flex items-center gap-2"><i data-lucide="sparkles" class="text-amber-400 w-5 h-5"></i> Offer Suggester Engine</h3>
-            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Pet You Want</label>
-                <input type="text" id="targetSearchInput" placeholder="Target pet name..." oninput="filterTargetList()" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white">
-                <div id="targetSelectContainer" class="hidden mt-1"><select id="targetSelect" onchange="onTargetSelectClick()" size="4" class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200"></select></div>
-              </div>
-              <div>
-                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant & Potions</label>
-                <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
-                  <button type="button" id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
-                  <button type="button" id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
-                  <button type="button" id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
-                  <button type="button" id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
-                </div>
-                <div class="text-[11px] text-slate-500 mt-1 text-center">Active Tag: <span id="targetActiveTag" class="text-brand-400 font-semibold">Regular_NP</span></div>
-              </div>
-            </div>
-            <button onclick="generateOfferSuggestions()" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg text-sm flex items-center justify-center gap-2"><i data-lucide="wand-2" class="w-4 h-4"></i> Generate Trade Offers From Backpack</button>
-          </div>
-
-          <div id="targetValSummary" class="text-xs text-slate-400 hidden px-2 flex justify-between items-center bg-slate-900/60 p-2.5 rounded-lg border border-slate-800">
-            <span class="flex items-center gap-2">Target Value: <strong id="dispBaseVal" class="text-white text-sm">0</strong></span>
-            <span id="targetTrendBadge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300">--</span>
-          </div>
-
-          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
-            <div class="bg-cardbg p-4 rounded-xl border border-emerald-500/30 flex flex-col space-y-3">
-              <span class="text-xs font-bold text-emerald-400 uppercase flex items-center gap-1"><i data-lucide="trending-up" class="w-4 h-4"></i> Win Offer</span>
-              <div id="winOfferContainer" class="flex-1 text-xs space-y-2"><div class="text-slate-500 py-4 text-center">Select target & click generate.</div></div>
-            </div>
-            <div class="bg-cardbg p-4 rounded-xl border border-blue-500/30 flex flex-col space-y-3">
-              <span class="text-xs font-bold text-blue-400 uppercase flex items-center gap-1"><i data-lucide="scale" class="w-4 h-4"></i> Fair Offer</span>
-              <div id="fairOfferContainer" class="flex-1 text-xs space-y-2"><div class="text-slate-500 py-4 text-center">Select target & click generate.</div></div>
-            </div>
-            <div class="bg-cardbg p-4 rounded-xl border border-amber-500/30 flex flex-col space-y-3">
-              <span class="text-xs font-bold text-amber-400 uppercase flex items-center gap-1"><i data-lucide="zap" class="w-4 h-4"></i> Overpay Offer</span>
-              <div id="loseOfferContainer" class="flex-1 text-xs space-y-2"><div class="text-slate-500 py-4 text-center">Select target & click generate.</div></div>
+        <!-- Backpack Pet Search -->
+        <div class="relative flex gap-2">
+          <div class="relative flex-1">
+            <input type="text" id="bpSearchInput" oninput="filterBpPetList()" placeholder="Type pet name to add..." class="w-full bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs rounded-lg p-2.5 outline-none">
+            
+            <div id="bpPetSelectContainer" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl max-h-40 overflow-y-auto">
+              <select id="bpPetSelect" size="4" onclick="onBpPetSelectClick()" onchange="onBpPetSelectClick()" class="w-full bg-slate-900 text-slate-200 text-xs p-1 outline-none border-none cursor-pointer"></select>
             </div>
           </div>
+          <button onclick="addToBackpack()" class="bg-brand-600 hover:bg-brand-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg border border-brand-500/40 transition">
+            + Add
+          </button>
         </div>
+      </div>
+
+      <!-- Backpack Scrollable Inventory Box -->
+      <div id="backpackItemsList" class="space-y-2 max-h-64 overflow-y-auto pr-1">
+        <div class="text-slate-500 py-2 text-xs text-center">Backpack is empty. Add items above!</div>
+      </div>
+    </div>
+
+    <!-- Target Pet & Offer Generator Controls -->
+    <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+      <div class="border-b border-slate-800 pb-3">
+        <h2 class="text-base font-bold text-white flex items-center gap-2">
+          <i data-lucide="target" class="text-brand-400 w-5 h-5"></i> Target Pet Selection
+        </h2>
+        <p class="text-xs text-slate-400">Select the pet you want to trade for</p>
+      </div>
+
+      <!-- Target Controls -->
+      <div class="space-y-3">
+        <div class="flex flex-wrap items-center gap-2">
+          <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+            <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Neon (N)</button>
+            <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Mega (M)</button>
+          </div>
+          <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+            <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Fly (F)</button>
+            <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="px-2.5 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">Ride (R)</button>
+          </div>
+          <span id="targetActiveTag" class="text-xs font-bold text-brand-400 bg-slate-900 px-2 py-1 rounded border border-slate-800">Regular_NP</span>
+        </div>
+
+        <div class="relative flex gap-2">
+          <div class="relative flex-1">
+            <input type="text" id="targetSearchInput" oninput="filterTargetList()" placeholder="Type target pet name..." class="w-full bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-xs rounded-lg p-2.5 outline-none">
+            
+            <div id="targetSelectContainer" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl max-h-40 overflow-y-auto">
+              <select id="targetSelect" size="4" onclick="onTargetSelectClick()" onchange="onTargetSelectClick()" class="w-full bg-slate-900 text-slate-200 text-xs p-1 outline-none border-none cursor-pointer"></select>
+            </div>
+          </div>
+          <button onclick="generateOfferSuggestions()" class="bg-emerald-600 hover:bg-emerald-500 text-white font-bold text-xs px-4 py-2.5 rounded-lg border border-emerald-500/40 transition">
+            Generate Offers
+          </button>
+        </div>
+      </div>
+
+      <!-- Selected Target Summary -->
+      <div id="targetValSummary" class="hidden bg-slate-900/90 p-3 rounded-lg border border-slate-800 flex items-center justify-between">
+        <div>
+          <span class="text-[11px] text-slate-400 block">Target Valuation</span>
+          <span id="dispBaseVal" class="text-base font-extrabold text-white">0.00 pts</span>
+        </div>
+        <span id="targetTrendBadge" class="px-2.5 py-1 rounded-full text-[11px] font-semibold bg-slate-800 text-slate-300">--</span>
       </div>
     </div>
 
   </div>
+
+  <!-- Generated Offers Display Columns -->
+  <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+    <!-- Win Column -->
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-xl space-y-3">
+      <h3 class="font-bold text-emerald-400 text-sm flex items-center gap-1.5 border-b border-slate-800 pb-2">
+        💚 Win Offers (Underpay)
+      </h3>
+      <div id="winOfferContainer" class="space-y-2">
+        <div class="text-slate-500 text-center py-4 text-xs">Generate offers to view suggestions.</div>
+      </div>
+    </div>
+
+    <!-- Fair Column -->
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-xl space-y-3">
+      <h3 class="font-bold text-blue-400 text-sm flex items-center gap-1.5 border-b border-slate-800 pb-2">
+        💙 Fair Offers (Equal)
+      </h3>
+      <div id="fairOfferContainer" class="space-y-2">
+        <div class="text-slate-500 text-center py-4 text-xs">Generate offers to view suggestions.</div>
+      </div>
+    </div>
+
+    <!-- Overpay Column -->
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-xl space-y-3">
+      <h3 class="font-bold text-amber-400 text-sm flex items-center gap-1.5 border-b border-slate-800 pb-2">
+        💛 Overpay Offers
+      </h3>
+      <div id="loseOfferContainer" class="space-y-2">
+        <div class="text-slate-500 text-center py-4 text-xs">Generate offers to view suggestions.</div>
+      </div>
+    </div>
+  </div>
+</div> 
 
   <!-- Script Import Hierarchy -->
   <script src="js/app.js"></script>
