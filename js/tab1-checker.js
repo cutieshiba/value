@@ -6,6 +6,7 @@ window.hasFly = window.hasFly || false;
 window.hasRide = window.hasRide || false;
 window.chartInstance = window.chartInstance || null;
 window.selectedPetName = window.selectedPetName || "";
+var MAX_SEARCH_HISTORY = 10;
 
 // ==========================================
 // 1. Button Toggles & UI Styling
@@ -104,7 +105,7 @@ function filterPetList() {
   }
 }
 
-// Called when user selects an item from the <select> list (handles onchange/onclick)
+// Called when user selects an item from the <select> list
 function onPetSelectClick() {
   const select = document.getElementById("petSelect");
   if (!select || !select.value) return;
@@ -216,6 +217,10 @@ function renderDashboard(petName, comboTag) {
         }
       });
     }
+
+    // Save search into local history
+    savePetToHistory(petName, comboTag);
+
   } else {
     alert(`No price history found for "${petName}" [${comboTag}]`);
   }
@@ -240,7 +245,78 @@ function inspectPetFromBackpack(petName, comboTag) {
   renderDashboard(petName, comboTag);
 }
 
+// ==========================================
+// 5. Search History LocalStorage Handler
+// ==========================================
+function getSearchHistory() {
+  try {
+    var stored = localStorage.getItem("petSearchHistory");
+    return stored ? JSON.parse(stored) : [];
+  } catch (e) {
+    return [];
+  }
+}
+
+function savePetToHistory(petName, comboTag) {
+  if (!petName) return;
+  var history = getSearchHistory();
+
+  // Deduplicate entry
+  history = history.filter(function(item) {
+    return !(item.name.toLowerCase() === petName.toLowerCase() && item.combo === comboTag);
+  });
+
+  // Prepend latest entry
+  history.unshift({
+    name: petName,
+    combo: comboTag
+  });
+
+  if (history.length > MAX_SEARCH_HISTORY) {
+    history = history.slice(0, MAX_SEARCH_HISTORY);
+  }
+
+  try {
+    localStorage.setItem("petSearchHistory", JSON.stringify(history));
+  } catch (e) {
+    console.error("Failed saving history", e);
+  }
+
+  renderSearchHistoryChips();
+}
+
+function renderSearchHistoryChips() {
+  var container = document.getElementById("searchHistoryChips");
+  if (!container) return;
+
+  var history = getSearchHistory();
+
+  if (history.length === 0) {
+    container.innerHTML = `<span class="text-slate-500 text-xs italic">No search history yet.</span>`;
+    return;
+  }
+
+  container.innerHTML = history.map(function(item) {
+    var safeName = item.name.replace(/'/g, "\\'");
+    var formattedCombo = (item.combo || 'Regular_NP').replace('Regular_', '');
+
+    return `
+      <button onclick="inspectPetFromBackpack('${safeName}', '${item.combo}')" 
+              class="flex items-center gap-1.5 bg-slate-900 hover:bg-slate-800 text-slate-300 hover:text-white px-2.5 py-1 rounded-md border border-slate-700/70 hover:border-indigo-500/50 text-xs transition shadow-sm group">
+        <span class="font-medium">${item.name}</span>
+        <span class="text-[10px] text-indigo-400 group-hover:text-indigo-300">(${formattedCombo})</span>
+      </button>
+    `;
+  }).join("");
+}
+
+function clearPetSearchHistory() {
+  localStorage.removeItem("petSearchHistory");
+  renderSearchHistoryChips();
+}
+
 // Initialize UI on load
 document.addEventListener("DOMContentLoaded", function() {
   updateToggleUI();
+  renderSearchHistoryChips();
 });
