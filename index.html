@@ -58,26 +58,126 @@
       </button>
     </nav>
 
-  <!-- TAB 1: Pet Inspector & Valuation History -->
+  <!-- TAB 1: Pet Valuation Inspector -->
 <div id="tabContent-1" class="space-y-6">
-  
-  <!-- Search History Section (Below Graph) -->
-<div class="pt-4 mt-4 border-t border-slate-800">
-  <div class="flex items-center justify-between mb-2">
-    <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
-      🕒 Recent Searches
-    </span>
-    <button onclick="clearPetSearchHistory()" class="text-[11px] text-slate-500 hover:text-rose-400 transition font-medium">
-      Clear History
-    </button>
+
+  <!-- Search & Variant Controls Card -->
+  <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+    <div class="flex flex-col lg:flex-row lg:items-center justify-between gap-4">
+      <div>
+        <h2 class="text-lg font-bold text-white flex items-center gap-2">
+          <i data-lucide="search" class="text-brand-400 w-5 h-5"></i> Pet Inspector
+        </h2>
+        <p class="text-xs text-slate-400">Search any pet to inspect historical trends and value breakdown</p>
+      </div>
+
+      <!-- Variant & Potion Toggle Buttons -->
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Variant Toggles (Neon / Mega) -->
+        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+          <button id="toggle-N" onclick="toggleVariant('N')" class="px-3 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">
+            Neon (N)
+          </button>
+          <button id="toggle-M" onclick="toggleVariant('M')" class="px-3 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">
+            Mega (M)
+          </button>
+        </div>
+
+        <!-- Potion Toggles (Fly / Ride) -->
+        <div class="flex items-center bg-slate-900 border border-slate-800 rounded-lg p-1 gap-1">
+          <button id="toggle-F" onclick="togglePotion('F')" class="px-3 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">
+            Fly (F)
+          </button>
+          <button id="toggle-R" onclick="togglePotion('R')" class="px-3 py-1 text-xs rounded-md transition text-slate-400 hover:text-white">
+            Ride (R)
+          </button>
+        </div>
+
+        <!-- Current Selected Combo Tag Badge -->
+        <div class="bg-slate-900/80 border border-brand-500/30 px-3 py-1.5 rounded-lg text-xs">
+          <span class="text-slate-400">Tag:</span>
+          <strong id="activeComboTag" class="text-brand-400 ml-1">Regular_NP</strong>
+        </div>
+      </div>
+    </div>
+
+    <!-- Search Input & Auto-complete Box -->
+    <div class="relative">
+      <div class="flex items-center gap-2">
+        <div class="relative flex-1">
+          <input type="text" id="searchInput" oninput="filterPetList()" placeholder="Type pet name (e.g., Shadow Dragon, Bat Dragon)..." class="w-full bg-slate-900 border border-slate-700 text-white placeholder-slate-500 text-sm rounded-lg p-3 pl-10 focus:ring-brand-500 focus:border-brand-500 outline-none">
+          <i data-lucide="search" class="w-4 h-4 text-slate-500 absolute left-3.5 top-3.5"></i>
+        </div>
+
+        <button onclick="executeSearch()" class="bg-indigo-600 hover:bg-indigo-500 text-white font-bold text-xs px-5 py-3 rounded-lg border border-indigo-500/40 transition flex items-center gap-2 shadow-lg">
+          <i data-lucide="line-chart" class="w-4 h-4"></i> Inspect
+        </button>
+      </div>
+
+      <!-- Auto-complete Suggestions Dropdown -->
+      <div id="petSelectContainer" class="hidden absolute z-50 left-0 right-0 top-full mt-1 bg-slate-900 border border-slate-700 rounded-lg shadow-2xl max-h-56 overflow-y-auto">
+        <select id="petSelect" size="5" onclick="onPetSelectClick()" onchange="onPetSelectClick()" class="w-full bg-slate-900 text-slate-200 text-sm p-1 outline-none border-none cursor-pointer">
+        </select>
+      </div>
+    </div>
   </div>
 
-  <!-- Search History Chips Area -->
-  <div id="searchHistoryChips" class="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-1">
-    <span class="text-slate-500 text-xs italic">No search history yet.</span>
+  <!-- Stats Counter Banner -->
+  <div class="grid grid-cols-2 md:grid-cols-4 gap-4">
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-md">
+      <span class="text-slate-400 text-xs font-semibold block">Current Value</span>
+      <span id="statCurrent" class="text-xl font-extrabold text-white mt-1 block">--</span>
+    </div>
+
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-md">
+      <span class="text-slate-400 text-xs font-semibold block">All-Time High (ATH)</span>
+      <span id="statATH" class="text-xl font-extrabold text-emerald-400 mt-1 block">--</span>
+    </div>
+
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-md">
+      <span class="text-slate-400 text-xs font-semibold block">Total Snapshots</span>
+      <span id="statSnapshots" class="text-xl font-extrabold text-indigo-400 mt-1 block">--</span>
+    </div>
+
+    <div class="bg-cardbg p-4 rounded-xl border border-slate-800 shadow-md">
+      <span class="text-slate-400 text-xs font-semibold block">Valuation Trend</span>
+      <div id="statTrend" class="text-sm font-bold text-slate-400 mt-1">--</div>
+    </div>
   </div>
+
+  <!-- Valuation History Chart & Search History Box -->
+  <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+    <div class="flex items-center justify-between">
+      <h3 class="font-bold text-white flex items-center gap-2">
+        <i data-lucide="line-chart" class="text-brand-400 w-5 h-5"></i> Valuation History Chart
+      </h3>
+      <span id="chartTitle" class="text-xs text-brand-400 font-semibold">Select a pet above</span>
+    </div>
+
+    <!-- Chart Canvas Container -->
+    <div class="relative h-64 w-full">
+      <canvas id="valueChart"></canvas>
+    </div>
+
+    <!-- Search History Section (Below Graph) -->
+    <div class="pt-4 mt-4 border-t border-slate-800">
+      <div class="flex items-center justify-between mb-2">
+        <span class="text-xs font-bold text-slate-300 flex items-center gap-1.5">
+          🕒 Recent Searches
+        </span>
+        <button onclick="clearPetSearchHistory()" class="text-[11px] text-slate-500 hover:text-rose-400 transition font-medium">
+          Clear History
+        </button>
+      </div>
+
+      <!-- Search History Chips Area -->
+      <div id="searchHistoryChips" class="flex flex-wrap gap-2 max-h-24 overflow-y-auto pr-1">
+        <span class="text-slate-500 text-xs italic">No search history yet.</span>
+      </div>
+    </div>
+  </div>
+
 </div>
-</div>  
 
   <!-- TAB 2 markup -->
 <div id="tabContent-2" class="space-y-6 hidden">
