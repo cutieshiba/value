@@ -53,30 +53,40 @@
       <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         
         <!-- Top Gainers Card -->
-        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl">
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
           <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
             <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
               <i data-lucide="arrow-up-right" class="text-emerald-400 w-5 h-5"></i>
-              Top 5 Gainers (Overall)
+              Top Gainers
             </h3>
             <span class="text-xs text-slate-500">% Change</span>
           </div>
-          <div id="topGainersList" class="space-y-2 text-sm">
+          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
             <div class="text-slate-500 text-xs">Calculating metrics...</div>
+          </div>
+          <div id="topGainersFooter" class="mt-4 pt-3 border-t border-slate-800 text-center hidden">
+            <button onclick="loadMoreGainers()" class="text-xs font-bold text-brand-400 hover:text-brand-300 py-1 px-3 rounded bg-slate-800 hover:bg-slate-700 transition">
+              See More Gainers
+            </button>
           </div>
         </div>
 
         <!-- Top Losers Card -->
-        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl">
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
           <div class="flex items-center justify-between mb-4 border-b border-slate-800 pb-3">
             <h3 class="font-bold text-white flex items-center gap-2 text-sm uppercase tracking-wider">
               <i data-lucide="arrow-down-right" class="text-rose-400 w-5 h-5"></i>
-              Top 5 Losers (Overall)
+              Top Losers
             </h3>
             <span class="text-xs text-slate-500">% Change</span>
           </div>
-          <div id="topLosersList" class="space-y-2 text-sm">
+          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1 scrollbar-thin scrollbar-thumb-slate-700 flex-1">
             <div class="text-slate-500 text-xs">Calculating metrics...</div>
+          </div>
+          <div id="topLosersFooter" class="mt-4 pt-3 border-t border-slate-800 text-center hidden">
+            <button onclick="loadMoreLosers()" class="text-xs font-bold text-brand-400 hover:text-brand-300 py-1 px-3 rounded bg-slate-800 hover:bg-slate-700 transition">
+              See More Losers
+            </button>
           </div>
         </div>
 
@@ -158,7 +168,7 @@
       </div>
 
       <!-- Main Analytics Viewport -->
-      <div class="lg:col-span-3 space-y-6 flex flex-col items-center">
+      <div id="analyticsViewport" class="lg:col-span-3 space-y-6 flex flex-col items-center">
         
         <!-- Reduced Width Container -->
         <div class="w-full max-w-2xl space-y-6">
@@ -277,6 +287,13 @@
     let activeType = 'Regular'; 
     let hasFly = false;
     let hasRide = false;
+
+    // Leaderboard Pagination State
+    let allGainers = [];
+    let allLosers = [];
+    let gainersDisplayed = 0;
+    let losersDisplayed = 0;
+    const PAGE_SIZE = 20;
 
     // Filter strictly for Audit Log
     const AUDIT_ALLOWED_VERSIONS = new Set(["Regular_FR", "N_FR", "M_FR"]);
@@ -415,35 +432,75 @@
           const startVal = history[0].val;
           const endVal = history[history.length - 1].val;
           const pctChange = ((endVal - startVal) / startVal) * 100;
-          metrics.push({ key, startVal, endVal, pctChange });
+          const name = history[0].name;
+          const combo = history[0].combo;
+          metrics.push({ key, name, combo, startVal, endVal, pctChange });
         }
       });
 
-      const gainers = [...metrics].sort((a,b) => b.pctChange - a.pctChange).slice(0, 5);
-      const losers = [...metrics].sort((a,b) => a.pctChange - b.pctChange).slice(0, 5);
+      allGainers = [...metrics].filter(m => m.pctChange > 0).sort((a,b) => b.pctChange - a.pctChange);
+      allLosers = [...metrics].filter(m => m.pctChange < 0).sort((a,b) => a.pctChange - b.pctChange);
 
-      renderLeaderboard('topGainersList', gainers, true);
-      renderLeaderboard('topLosersList', losers, false);
+      document.getElementById('topGainersList').innerHTML = "";
+      document.getElementById('topLosersList').innerHTML = "";
+      gainersDisplayed = 0;
+      losersDisplayed = 0;
+
+      loadMoreGainers();
+      loadMoreLosers();
     }
 
-    function renderLeaderboard(elementId, items, isGainer) {
-      const container = document.getElementById(elementId);
-      container.innerHTML = "";
+    function loadMoreGainers() {
+      const container = document.getElementById('topGainersList');
+      const nextBatch = allGainers.slice(gainersDisplayed, gainersDisplayed + PAGE_SIZE);
+      
+      appendLeaderboardItems(container, nextBatch, true);
+      gainersDisplayed += nextBatch.length;
 
-      if (items.length === 0) {
-        container.innerHTML = `<div class="text-xs text-slate-500">Not enough data points yet.</div>`;
+      const footer = document.getElementById('topGainersFooter');
+      if (gainersDisplayed < allGainers.length) {
+        footer.classList.remove('hidden');
+      } else {
+        footer.classList.add('hidden');
+      }
+    }
+
+    function loadMoreLosers() {
+      const container = document.getElementById('topLosersList');
+      const nextBatch = allLosers.slice(losersDisplayed, losersDisplayed + PAGE_SIZE);
+
+      appendLeaderboardItems(container, nextBatch, false);
+      losersDisplayed += nextBatch.length;
+
+      const footer = document.getElementById('topLosersFooter');
+      if (losersDisplayed < allLosers.length) {
+        footer.classList.remove('hidden');
+      } else {
+        footer.classList.add('hidden');
+      }
+    }
+
+    function appendLeaderboardItems(container, items, isGainer) {
+      if (container.children.length === 1 && container.children[0].innerText.includes("Calculating")) {
+        container.innerHTML = "";
+      }
+
+      if (items.length === 0 && container.children.length === 0) {
+        container.innerHTML = `<div class="text-xs text-slate-500 py-2">No items found.</div>`;
         return;
       }
 
       items.forEach(item => {
         const div = document.createElement('div');
-        div.className = "flex justify-between items-center py-1.5 border-b border-slate-800/60 last:border-0";
+        div.className = "flex justify-between items-center py-1.5 border-b border-slate-800/60 last:border-0 hover:bg-slate-800/40 px-2 rounded cursor-pointer transition group";
         
         const badgeClass = isGainer ? "text-emerald-400 bg-emerald-500/10" : "text-rose-400 bg-rose-500/10";
         const prefix = item.pctChange > 0 ? "+" : "";
 
+        div.onclick = () => selectAndNavigateToPet(item.name, item.combo);
+
         div.innerHTML = `
-          <span class="text-slate-200 truncate font-medium max-w-[200px]">${item.key}</span>
+          <span class="text-slate-200 group-hover:text-brand-400 truncate font-medium max-w-[180px]">${item.key}</span>
           <div class="flex items-center gap-3">
             <span class="text-xs text-slate-400">${item.endVal.toLocaleString()}</span>
             <span class="px-2 py-0.5 rounded text-xs font-bold ${badgeClass}">
@@ -453,6 +510,21 @@
         `;
         container.appendChild(div);
       });
+    }
+
+    function selectAndNavigateToPet(petName, comboTag) {
+      selectedPetName = petName;
+      document.getElementById("searchInput").value = petName;
+
+      const parts = comboTag.split('_');
+      activeType = parts[0] || 'Regular';
+      hasFly = parts[1] ? parts[1].includes('F') : false;
+      hasRide = parts[1] ? parts[1].includes('R') : false;
+
+      updateToggleUI();
+      executeSearch();
+
+      document.getElementById('analyticsViewport').scrollIntoView({ behavior: 'smooth' });
     }
 
     // Timestamp & Audit Log
@@ -485,7 +557,6 @@
       const thirtyDaysAgo = new Date();
       thirtyDaysAgo.setDate(now.getDate() - 30);
 
-      // Collect unique update dates
       const uniqueDates = Array.from(new Set(rawRecords.map(r => r.date)))
         .filter(d => new Date(d) >= thirtyDaysAgo)
         .sort((a,b) => new Date(b) - new Date(a));
@@ -513,7 +584,6 @@
       const changesContainer = document.getElementById('auditChangesList');
       changesContainer.innerHTML = "";
 
-      // Restrict audit display strictly to FR, NFR, MFR versions
       const targetRecords = rawRecords.filter(r => r.date === targetDateStr && AUDIT_ALLOWED_VERSIONS.has(r.combo));
       
       const changes = [];
@@ -551,7 +621,6 @@
         const isUp = c.diff > 0;
         const colorClass = isUp ? "text-emerald-400" : "text-rose-400";
         
-        // Friendly Label Tag Map
         let versionLabel = "FR";
         if (c.combo === "N_FR") versionLabel = "NFR";
         if (c.combo === "M_FR") versionLabel = "MFR";
@@ -680,7 +749,6 @@
           selectedPetName = item.petName;
           document.getElementById("searchInput").value = item.petName;
           
-          // Reconstruct tag toggles
           const parts = item.comboTag.split('_');
           activeType = parts[0] || 'Regular';
           hasFly = parts[1] ? parts[1].includes('F') : false;
