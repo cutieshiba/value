@@ -101,27 +101,36 @@
       </div>
     </div>
 
-    <!-- TAB 2 markup -->
-    <div id="tabContent-2" class="space-y-6 hidden">
-      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
-          <h3 class="font-bold text-white mb-1 flex items-center gap-2"><i data-lucide="trending-up" class="text-emerald-400 w-5 h-5"></i> Top Market Gainers</h3>
-          <p class="text-xs text-slate-400 mb-4">Pets with highest valuation growth across snapshots</p>
-          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1"></div>
-        </div>
-        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
-          <h3 class="font-bold text-white mb-1 flex items-center gap-2"><i data-lucide="trending-down" class="text-rose-400 w-5 h-5"></i> Top Market Losers</h3>
-          <p class="text-xs text-slate-400 mb-4">Pets experiencing price drops across snapshots</p>
-          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1"></div>
-        </div>
-      </div>
-      <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-3">
-        <h3 class="font-bold text-white flex items-center gap-2"><i data-lucide="history" class="text-brand-400 w-5 h-5"></i> CSV Update History Log</h3>
-        <p class="text-xs text-slate-400">Snapshot dates and data log points imported from history.csv</p>
-        <div id="updateHistoryList" class="space-y-2 text-xs border border-slate-800 p-3 rounded-lg bg-slate-900/50 max-h-60 overflow-y-auto"></div>
-      </div>
+   <!-- TAB 2 markup -->
+<div id="tabContent-2" class="space-y-6 hidden">
+  <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+    <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
+      <h3 class="font-bold text-white mb-1 flex items-center gap-2">
+        <i data-lucide="trending-up" class="text-emerald-400 w-5 h-5"></i> Top Market Gainers
+      </h3>
+      <p class="text-xs text-slate-400 mb-4">Pets with highest valuation growth across snapshots</p>
+      <!-- REMOVED max-h-96 HERE -->
+      <div id="topGainersList" class="space-y-2 text-sm pr-1"></div>
     </div>
 
+    <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
+      <h3 class="font-bold text-white mb-1 flex items-center gap-2">
+        <i data-lucide="trending-down" class="text-rose-400 w-5 h-5"></i> Top Market Losers
+      </h3>
+      <p class="text-xs text-slate-400 mb-4">Pets experiencing price drops across snapshots</p>
+      <!-- REMOVED max-h-96 HERE -->
+      <div id="topLosersList" class="space-y-2 text-sm pr-1"></div>
+    </div>
+  </div>
+
+  <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-3">
+    <h3 class="font-bold text-white flex items-center gap-2">
+      <i data-lucide="history" class="text-brand-400 w-5 h-5"></i> CSV Update History Log
+    </h3>
+    <p class="text-xs text-slate-400">Click any date to view price changes for FR, NFR, and MFR versions</p>
+    <div id="updateHistoryList" class="space-y-2 text-xs border border-slate-800 p-3 rounded-lg bg-slate-900/50"></div>
+  </div>
+</div>
     <!-- TAB 3 markup -->
     <div id="tabContent-3" class="space-y-6 hidden">
       <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
