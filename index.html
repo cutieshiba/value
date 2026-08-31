@@ -24,6 +24,13 @@
       }
     }
   </script>
+  <style>
+    /* Variant & Potion Button Active Color Themes */
+    .btn-m-active { background-color: #a855f7 !important; color: #ffffff !important; border-color: #c084fc !important; }
+    .btn-n-active { background-color: #22c55e !important; color: #ffffff !important; border-color: #4ade80 !important; }
+    .btn-f-active { background-color: #3b82f6 !important; color: #ffffff !important; border-color: #60a5fa !important; }
+    .btn-r-active { background-color: #ec4899 !important; color: #ffffff !important; border-color: #f472b6 !important; }
+  </style>
 </head>
 <body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white">
 
@@ -156,7 +163,7 @@
             <i data-lucide="backpack" class="text-brand-500 w-5 h-5"></i>
             Manage Your Backpack
           </h3>
-          <p class="text-xs text-slate-400">Save owned pets here to automatically calculate trade offers.</p>
+          <p class="text-xs text-slate-400">Save owned pets here. Click any pet in your backpack to view its value chart!</p>
 
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Add Pet to Inventory</label>
@@ -172,10 +179,10 @@
           <div>
             <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Variant & Potions</label>
             <div class="grid grid-cols-4 gap-2 text-xs font-bold">
-              <button id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
-              <button id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
-              <button id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
-              <button id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
+              <button id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">M</button>
+              <button id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">N</button>
+              <button id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">F</button>
+              <button id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">R</button>
             </div>
           </div>
 
@@ -218,10 +225,10 @@
               <div>
                 <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant & Potions</label>
                 <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
-                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
-                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">N</button>
-                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">F</button>
-                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">R</button>
+                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">M</button>
+                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">N</button>
+                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">F</button>
+                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700 transition">R</button>
                 </div>
                 <div class="text-[11px] text-slate-500 mt-1 text-center">
                   Active Tag: <span id="targetActiveTag" class="text-brand-400 font-semibold">Regular_NP</span>
@@ -295,11 +302,14 @@
     let chartInstance = null;
     let selectedPetName = "";
 
+    // Tab 1 State
     let activeType = 'Regular', hasFly = false, hasRide = false;
+    
+    // Tab 3 Backpack State
     let backpack = JSON.parse(localStorage.getItem('user_backpack') || '[]');
     let bpSelectedPet = "", bpActiveType = 'Regular', bpHasFly = false, bpHasRide = false;
     
-    // Target Selection State
+    // Tab 3 Target State
     let targetSelectedPet = "", targetActiveType = 'Regular', targetHasFly = false, targetHasRide = false;
 
     function switchTab(tabIndex) {
@@ -349,7 +359,7 @@
       lucide.createIcons();
     }
 
-    // Helper Functions
+    // Helpers
     function getCurrentVal(petName, comboTag) {
       const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
       if (records.length === 0) return 0;
@@ -378,10 +388,25 @@
       return `${type}_${potionTag}`;
     }
 
-    // Tab 1 Options
+    function updateButtonStyling(prefix, activeType, fly, ride) {
+      const btnM = document.getElementById(`${prefix}-toggle-M`);
+      const btnN = document.getElementById(`${prefix}-toggle-N`);
+      const btnF = document.getElementById(`${prefix}-toggle-F`);
+      const btnR = document.getElementById(`${prefix}-toggle-R`);
+
+      const defaultClass = "bg-slate-800 text-slate-400 border-slate-700";
+
+      btnM.className = `py-2 rounded border transition ${activeType === 'M' ? 'btn-m-active' : defaultClass}`;
+      btnN.className = `py-2 rounded border transition ${activeType === 'N' ? 'btn-n-active' : defaultClass}`;
+      btnF.className = `py-2 rounded border transition ${fly ? 'btn-f-active' : defaultClass}`;
+      btnR.className = `py-2 rounded border transition ${ride ? 'btn-r-active' : defaultClass}`;
+    }
+
+    // Tab 1 Handlers
     function toggleVariant(v) { activeType = activeType === v ? 'Regular' : v; updateToggleUI(); }
     function togglePotion(p) { if (p === 'F') hasFly = !hasFly; if (p === 'R') hasRide = !hasRide; updateToggleUI(); }
     function updateToggleUI() {
+      updateButtonStyling('toggle', activeType, hasFly, hasRide);
       document.getElementById('activeComboTag').innerText = getComboTag(activeType, hasFly, hasRide);
     }
 
@@ -441,9 +466,27 @@
       }
     }
 
+    // Redirect Clicked Backpack Pet to Tab 1 Value Checker
+    function inspectPetFromBackpack(petName, comboTag) {
+      selectedPetName = petName;
+      document.getElementById("searchInput").value = petName;
+
+      // Extract combo state
+      const parts = comboTag.split('_');
+      activeType = parts[0] || 'Regular';
+      const potions = parts[1] || 'NP';
+      hasFly = potions.includes('F');
+      hasRide = potions.includes('R');
+
+      updateToggleUI();
+      switchTab(1);
+      renderDashboard(petName, comboTag);
+    }
+
     // Backpack Management
-    function toggleBpVariant(v) { bpActiveType = bpActiveType === v ? 'Regular' : v; }
-    function toggleBpPotion(p) { if (p === 'F') bpHasFly = !bpHasFly; if (p === 'R') bpHasRide = !bpHasRide; }
+    function toggleBpVariant(v) { bpActiveType = bpActiveType === v ? 'Regular' : v; updateButtonStyling('bp-toggle', bpActiveType, bpHasFly, bpHasRide); }
+    function toggleBpPotion(p) { if (p === 'F') bpHasFly = !bpHasFly; if (p === 'R') bpHasRide = !bpHasRide; updateButtonStyling('bp-toggle', bpActiveType, bpHasFly, bpHasRide); }
+    
     function filterBpPetList() {
       const q = document.getElementById("bpSearchInput").value.trim().toLowerCase();
       const container = document.getElementById("bpPetSelectContainer");
@@ -458,6 +501,7 @@
       });
       container.classList.remove("hidden");
     }
+
     function onBpPetSelectClick() {
       bpSelectedPet = document.getElementById("bpPetSelect").value;
       document.getElementById("bpSearchInput").value = bpSelectedPet;
@@ -498,15 +542,15 @@
       backpack.forEach(item => {
         const trend = calculatePetTrend(item.name, item.combo);
         list.innerHTML += `
-          <div class="flex items-center justify-between bg-slate-800 p-2 rounded text-xs">
-            <div class="flex items-center gap-1.5">
-              <span class="font-bold text-white">${item.name}</span>
+          <div class="flex items-center justify-between bg-slate-800 p-2 rounded text-xs hover:bg-slate-700/60 transition">
+            <div onclick="inspectPetFromBackpack('${item.name}', '${item.combo}')" class="flex items-center gap-1.5 cursor-pointer flex-1" title="Click to view chart in Tab 1">
+              <span class="font-bold text-white hover:text-brand-400 underline decoration-slate-600">${item.name}</span>
               <span class="text-[10px] text-brand-400">(${item.combo})</span>
               <span class="text-[10px] ${trend.color}">${trend.text.split(' ')[0]}</span>
             </div>
             <div class="flex items-center gap-2">
               <span class="text-emerald-400 font-semibold">${item.val} pts</span>
-              <button onclick="removeFromBackpack(${item.id})" class="text-rose-400 hover:text-rose-300">✕</button>
+              <button onclick="removeFromBackpack(${item.id})" class="text-rose-400 hover:text-rose-300 ml-1">✕</button>
             </div>
           </div>
         `;
@@ -516,29 +560,14 @@
     // Interactive Target Buttons
     function toggleTargetVariant(v) {
       targetActiveType = targetActiveType === v ? 'Regular' : v;
-      updateTargetButtonUI();
+      updateButtonStyling('target-toggle', targetActiveType, targetHasFly, targetHasRide);
+      document.getElementById('targetActiveTag').innerText = getComboTag(targetActiveType, targetHasFly, targetHasRide);
     }
 
     function toggleTargetPotion(p) {
       if (p === 'F') targetHasFly = !targetHasFly;
       if (p === 'R') targetHasRide = !targetHasRide;
-      updateTargetButtonUI();
-    }
-
-    function updateTargetButtonUI() {
-      const btnM = document.getElementById('target-toggle-M');
-      const btnN = document.getElementById('target-toggle-N');
-      const btnF = document.getElementById('target-toggle-F');
-      const btnR = document.getElementById('target-toggle-R');
-
-      const activeClass = "bg-brand-600 text-white border-brand-500";
-      const inactiveClass = "bg-slate-800 text-slate-400 border-slate-700";
-
-      btnM.className = `py-2 rounded border transition ${targetActiveType === 'M' ? activeClass : inactiveClass}`;
-      btnN.className = `py-2 rounded border transition ${targetActiveType === 'N' ? activeClass : inactiveClass}`;
-      btnF.className = `py-2 rounded border transition ${targetHasFly ? activeClass : inactiveClass}`;
-      btnR.className = `py-2 rounded border transition ${targetHasRide ? activeClass : inactiveClass}`;
-
+      updateButtonStyling('target-toggle', targetActiveType, targetHasFly, targetHasRide);
       document.getElementById('targetActiveTag').innerText = getComboTag(targetActiveType, targetHasFly, targetHasRide);
     }
 
@@ -565,87 +594,88 @@
 
     // Offer Generator Logic
     function generateOfferSuggestions() {
-  if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
-  if (!targetSelectedPet) return alert("Select target pet!");
-  if (backpack.length === 0) return alert("Backpack is empty!");
+      if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
+      if (!targetSelectedPet) return alert("Select target pet!");
+      if (backpack.length === 0) return alert("Backpack is empty!");
 
-  const combo = getComboTag(targetActiveType, targetHasFly, targetHasRide);
-  const baseVal = getCurrentVal(targetSelectedPet, combo);
-  const trend = calculatePetTrend(targetSelectedPet, combo);
+      const combo = getComboTag(targetActiveType, targetHasFly, targetHasRide);
+      const baseVal = getCurrentVal(targetSelectedPet, combo);
+      const trend = calculatePetTrend(targetSelectedPet, combo);
 
-  if (baseVal === 0) return alert("Selected target pet variant has no valid price data.");
+      if (baseVal === 0) return alert("Selected target pet variant has no valid price data.");
 
-  // Display Target Summary
-  document.getElementById("targetValSummary").classList.remove("hidden");
-  document.getElementById("dispBaseVal").innerText = baseVal + " pts";
-  
-  const badge = document.getElementById("targetTrendBadge");
-  badge.innerText = `Market Trend: ${trend.text}`;
-  badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
+      // Display Target Summary
+      document.getElementById("targetValSummary").classList.remove("hidden");
+      document.getElementById("dispBaseVal").innerText = baseVal + " pts";
+      
+      const badge = document.getElementById("targetTrendBadge");
+      badge.innerText = `Market Trend: ${trend.text}`;
+      badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
 
-  // Find distinct combinations from backpack
-  const allCombos = getAllCombinations(backpack);
+      // Calculate Combinations
+      const allCombos = getAllCombinations(backpack);
 
-  // Categorize offers based on strict value ranges
-  const winOffers = allCombos.filter(c => c.totalVal >= baseVal * 0.85 && c.totalVal <= baseVal * 0.96);
-  const fairOffers = allCombos.filter(c => c.totalVal > baseVal * 0.96 && c.totalVal <= baseVal * 1.05);
-  const overpayOffers = allCombos.filter(c => c.totalVal > baseVal * 1.05 && c.totalVal <= baseVal * 1.20);
+      const winOffers = allCombos.filter(c => c.totalVal >= baseVal * 0.85 && c.totalVal <= baseVal * 0.96);
+      const fairOffers = allCombos.filter(c => c.totalVal > baseVal * 0.96 && c.totalVal <= baseVal * 1.05);
+      const overpayOffers = allCombos.filter(c => c.totalVal > baseVal * 1.05 && c.totalVal <= baseVal * 1.20);
 
-  // Render top 3 unique options for each
-  renderOfferColumn("winOfferContainer", winOffers.slice(0, 3), "Win");
-  renderOfferColumn("fairOfferContainer", fairOffers.slice(0, 3), "Fair");
-  renderOfferColumn("loseOfferContainer", overpayOffers.slice(0, 3), "Overpay");
-}
-
-// Helper to generate subset combinations from inventory
-function getAllCombinations(items) {
-  let results = [];
-  
-  // Recursively find item subsets (limited to 6 items per offer max for Adopt Me trade grid)
-  function combine(start, currentCombo, currentVal) {
-    if (currentCombo.length > 0 && currentCombo.length <= 6) {
-      results.push({ items: [...currentCombo], totalVal: currentVal });
+      renderOfferColumn("winOfferContainer", winOffers.slice(0, 3), "Win");
+      renderOfferColumn("fairOfferContainer", fairOffers.slice(0, 3), "Fair");
+      renderOfferColumn("loseOfferContainer", overpayOffers.slice(0, 3), "Overpay");
     }
-    if (currentCombo.length === 6) return;
 
-    for (let i = start; i < items.length; i++) {
-      combine(i + 1, [...currentCombo, items[i]], currentVal + items[i].val);
+    function getAllCombinations(items) {
+      let results = [];
+      
+      function combine(start, currentCombo, currentVal) {
+        if (currentCombo.length > 0 && currentCombo.length <= 6) {
+          results.push({ items: [...currentCombo], totalVal: currentVal });
+        }
+        if (currentCombo.length === 6) return;
+
+        for (let i = start; i < items.length; i++) {
+          combine(i + 1, [...currentCombo, items[i]], currentVal + items[i].val);
+        }
+      }
+
+      combine(0, [], 0);
+      return results.sort((a, b) => a.totalVal - b.totalVal);
     }
-  }
 
-  combine(0, [], 0);
-  
-  // Sort combinations by closest match and deduplicate identical values
-  return results.sort((a, b) => a.totalVal - b.totalVal);
-}
+    function renderOfferColumn(containerId, optionsList, typeLabel) {
+      const box = document.getElementById(containerId);
 
-function renderOfferColumn(containerId, optionsList, typeLabel) {
-  const box = document.getElementById(containerId);
+      if (!optionsList || optionsList.length === 0) {
+        box.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">No suitable ${typeLabel} combinations found in backpack.</div>`;
+        return;
+      }
 
-  if (!optionsList || optionsList.length === 0) {
-    box.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">No suitable ${typeLabel} combinations found in backpack.</div>`;
-    return;
-  }
-
-  box.innerHTML = optionsList.map((opt, idx) => `
-    <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 space-y-1.5 mb-2">
-      <div class="flex justify-between items-center border-b border-slate-800 pb-1">
-        <span class="text-[10px] font-bold text-brand-400 uppercase">Option ${idx + 1}</span>
-        <span class="text-xs font-bold ${typeLabel === 'Win' ? 'text-emerald-400' : typeLabel === 'Fair' ? 'text-blue-400' : 'text-amber-400'}">
-          ${opt.totalVal.toFixed(1)} pts
-        </span>
-      </div>
-      <div class="space-y-1">
-        ${opt.items.map(i => `
-          <div class="flex justify-between text-[11px] text-slate-300">
-            <span>${i.name} <span class="text-[9px] text-slate-500">(${i.combo})</span></span>
-            <span class="text-slate-400">${i.val}</span>
+      box.innerHTML = optionsList.map((opt, idx) => `
+        <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 space-y-1.5 mb-2">
+          <div class="flex justify-between items-center border-b border-slate-800 pb-1">
+            <span class="text-[10px] font-bold text-brand-400 uppercase">Option ${idx + 1}</span>
+            <span class="text-xs font-bold ${typeLabel === 'Win' ? 'text-emerald-400' : typeLabel === 'Fair' ? 'text-blue-400' : 'text-amber-400'}">
+              ${opt.totalVal.toFixed(1)} pts
+            </span>
           </div>
-        `).join("")}
-      </div>
-    </div>
-  `).join("");
-}
+          <div class="space-y-1">
+            ${opt.items.map(i => {
+              const itemTrend = calculatePetTrend(i.name, i.combo);
+              return `
+                <div class="flex justify-between items-center text-[11px] text-slate-300">
+                  <span class="flex items-center gap-1">
+                    <span>${i.name}</span>
+                    <span class="text-[9px] text-slate-500">(${i.combo})</span>
+                    <span class="text-[9px] ${itemTrend.color}">${itemTrend.text.split(' ')[0]}</span>
+                  </span>
+                  <span class="text-slate-400">${i.val}</span>
+                </div>
+              `;
+            }).join("")}
+          </div>
+        </div>
+      `).join("");
+    }
   </script>
 
 </body>
