@@ -13,26 +13,27 @@ function getComboTag(type, fly, ride) {
 
 // Direct Hardcoded Button Style Manager
 function updateButtonStyling(prefix, currentType, fly, ride) {
-  // Looks for "toggle-M", "toggle-N", "toggle-F", "toggle-R"
+  // Looks for "toggle-M", "toggle-N", "toggle-F", "toggle-R" directly
   const btnM = document.getElementById(`${prefix}-M`);
   const btnN = document.getElementById(`${prefix}-N`);
   const btnF = document.getElementById(`${prefix}-F`);
   const btnR = document.getElementById(`${prefix}-R`);
 
   // Default Inactive Style (Dark Slate)
-  const defaultStyle = "background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;";
+  const defaultStyle = "background-color: #1e293b; color: #94a3b8; border: 1px solid #334155; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer;";
 
   // Active Hardcoded Color Styles
-  const mStyle = "background-color: #a855f7; color: #ffffff; border: 1px solid #c084fc; font-weight: bold;";
-  const nStyle = "background-color: #22c55e; color: #ffffff; border: 1px solid #4ade80; font-weight: bold;";
-  const fStyle = "background-color: #3b82f6; color: #ffffff; border: 1px solid #60a5fa; font-weight: bold;";
-  const rStyle = "background-color: #ec4899; color: #ffffff; border: 1px solid #f472b6; font-weight: bold;";
+  const mStyle = "background-color: #a855f7; color: #ffffff; border: 1px solid #c084fc; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer;"; // Purple
+  const nStyle = "background-color: #22c55e; color: #ffffff; border: 1px solid #4ade80; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer;"; // Green
+  const fStyle = "background-color: #3b82f6; color: #ffffff; border: 1px solid #60a5fa; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer;"; // Blue
+  const rStyle = "background-color: #ec4899; color: #ffffff; border: 1px solid #f472b6; padding: 0.5rem; border-radius: 0.5rem; font-weight: bold; cursor: pointer;"; // Pink
 
   if (btnM) btnM.style.cssText = currentType === 'M' ? mStyle : defaultStyle;
   if (btnN) btnN.style.cssText = currentType === 'N' ? nStyle : defaultStyle;
   if (btnF) btnF.style.cssText = fly ? fStyle : defaultStyle;
   if (btnR) btnR.style.cssText = ride ? rStyle : defaultStyle;
 }
+
 // Tab Switch Routing
 function switchTab(tabIndex) {
   [1, 2, 3].forEach(i => {
@@ -40,7 +41,7 @@ function switchTab(tabIndex) {
     const btn = document.getElementById(`tabBtn-${i}`);
     if (content) content.classList.add('hidden');
     if (btn) {
-      btn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid transparent; color: #94a3b8;";
+      btn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid transparent; color: #94a3b8; cursor: pointer;";
     }
   });
 
@@ -49,7 +50,7 @@ function switchTab(tabIndex) {
 
   if (activeContent) activeContent.classList.remove('hidden');
   if (activeBtn) {
-    activeBtn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid #6366f1; color: #818cf8;";
+    activeBtn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid #6366f1; color: #818cf8; cursor: pointer;";
   }
 }
 
@@ -80,7 +81,8 @@ Papa.parse("history.csv", {
   skipEmptyLines: true,
   complete: function(results) { processCSVData(results.data); },
   error: function() {
-    document.getElementById('statusBadge').innerText = "Failed to load history.csv";
+    const badge = document.getElementById('statusBadge');
+    if (badge) badge.innerText = "Failed to load history.csv";
   }
 });
 
@@ -107,7 +109,8 @@ function processCSVData(rows) {
   }
 
   uniqueBasePets = Array.from(basePetSet).sort();
-  document.getElementById('statusBadge').innerText = `${rawRecords.length} Records Loaded`;
+  const badge = document.getElementById('statusBadge');
+  if (badge) badge.innerText = `${rawRecords.length} Records Loaded`;
   
   if (typeof renderBackpackUI === 'function') renderBackpackUI();
   if (typeof computeMarketTrends === 'function') computeMarketTrends();
