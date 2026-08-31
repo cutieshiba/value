@@ -13,10 +13,11 @@ function getComboTag(type, fly, ride) {
 
 // Direct Hardcoded Button Style Manager
 function updateButtonStyling(prefix, currentType, fly, ride) {
-  const btnM = document.getElementById(`${prefix}-toggle-M`);
-  const btnN = document.getElementById(`${prefix}-toggle-N`);
-  const btnF = document.getElementById(`${prefix}-toggle-F`);
-  const btnR = document.getElementById(`${prefix}-toggle-R`);
+  // Looks for "toggle-M", "toggle-N", "toggle-F", "toggle-R"
+  const btnM = document.getElementById(`${prefix}-M`);
+  const btnN = document.getElementById(`${prefix}-N`);
+  const btnF = document.getElementById(`${prefix}-F`);
+  const btnR = document.getElementById(`${prefix}-R`);
 
   // Default Inactive Style (Dark Slate)
   const defaultStyle = "background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;";
@@ -32,7 +33,6 @@ function updateButtonStyling(prefix, currentType, fly, ride) {
   if (btnF) btnF.style.cssText = fly ? fStyle : defaultStyle;
   if (btnR) btnR.style.cssText = ride ? rStyle : defaultStyle;
 }
-
 // Tab Switch Routing
 function switchTab(tabIndex) {
   [1, 2, 3].forEach(i => {
