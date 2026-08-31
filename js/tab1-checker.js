@@ -1,69 +1,79 @@
+// ==========================================
 // Tab 1 Global State
-window.activeType = 'Regular'; // 'Regular', 'M', or 'N'
-window.hasFly = false; 
-window.hasRide = false;
-window.chartInstance = null;
-window.selectedPetName = "";
+// ==========================================
+var activeType = 'Regular'; // 'Regular', 'M', or 'N'
+var hasFly = false; 
+var hasRide = false;
+var chartInstance = null;
+var selectedPetName = "";
 
-// Explicitly attach toggle functions to window scope for HTML onclick
-window.toggleVariant = function(v) { 
-  window.activeType = (window.activeType === v) ? 'Regular' : v; 
-  window.updateToggleUI(); 
-};
+// ==========================================
+// 1. Button Toggles & UI Styling
+// ==========================================
+function toggleVariant(v) { 
+  activeType = (activeType === v) ? 'Regular' : v; 
+  updateToggleUI(); 
+}
 
-window.togglePotion = function(p) { 
-  if (p === 'F') window.hasFly = !window.hasFly; 
-  if (p === 'R') window.hasRide = !window.hasRide; 
-  window.updateToggleUI(); 
-};
+function togglePotion(p) { 
+  if (p === 'F') hasFly = !hasFly; 
+  if (p === 'R') hasRide = !hasRide; 
+  updateToggleUI(); 
+}
 
-// Direct, foolproof color updates
-window.updateToggleUI = function() {
+function updateToggleUI() {
   const btnM = document.getElementById("toggle-M");
   const btnN = document.getElementById("toggle-N");
   const btnF = document.getElementById("toggle-F");
   const btnR = document.getElementById("toggle-R");
 
-  // Reset / Default styling helper
   function styleButton(btn, isActive, activeBgColor, activeBorderColor) {
     if (!btn) return;
     if (isActive) {
-      btn.style.setProperty("background-color", activeBgColor, "important");
-      btn.style.setProperty("border-color", activeBorderColor, "important");
-      btn.style.setProperty("color", "#ffffff", "important");
-      btn.style.setProperty("font-weight", "bold", "important");
+      btn.style.backgroundColor = activeBgColor;
+      btn.style.borderColor = activeBorderColor;
+      btn.style.color = "#ffffff";
+      btn.style.fontWeight = "bold";
     } else {
-      btn.style.setProperty("background-color", "#1e293b", "important");
-      btn.style.setProperty("border-color", "#334155", "important");
-      btn.style.setProperty("color", "#94a3b8", "important");
-      btn.style.setProperty("font-weight", "normal", "important");
+      btn.style.backgroundColor = "#1e293b";
+      btn.style.borderColor = "#334155";
+      btn.style.color = "#94a3b8";
+      btn.style.fontWeight = "normal";
     }
   }
 
-  styleButton(btnM, window.activeType === 'M', '#a855f7', '#c084fc'); // Purple
-  styleButton(btnN, window.activeType === 'N', '#22c55e', '#4ade80'); // Green
-  styleButton(btnF, window.hasFly,          '#3b82f6', '#60a5fa'); // Blue
-  styleButton(btnR, window.hasRide,         '#ec4899', '#f472b6'); // Pink
+  styleButton(btnM, activeType === 'M', '#a855f7', '#c084fc'); // Purple
+  styleButton(btnN, activeType === 'N', '#22c55e', '#4ade80'); // Green
+  styleButton(btnF, hasFly,          '#3b82f6', '#60a5fa'); // Blue
+  styleButton(btnR, hasRide,         '#ec4899', '#f472b6'); // Pink
 
-  // Update combo tag display
+  // Update combo tag display label if present
   const tagDisplay = document.getElementById('activeComboTag');
   if (tagDisplay && typeof getComboTag === 'function') {
-    tagDisplay.innerText = getComboTag(window.activeType, window.hasFly, window.hasRide);
+    tagDisplay.innerText = getComboTag(activeType, hasFly, hasRide);
   }
-};
+}
 
-// Search list filter
-window.filterPetList = function() {
-  const query = document.getElementById("searchInput").value.trim().toLowerCase();
+// ==========================================
+// 2. Search & Dropdown Filter Handlers
+// ==========================================
+function filterPetList() {
+  const input = document.getElementById("searchInput");
+  if (!input) return;
+
+  const query = input.value.trim().toLowerCase();
   const container = document.getElementById("petSelectContainer");
   const select = document.getElementById("petSelect");
+
+  // Keep search target updated as user types
+  selectedPetName = input.value.trim();
 
   if (!query) { 
     if (container) container.classList.add("hidden"); 
     return; 
   }
 
-  if (typeof uniqueBasePets !== 'undefined' && select) {
+  if (typeof uniqueBasePets !== 'undefined' && Array.isArray(uniqueBasePets) && select) {
     const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(query));
     select.innerHTML = "";
     
@@ -74,45 +84,69 @@ window.filterPetList = function() {
       select.appendChild(opt);
     });
 
-    if (container && filtered.length > 0) {
-      container.classList.remove("hidden");
+    if (container) {
+      if (filtered.length > 0) {
+        container.classList.remove("hidden");
+      } else {
+        container.classList.add("hidden");
+      }
     }
   }
-};
+}
 
-window.onPetSelectClick = function() {
+function onPetSelectClick() {
   const select = document.getElementById("petSelect");
   if (!select || !select.value) return;
 
-  window.selectedPetName = select.value;
-  document.getElementById("searchInput").value = window.selectedPetName;
+  selectedPetName = select.value;
+  
+  const input = document.getElementById("searchInput");
+  if (input) input.value = selectedPetName;
   
   const container = document.getElementById("petSelectContainer");
   if (container) container.classList.add("hidden");
-};
+}
 
-window.executeSearch = function() {
-  if (!window.selectedPetName) {
-    window.selectedPetName = document.getElementById("searchInput").value.trim();
+function executeSearch() {
+  const input = document.getElementById("searchInput");
+  if (input && input.value.trim() !== "") {
+    selectedPetName = input.value.trim();
   }
   
-  if (!window.selectedPetName) {
-    alert("Please select or enter a pet name!");
+  if (!selectedPetName) {
+    alert("Please type or select a pet name first!");
     return;
   }
 
-  const combo = getComboTag(window.activeType, window.hasFly, window.hasRide);
-  window.renderDashboard(window.selectedPetName, combo);
-};
+  // Fallback helper if app.js isn't providing getComboTag
+  let combo = "";
+  if (typeof getComboTag === 'function') {
+    combo = getComboTag(activeType, hasFly, hasRide);
+  } else {
+    let potionTag = "NP";
+    if (hasFly && hasRide) potionTag = "FR";
+    else if (hasFly) potionTag = "F";
+    else if (hasRide) potionTag = "R";
+    combo = `${activeType}_${potionTag}`;
+  }
 
-window.renderDashboard = function(petName, comboTag) {
+  renderDashboard(selectedPetName, combo);
+}
+
+// ==========================================
+// 3. Dashboard & Chart Rendering
+// ==========================================
+function renderDashboard(petName, comboTag) {
   const titleElem = document.getElementById('chartTitle');
   if (titleElem) titleElem.innerText = `${petName} (${comboTag})`;
 
-  if (typeof rawRecords === 'undefined') return;
+  if (typeof rawRecords === 'undefined' || !Array.isArray(rawRecords)) {
+    alert("Data not loaded yet. Please wait or check your CSV file.");
+    return;
+  }
 
   const records = rawRecords.filter(r => 
-    r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag
+    r.name && r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag
   );
 
   records.sort((a, b) => new Date(a.date) - new Date(b.date));
@@ -121,6 +155,7 @@ window.renderDashboard = function(petName, comboTag) {
   const values = records.map(r => r.val);
 
   if (values.length > 0) {
+    // Populate Stat Counter Elements
     const statCurr = document.getElementById('statCurrent');
     const statAth = document.getElementById('statATH');
     const statSnaps = document.getElementById('statSnapshots');
@@ -129,6 +164,7 @@ window.renderDashboard = function(petName, comboTag) {
     if (statAth) statAth.innerText = Math.max(...values);
     if (statSnaps) statSnaps.innerText = records.length;
     
+    // Calculate Trend
     if (typeof calculatePetTrend === 'function') {
       const trend = calculatePetTrend(petName, comboTag);
       const trendElem = document.getElementById('statTrend');
@@ -138,12 +174,13 @@ window.renderDashboard = function(petName, comboTag) {
       }
     }
 
+    // Chart.js Graph Rendering
     const chartCanvas = document.getElementById('valueChart');
     if (chartCanvas && window.Chart) {
       const ctx = chartCanvas.getContext('2d');
-      if (window.chartInstance) window.chartInstance.destroy();
+      if (chartInstance) chartInstance.destroy();
 
-      window.chartInstance = new Chart(ctx, {
+      chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: dates,
@@ -168,11 +205,30 @@ window.renderDashboard = function(petName, comboTag) {
       });
     }
   } else {
-    alert(`No price history found for ${petName} [${comboTag}]`);
+    alert(`No price history found for "${petName}" [${comboTag}]`);
   }
-};
+}
 
-// Initialize colors after DOM loads
-document.addEventListener("DOMContentLoaded", () => {
-  window.updateToggleUI();
+// ==========================================
+// 4. Backpack Integration Route (Tab 2/3 Link)
+// ==========================================
+function inspectPetFromBackpack(petName, comboTag) {
+  selectedPetName = petName;
+  const searchInput = document.getElementById("searchInput");
+  if (searchInput) searchInput.value = petName;
+
+  const parts = comboTag.split('_');
+  activeType = parts[0] || 'Regular';
+  const potions = parts[1] || 'NP';
+  hasFly = potions.includes('F');
+  hasRide = potions.includes('R');
+
+  updateToggleUI();
+  if (typeof switchTab === 'function') switchTab(1);
+  renderDashboard(petName, comboTag);
+}
+
+// Ensure Button Styling on Page Load
+document.addEventListener("DOMContentLoaded", function() {
+  updateToggleUI();
 });
