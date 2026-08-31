@@ -10726,3 +10726,707 @@ date,pet_name,variant,value
 2026-08-29,Zombie Wolf,Regular_F,2.03
 2026-08-29,Zombie Wolf,Regular_FR,2.33
 2026-08-29,Zombie Wolf,Regular_NP,1.78
+2026-08-31,2D Doggy,M_F,114.9
+2026-08-31,2D Doggy,M_FR,116
+2026-08-31,2D Doggy,M_NP,113
+2026-08-31,2D Doggy,M_R,114
+2026-08-31,2D Doggy,N_F,27.2
+2026-08-31,2D Doggy,N_FR,28
+2026-08-31,2D Doggy,N_NP,26.25
+2026-08-31,2D Doggy,N_R,27.2
+2026-08-31,2D Doggy,Regular_F,6.6
+2026-08-31,2D Doggy,Regular_FR,7
+2026-08-31,2D Doggy,Regular_NP,6.25
+2026-08-31,African Wild Dog,M_F,2024.9
+2026-08-31,African Wild Dog,M_FR,2026
+2026-08-31,African Wild Dog,M_NP,2103
+2026-08-31,African Wild Dog,M_R,2024
+2026-08-31,African Wild Dog,N_F,544
+2026-08-31,African Wild Dog,N_FR,545
+2026-08-31,African Wild Dog,N_NP,560
+2026-08-31,African Wild Dog,N_R,544
+2026-08-31,Alley Cat,Regular_F,3.15
+2026-08-31,Alley Cat,Regular_FR,3.55
+2026-08-31,Arctic Reindeer,Regular_F,48.35
+2026-08-31,Arctic Reindeer,Regular_FR,49.5
+2026-08-31,Arctic Reindeer,Regular_NP,50
+2026-08-31,Aurora Fox,M_F,76.9
+2026-08-31,Aurora Fox,M_FR,78
+2026-08-31,Aurora Fox,M_NP,75
+2026-08-31,Aurora Fox,M_R,76
+2026-08-31,Aurora Fox,N_F,18.2
+2026-08-31,Aurora Fox,N_FR,19
+2026-08-31,Aurora Fox,N_NP,17.25
+2026-08-31,Aurora Fox,N_R,18.2
+2026-08-31,Aurora Fox,Regular_F,4.3
+2026-08-31,Aurora Fox,Regular_FR,4.7
+2026-08-31,Aurora Fox,Regular_NP,4
+2026-08-31,Balloon Unicorn,M_F,2063.9
+2026-08-31,Balloon Unicorn,M_FR,2065
+2026-08-31,Balloon Unicorn,M_NP,2230
+2026-08-31,Balloon Unicorn,M_R,2063
+2026-08-31,Balloon Unicorn,N_F,559
+2026-08-31,Balloon Unicorn,N_FR,560
+2026-08-31,Balloon Unicorn,N_NP,565
+2026-08-31,Balloon Unicorn,N_R,559
+2026-08-31,Bat Dragon,M_F,6782.6
+2026-08-31,Bat Dragon,M_FR,6720
+2026-08-31,Bat Dragon,M_NP,7257.6
+2026-08-31,Bat Dragon,M_R,6813.9
+2026-08-31,Bat Dragon,Regular_F,930
+2026-08-31,Bat Dragon,Regular_FR,930
+2026-08-31,Bat Dragon,Regular_NP,943
+2026-08-31,Black-Chested Pheasant,M_F,288.9
+2026-08-31,Black-Chested Pheasant,M_FR,290
+2026-08-31,Black-Chested Pheasant,M_NP,295
+2026-08-31,Black-Chested Pheasant,M_R,288
+2026-08-31,Black-Chested Pheasant,N_F,69
+2026-08-31,Black-Chested Pheasant,N_FR,70
+2026-08-31,Black-Chested Pheasant,N_NP,68
+2026-08-31,Black-Chested Pheasant,N_R,69
+2026-08-31,Black-Chested Pheasant,Regular_F,16.45
+2026-08-31,Black-Chested Pheasant,Regular_FR,17
+2026-08-31,Black-Chested Pheasant,Regular_NP,16
+2026-08-31,Blazing Lion,M_F,2848.9
+2026-08-31,Blazing Lion,M_FR,2850
+2026-08-31,Blazing Lion,M_NP,3047
+2026-08-31,Blazing Lion,M_R,2848
+2026-08-31,Blazing Lion,N_F,724
+2026-08-31,Blazing Lion,N_FR,725
+2026-08-31,Blazing Lion,N_NP,733
+2026-08-31,Blazing Lion,N_R,724
+2026-08-31,Blazing Lion,Regular_F,197
+2026-08-31,Blazing Lion,Regular_FR,199
+2026-08-31,Blazing Lion,Regular_NP,197
+2026-08-31,Budgie Witch,M_F,1.85
+2026-08-31,Budgie Witch,M_FR,2.6
+2026-08-31,Budgie Witch,M_NP,1.1
+2026-08-31,Budgie Witch,M_R,1.85
+2026-08-31,Budgie Witch,N_F,0.53
+2026-08-31,Budgie Witch,N_FR,0.8
+2026-08-31,Budgie Witch,N_NP,0.25
+2026-08-31,Budgie Witch,N_R,0.53
+2026-08-31,Budgie Witch,Regular_F,0.23
+2026-08-31,Budgie Witch,Regular_FR,0.48
+2026-08-31,Budgie Witch,Regular_NP,0.03
+2026-08-31,Buzzing Honeypot Hat,Regular_NP,135
+2026-08-31,Candicorn,M_F,104.9
+2026-08-31,Candicorn,M_FR,106
+2026-08-31,Candicorn,M_NP,103
+2026-08-31,Candicorn,M_R,104
+2026-08-31,Candy Cannon,Regular_NP,240
+2026-08-31,Cerberus,M_F,84.9
+2026-08-31,Cerberus,M_FR,86
+2026-08-31,Cerberus,M_NP,83
+2026-08-31,Cerberus,M_R,84
+2026-08-31,Cerberus,N_F,20.2
+2026-08-31,Cerberus,N_FR,21
+2026-08-31,Cerberus,N_NP,19.25
+2026-08-31,Cerberus,N_R,20.2
+2026-08-31,Cerberus,Regular_F,4.8
+2026-08-31,Cerberus,Regular_FR,5.2
+2026-08-31,Cerberus,Regular_NP,4.5
+2026-08-31,Clumpty,M_F,3.05
+2026-08-31,Clumpty,M_FR,3.8
+2026-08-31,Clumpty,M_NP,2.3
+2026-08-31,Clumpty,M_R,3.05
+2026-08-31,Clumpty,N_F,0.79
+2026-08-31,Clumpty,N_FR,1.06
+2026-08-31,Clumpty,N_NP,0.51
+2026-08-31,Clumpty,N_R,0.79
+2026-08-31,Clumpty,Regular_F,0.26
+2026-08-31,Clumpty,Regular_FR,0.51
+2026-08-31,Clumpty,Regular_NP,0.06
+2026-08-31,Crimson Cape,M_F,4.58
+2026-08-31,Crimson Cape,M_FR,5.5
+2026-08-31,Crimson Cape,M_NP,3.65
+2026-08-31,Crimson Cape,M_R,4.58
+2026-08-31,Crimson Cape,N_F,1.13
+2026-08-31,Crimson Cape,N_FR,1.4
+2026-08-31,Crimson Cape,N_NP,0.85
+2026-08-31,Crimson Cape,N_R,1.13
+2026-08-31,Crimson Cape,Regular_F,0.33
+2026-08-31,Crimson Cape,Regular_FR,0.58
+2026-08-31,Crimson Cape,Regular_NP,0.13
+2026-08-31,Cryptid,M_F,1498.9
+2026-08-31,Cryptid,M_FR,1500
+2026-08-31,Cryptid,M_NP,1546
+2026-08-31,Cryptid,M_R,1498
+2026-08-31,Cryptid,N_F,404
+2026-08-31,Cryptid,N_FR,405
+2026-08-31,Cryptid,N_NP,403
+2026-08-31,Cryptid,N_R,404
+2026-08-31,Cryptid,Regular_F,137.85
+2026-08-31,Cryptid,Regular_FR,139
+2026-08-31,Cryptid,Regular_NP,137
+2026-08-31,Cupid Dragon,M_F,110.9
+2026-08-31,Cupid Dragon,M_FR,112
+2026-08-31,Cupid Dragon,M_NP,115
+2026-08-31,Cupid Dragon,M_R,110
+2026-08-31,Cupid Dragon,N_F,27
+2026-08-31,Cupid Dragon,N_FR,28
+2026-08-31,Cupid Dragon,N_NP,26
+2026-08-31,Cupid Dragon,N_R,27
+2026-08-31,Cupid Dragon,Regular_F,6.65
+2026-08-31,Cupid Dragon,Regular_FR,7.1
+2026-08-31,Cupid Dragon,Regular_NP,6.25
+2026-08-31,Diamond Albatross,M_F,80.9
+2026-08-31,Diamond Albatross,M_FR,82
+2026-08-31,Diamond Albatross,M_NP,79
+2026-08-31,Diamond Albatross,M_R,80
+2026-08-31,Diamond Albatross,N_F,19.2
+2026-08-31,Diamond Albatross,N_FR,20
+2026-08-31,Diamond Albatross,N_NP,18.25
+2026-08-31,Diamond Albatross,N_R,19.2
+2026-08-31,Diamond Albatross,Regular_F,4.55
+2026-08-31,Diamond Albatross,Regular_FR,4.95
+2026-08-31,Diamond Albatross,Regular_NP,4.25
+2026-08-31,Diamond Butterfly,M_F,1198.9
+2026-08-31,Diamond Butterfly,M_FR,1200
+2026-08-31,Diamond Butterfly,M_NP,1311
+2026-08-31,Diamond Butterfly,M_R,1198
+2026-08-31,Diamond Butterfly,N_F,299
+2026-08-31,Diamond Butterfly,N_FR,300
+2026-08-31,Diamond Butterfly,N_NP,315
+2026-08-31,Diamond Butterfly,N_R,299
+2026-08-31,Diamond Butterfly,Regular_F,74
+2026-08-31,Diamond Butterfly,Regular_FR,75
+2026-08-31,Diamond Butterfly,Regular_NP,74
+2026-08-31,Diamond Ladybug,M_F,34.9
+2026-08-31,Diamond Ladybug,M_FR,36
+2026-08-31,Diamond Ladybug,M_NP,33
+2026-08-31,Diamond Ladybug,M_R,34
+2026-08-31,Diamond Ladybug,N_F,7.7
+2026-08-31,Diamond Ladybug,N_FR,8.5
+2026-08-31,Diamond Ladybug,N_NP,6.75
+2026-08-31,Diamond Ladybug,N_R,7.7
+2026-08-31,Diamond Ladybug,Regular_F,1.65
+2026-08-31,Diamond Ladybug,Regular_FR,2.05
+2026-08-31,Diamond Ladybug,Regular_NP,1.35
+2026-08-31,Emperor Gorilla,M_F,368.9
+2026-08-31,Emperor Gorilla,M_FR,370
+2026-08-31,Emperor Gorilla,M_NP,385
+2026-08-31,Emperor Gorilla,M_R,368
+2026-08-31,Emperor Gorilla,N_F,91
+2026-08-31,Emperor Gorilla,N_FR,92
+2026-08-31,Emperor Gorilla,N_NP,92
+2026-08-31,Emperor Gorilla,N_R,91
+2026-08-31,Emperor Gorilla,Regular_F,22.6
+2026-08-31,Emperor Gorilla,Regular_FR,23
+2026-08-31,Emperor Gorilla,Regular_NP,22.25
+2026-08-31,Flaming Fox,N_F,10.95
+2026-08-31,Flaming Fox,N_NP,10.4
+2026-08-31,Flaming Fox,N_R,10.95
+2026-08-31,Flaming Fox,Regular_F,2.45
+2026-08-31,Flaming Fox,Regular_FR,2.85
+2026-08-31,Frostbite Bear,M_F,618.9
+2026-08-31,Frostbite Bear,M_FR,620
+2026-08-31,Frostbite Bear,M_NP,617
+2026-08-31,Frostbite Bear,M_R,618
+2026-08-31,Frostbite Bear,N_F,151
+2026-08-31,Frostbite Bear,N_FR,152
+2026-08-31,Frostbite Bear,N_NP,150
+2026-08-31,Frostbite Bear,N_R,151
+2026-08-31,Frostbite Bear,Regular_F,36.45
+2026-08-31,Frostbite Bear,Regular_FR,37
+2026-08-31,Frostbite Bear,Regular_NP,36
+2026-08-31,Gaelic Fae,M_F,23.7
+2026-08-31,Gaelic Fae,M_FR,24.8
+2026-08-31,Gaelic Fae,M_NP,21.8
+2026-08-31,Gaelic Fae,M_R,22.8
+2026-08-31,Gaelic Fae,N_F,5.4
+2026-08-31,Gaelic Fae,N_FR,5.95
+2026-08-31,Gaelic Fae,N_NP,4.85
+2026-08-31,Gaelic Fae,N_R,5.4
+2026-08-31,Gaelic Fae,Regular_F,1.27
+2026-08-31,Gaelic Fae,Regular_FR,1.57
+2026-08-31,Gaelic Fae,Regular_NP,1.02
+2026-08-31,Ghost Bunny,M_F,38.9
+2026-08-31,Ghost Bunny,M_FR,40
+2026-08-31,Ghost Bunny,M_NP,37
+2026-08-31,Ghost Bunny,M_R,38
+2026-08-31,Ghost Bunny,N_F,9.2
+2026-08-31,Ghost Bunny,N_FR,9.75
+2026-08-31,Ghost Bunny,N_NP,8.65
+2026-08-31,Ghost Bunny,N_R,9.2
+2026-08-31,Ghost Bunny,Regular_F,2.03
+2026-08-31,Ghost Bunny,Regular_FR,2.33
+2026-08-31,Ghost Bunny,Regular_NP,1.78
+2026-08-31,Ghost Dog,M_F,37.3
+2026-08-31,Ghost Dog,M_FR,38.4
+2026-08-31,Ghost Dog,M_NP,35.4
+2026-08-31,Ghost Dog,M_R,36.4
+2026-08-31,Ghost Dog,N_F,8.8
+2026-08-31,Ghost Dog,N_FR,9.35
+2026-08-31,Ghost Dog,N_NP,8.25
+2026-08-31,Ghost Dog,N_R,8.8
+2026-08-31,Ghost Dog,Regular_F,1.95
+2026-08-31,Ghost Dog,Regular_FR,2.25
+2026-08-31,Ghost Dog,Regular_NP,1.7
+2026-08-31,Ghost Wolf,M_F,4.13
+2026-08-31,Ghost Wolf,M_FR,5
+2026-08-31,Ghost Wolf,M_NP,3.25
+2026-08-31,Ghost Wolf,M_R,4.13
+2026-08-31,Ghost Wolf,N_F,1.03
+2026-08-31,Ghost Wolf,N_FR,1.3
+2026-08-31,Ghost Wolf,N_NP,0.75
+2026-08-31,Ghost Wolf,N_R,1.03
+2026-08-31,Ghost Wolf,Regular_F,0.31
+2026-08-31,Ghost Wolf,Regular_FR,0.56
+2026-08-31,Ghost Wolf,Regular_NP,0.11
+2026-08-31,Giant Gold Scarab,M_F,80.9
+2026-08-31,Giant Gold Scarab,M_FR,82
+2026-08-31,Giant Gold Scarab,M_NP,79
+2026-08-31,Giant Gold Scarab,M_R,80
+2026-08-31,Giant Gold Scarab,N_F,19.2
+2026-08-31,Giant Gold Scarab,N_FR,20
+2026-08-31,Giant Gold Scarab,N_NP,18.25
+2026-08-31,Giant Gold Scarab,N_R,19.2
+2026-08-31,Giant Gold Scarab,Regular_F,4.55
+2026-08-31,Giant Gold Scarab,Regular_FR,4.95
+2026-08-31,Giant Gold Scarab,Regular_NP,4.25
+2026-08-31,Giant Panda,M_F,3198.9
+2026-08-31,Giant Panda,M_FR,3200
+2026-08-31,Giant Panda,M_NP,3273
+2026-08-31,Giant Panda,M_R,3198
+2026-08-31,Giant Panda,N_F,834
+2026-08-31,Giant Panda,N_FR,835
+2026-08-31,Giant Panda,N_NP,840
+2026-08-31,Giant Panda,N_R,834
+2026-08-31,Giant Panda,Regular_F,219.85
+2026-08-31,Giant Panda,Regular_FR,221
+2026-08-31,Giant Panda,Regular_NP,219.5
+2026-08-31,Granny Wolf,M_F,2.9
+2026-08-31,Granny Wolf,M_FR,3.65
+2026-08-31,Granny Wolf,M_NP,2.15
+2026-08-31,Granny Wolf,M_R,2.9
+2026-08-31,Granny Wolf,N_F,0.76
+2026-08-31,Granny Wolf,N_FR,1.03
+2026-08-31,Granny Wolf,N_NP,0.48
+2026-08-31,Granny Wolf,N_R,0.76
+2026-08-31,Granny Wolf,Regular_F,0.25
+2026-08-31,Granny Wolf,Regular_FR,0.51
+2026-08-31,Granny Wolf,Regular_NP,0.06
+2026-08-31,Grim Dragon,M_F,473.9
+2026-08-31,Grim Dragon,M_FR,475
+2026-08-31,Grim Dragon,M_NP,483
+2026-08-31,Grim Dragon,M_R,473
+2026-08-31,Grim Dragon,N_F,119
+2026-08-31,Grim Dragon,N_FR,120
+2026-08-31,Grim Dragon,N_NP,118
+2026-08-31,Grim Dragon,N_R,119
+2026-08-31,Grim Dragon,Regular_F,30.45
+2026-08-31,Grim Dragon,Regular_FR,31
+2026-08-31,Grim Dragon,Regular_NP,30
+2026-08-31,Haetae,M_F,1938.9
+2026-08-31,Haetae,M_FR,1940
+2026-08-31,Haetae,M_NP,1980
+2026-08-31,Haetae,M_R,1938
+2026-08-31,Haetae,N_F,484
+2026-08-31,Haetae,N_FR,485
+2026-08-31,Haetae,N_NP,493
+2026-08-31,Haetae,N_R,484
+2026-08-31,Haetae,Regular_F,120.85
+2026-08-31,Haetae,Regular_FR,122
+2026-08-31,Haetae,Regular_NP,120
+2026-08-31,Headless Horse,M_F,24.1
+2026-08-31,Headless Horse,M_FR,25.2
+2026-08-31,Headless Horse,M_NP,22.2
+2026-08-31,Headless Horse,M_R,23.2
+2026-08-31,Headless Horse,N_F,5.5
+2026-08-31,Headless Horse,N_FR,6.05
+2026-08-31,Headless Horse,N_NP,4.95
+2026-08-31,Headless Horse,N_R,5.5
+2026-08-31,Headless Horse,Regular_F,1.29
+2026-08-31,Headless Horse,Regular_FR,1.59
+2026-08-31,Headless Horse,Regular_NP,1.04
+2026-08-31,Hero Gibbon,M_F,168.9
+2026-08-31,Hero Gibbon,M_FR,170
+2026-08-31,Hero Gibbon,M_NP,167
+2026-08-31,Hero Gibbon,M_R,168
+2026-08-31,Hero Gibbon,N_F,41.2
+2026-08-31,Hero Gibbon,N_FR,42
+2026-08-31,Hero Gibbon,N_NP,40.25
+2026-08-31,Hero Gibbon,N_R,41.2
+2026-08-31,Hero Gibbon,Regular_F,10.1
+2026-08-31,Hero Gibbon,Regular_FR,10.5
+2026-08-31,Hero Gibbon,Regular_NP,9.75
+2026-08-31,Huntsman Robin,M_F,20.9
+2026-08-31,Huntsman Robin,M_FR,22
+2026-08-31,Huntsman Robin,M_NP,19
+2026-08-31,Huntsman Robin,M_R,20
+2026-08-31,Huntsman Robin,N_F,4.73
+2026-08-31,Huntsman Robin,N_FR,5.53
+2026-08-31,Huntsman Robin,N_NP,3.8
+2026-08-31,Huntsman Robin,N_R,4.73
+2026-08-31,Huntsman Robin,Regular_F,1.09
+2026-08-31,Huntsman Robin,Regular_FR,1.49
+2026-08-31,Huntsman Robin,Regular_NP,0.79
+2026-08-31,Ice Cream Hermit Crab,N_F,10.95
+2026-08-31,Ice Cream Hermit Crab,N_NP,10.4
+2026-08-31,Ice Cream Hermit Crab,N_R,10.95
+2026-08-31,Ice Cream Hermit Crab,Regular_F,2.45
+2026-08-31,Ice Cream Hermit Crab,Regular_FR,2.85
+2026-08-31,Ice Wolf,M_F,48.9
+2026-08-31,Ice Wolf,M_FR,50
+2026-08-31,Ice Wolf,M_NP,47
+2026-08-31,Ice Wolf,M_R,48
+2026-08-31,Ice Wolf,N_F,11.45
+2026-08-31,Ice Wolf,N_FR,12
+2026-08-31,Ice Wolf,N_NP,10.9
+2026-08-31,Ice Wolf,N_R,11.45
+2026-08-31,Ice Wolf,Regular_F,2.55
+2026-08-31,Ice Wolf,Regular_FR,2.95
+2026-08-31,Ice Wolf,Regular_NP,2.25
+2026-08-31,Jekyll Hydra,M_F,884.9
+2026-08-31,Jekyll Hydra,M_FR,886
+2026-08-31,Jekyll Hydra,M_NP,916
+2026-08-31,Jekyll Hydra,M_R,884
+2026-08-31,Jekyll Hydra,N_F,224
+2026-08-31,Jekyll Hydra,N_FR,225
+2026-08-31,Jekyll Hydra,N_NP,223
+2026-08-31,Jekyll Hydra,N_R,224
+2026-08-31,Jekyll Hydra,Regular_F,64.25
+2026-08-31,Jekyll Hydra,Regular_FR,65
+2026-08-31,Jekyll Hydra,Regular_NP,64
+2026-08-31,Jousting Horse,M_F,168.9
+2026-08-31,Jousting Horse,M_FR,170
+2026-08-31,Jousting Horse,M_NP,167
+2026-08-31,Jousting Horse,M_R,168
+2026-08-31,Jousting Horse,N_F,41.2
+2026-08-31,Jousting Horse,N_FR,42
+2026-08-31,Jousting Horse,N_NP,40.25
+2026-08-31,Jousting Horse,N_R,41.2
+2026-08-31,Jousting Horse,Regular_F,10.1
+2026-08-31,Jousting Horse,Regular_FR,10.5
+2026-08-31,Jousting Horse,Regular_NP,9.75
+2026-08-31,Kookaburra,Regular_F,2.8
+2026-08-31,Kookaburra,Regular_FR,3.2
+2026-08-31,Lava Wolf,M_F,36.9
+2026-08-31,Lava Wolf,M_FR,38
+2026-08-31,Lava Wolf,M_NP,35
+2026-08-31,Lava Wolf,M_R,36
+2026-08-31,Lava Wolf,N_F,8.2
+2026-08-31,Lava Wolf,N_FR,9
+2026-08-31,Lava Wolf,N_NP,7.2
+2026-08-31,Lava Wolf,N_R,8.2
+2026-08-31,Lava Wolf,Regular_F,1.8
+2026-08-31,Lava Wolf,Regular_FR,2.2
+2026-08-31,Lava Wolf,Regular_NP,1.5
+2026-08-31,Little Lamb,M_F,4.83
+2026-08-31,Little Lamb,M_FR,5.75
+2026-08-31,Little Lamb,M_NP,3.9
+2026-08-31,Little Lamb,M_R,4.83
+2026-08-31,Little Lamb,N_F,1.18
+2026-08-31,Little Lamb,N_FR,1.45
+2026-08-31,Little Lamb,N_NP,0.9
+2026-08-31,Little Lamb,N_R,1.18
+2026-08-31,Little Lamb,Regular_F,0.34
+2026-08-31,Little Lamb,Regular_FR,0.59
+2026-08-31,Little Lamb,Regular_NP,0.14
+2026-08-31,Mechapup,M_F,310.9
+2026-08-31,Mechapup,M_FR,312
+2026-08-31,Mechapup,M_NP,317
+2026-08-31,Mechapup,M_R,310
+2026-08-31,Mechapup,N_F,76.2
+2026-08-31,Mechapup,N_FR,77
+2026-08-31,Mechapup,N_NP,75.25
+2026-08-31,Mechapup,N_R,76.2
+2026-08-31,Midnight Dragon,M_F,123.9
+2026-08-31,Midnight Dragon,M_FR,125
+2026-08-31,Midnight Dragon,M_NP,122
+2026-08-31,Midnight Dragon,M_R,123
+2026-08-31,Midnight Dragon,N_F,29.2
+2026-08-31,Midnight Dragon,N_FR,30
+2026-08-31,Midnight Dragon,N_NP,28.25
+2026-08-31,Midnight Dragon,N_R,29.2
+2026-08-31,Midnight Dragon,Regular_F,7.1
+2026-08-31,Midnight Dragon,Regular_FR,7.5
+2026-08-31,Midnight Dragon,Regular_NP,6.75
+2026-08-31,Monkey King,M_F,650
+2026-08-31,Monkey King,M_FR,600
+2026-08-31,Monkey King,M_R,625
+2026-08-31,Monkey King,N_F,158
+2026-08-31,Monkey King,N_FR,150
+2026-08-31,Monkey King,N_R,150
+2026-08-31,Monkey King,Regular_F,38.25
+2026-08-31,Monkey King,Regular_FR,37.5
+2026-08-31,Moonbeam Peacock,M_F,278.9
+2026-08-31,Moonbeam Peacock,M_FR,280
+2026-08-31,Moonbeam Peacock,M_NP,277
+2026-08-31,Moonbeam Peacock,M_R,278
+2026-08-31,Moonbeam Peacock,N_F,67
+2026-08-31,Moonbeam Peacock,N_FR,68
+2026-08-31,Moonbeam Peacock,N_NP,66
+2026-08-31,Moonbeam Peacock,N_R,67
+2026-08-31,Moonbeam Peacock,Regular_F,15.95
+2026-08-31,Moonbeam Peacock,Regular_FR,16.5
+2026-08-31,Moonbeam Peacock,Regular_NP,15.5
+2026-08-31,Ms. Muffet,M_F,1.18
+2026-08-31,Ms. Muffet,M_FR,1.9
+2026-08-31,Ms. Muffet,M_NP,0.45
+2026-08-31,Ms. Muffet,M_R,1.18
+2026-08-31,Ms. Muffet,N_F,0.37
+2026-08-31,Ms. Muffet,N_FR,0.64
+2026-08-31,Ms. Muffet,N_NP,0.09
+2026-08-31,Ms. Muffet,N_R,0.37
+2026-08-31,Ms. Muffet,Regular_F,0.21
+2026-08-31,Ms. Muffet,Regular_FR,0.47
+2026-08-31,Ms. Muffet,Regular_NP,0.02
+2026-08-31,Naughty Mistletroll,M_F,36.9
+2026-08-31,Naughty Mistletroll,M_FR,38
+2026-08-31,Naughty Mistletroll,M_NP,35
+2026-08-31,Naughty Mistletroll,M_R,36
+2026-08-31,Naughty Mistletroll,N_F,8.2
+2026-08-31,Naughty Mistletroll,N_FR,9
+2026-08-31,Naughty Mistletroll,N_NP,7.25
+2026-08-31,Naughty Mistletroll,N_R,8.2
+2026-08-31,Naughty Mistletroll,Regular_F,1.8
+2026-08-31,Naughty Mistletroll,Regular_FR,2.2
+2026-08-31,Naughty Mistletroll,Regular_NP,1.5
+2026-08-31,Orchid Butterfly,M_F,1630.9
+2026-08-31,Orchid Butterfly,M_FR,1632
+2026-08-31,Orchid Butterfly,M_NP,1642
+2026-08-31,Orchid Butterfly,M_R,1630
+2026-08-31,Orchid Butterfly,N_F,407
+2026-08-31,Orchid Butterfly,N_FR,408
+2026-08-31,Orchid Butterfly,N_NP,408
+2026-08-31,Orchid Butterfly,N_R,407
+2026-08-31,Panda Cap,Regular_NP,900
+2026-08-31,Peppermint Penguin,M_F,428.9
+2026-08-31,Peppermint Penguin,M_FR,430
+2026-08-31,Peppermint Penguin,M_NP,445
+2026-08-31,Peppermint Penguin,M_R,428
+2026-08-31,Peppermint Penguin,N_F,107
+2026-08-31,Peppermint Penguin,N_FR,108
+2026-08-31,Peppermint Penguin,N_NP,106
+2026-08-31,Peppermint Penguin,N_R,107
+2026-08-31,Phantom Dragon,M_F,170.9
+2026-08-31,Phantom Dragon,M_FR,172
+2026-08-31,Phantom Dragon,M_NP,173
+2026-08-31,Phantom Dragon,M_R,170
+2026-08-31,Phantom Dragon,N_F,42.2
+2026-08-31,Phantom Dragon,N_FR,43
+2026-08-31,Phantom Dragon,N_NP,41.25
+2026-08-31,Phantom Dragon,N_R,42.2
+2026-08-31,Phantom Dragon,Regular_F,10.4
+2026-08-31,Phantom Dragon,Regular_FR,10.85
+2026-08-31,Phantom Dragon,Regular_NP,10
+2026-08-31,Pinkypillar,M_F,1.18
+2026-08-31,Pinkypillar,M_FR,1.9
+2026-08-31,Pinkypillar,M_NP,0.45
+2026-08-31,Pinkypillar,M_R,1.18
+2026-08-31,Pinkypillar,N_F,0.37
+2026-08-31,Pinkypillar,N_FR,0.64
+2026-08-31,Pinkypillar,N_NP,0.09
+2026-08-31,Pinkypillar,N_R,0.37
+2026-08-31,Pinkypillar,Regular_F,0.21
+2026-08-31,Pinkypillar,Regular_FR,0.47
+2026-08-31,Pinkypillar,Regular_NP,0.02
+2026-08-31,Pirate Ghost Capuchin Monkey,M_F,360.9
+2026-08-31,Pirate Ghost Capuchin Monkey,M_FR,362
+2026-08-31,Pirate Ghost Capuchin Monkey,M_NP,377
+2026-08-31,Pirate Ghost Capuchin Monkey,M_R,360
+2026-08-31,Pirate Ghost Capuchin Monkey,N_F,89
+2026-08-31,Pirate Ghost Capuchin Monkey,N_FR,90
+2026-08-31,Pirate Ghost Capuchin Monkey,N_NP,90
+2026-08-31,Pirate Ghost Capuchin Monkey,N_R,89
+2026-08-31,Pirate Ghost Capuchin Monkey,Regular_F,22.1
+2026-08-31,Pirate Ghost Capuchin Monkey,Regular_FR,22.5
+2026-08-31,Pirate Ghost Capuchin Monkey,Regular_NP,21.75
+2026-08-31,Princess Mare,M_F,1.85
+2026-08-31,Princess Mare,M_FR,2.6
+2026-08-31,Princess Mare,M_NP,1.1
+2026-08-31,Princess Mare,M_R,1.85
+2026-08-31,Princess Mare,N_F,0.53
+2026-08-31,Princess Mare,N_FR,0.8
+2026-08-31,Princess Mare,N_NP,0.25
+2026-08-31,Princess Mare,N_R,0.53
+2026-08-31,Princess Mare,Regular_F,0.23
+2026-08-31,Princess Mare,Regular_FR,0.48
+2026-08-31,Princess Mare,Regular_NP,0.03
+2026-08-31,Rose Dragon,M_F,62.9
+2026-08-31,Rose Dragon,M_FR,64
+2026-08-31,Rose Dragon,M_NP,61
+2026-08-31,Rose Dragon,M_R,62
+2026-08-31,Rose Dragon,N_F,14.7
+2026-08-31,Rose Dragon,N_FR,15.5
+2026-08-31,Rose Dragon,N_NP,13.75
+2026-08-31,Rose Dragon,N_R,14.7
+2026-08-31,Rose Dragon,Regular_F,3.45
+2026-08-31,Rose Dragon,Regular_FR,3.85
+2026-08-31,Rose Dragon,Regular_NP,3.15
+2026-08-31,Royal Mistletroll,M_F,378.9
+2026-08-31,Royal Mistletroll,M_FR,380
+2026-08-31,Royal Mistletroll,M_NP,383
+2026-08-31,Royal Mistletroll,M_R,378
+2026-08-31,Royal Mistletroll,N_F,92.2
+2026-08-31,Royal Mistletroll,N_FR,93
+2026-08-31,Royal Mistletroll,N_NP,91.25
+2026-08-31,Royal Mistletroll,N_R,92.2
+2026-08-31,Royal Mistletroll,Regular_F,22.45
+2026-08-31,Royal Mistletroll,Regular_FR,23
+2026-08-31,Royal Mistletroll,Regular_NP,22
+2026-08-31,Scarebear,M_F,29.9
+2026-08-31,Scarebear,M_FR,31
+2026-08-31,Scarebear,M_NP,28
+2026-08-31,Scarebear,M_R,29
+2026-08-31,Scarebear,N_F,6.7
+2026-08-31,Scarebear,N_FR,7.5
+2026-08-31,Scarebear,N_NP,5.2
+2026-08-31,Scarebear,N_R,6.7
+2026-08-31,Scarebear,Regular_F,1.45
+2026-08-31,Scarebear,Regular_FR,1.85
+2026-08-31,Scarebear,Regular_NP,1.15
+2026-08-31,Shadow Dragon Ducky,M_F,13.1
+2026-08-31,Shadow Dragon Ducky,M_FR,14.2
+2026-08-31,Shadow Dragon Ducky,M_NP,11.2
+2026-08-31,Shadow Dragon Ducky,M_R,12.2
+2026-08-31,Shadow Dragon Ducky,N_F,2.98
+2026-08-31,Shadow Dragon Ducky,N_FR,3.3
+2026-08-31,Shadow Dragon Ducky,N_NP,2.65
+2026-08-31,Shadow Dragon Ducky,N_R,2.98
+2026-08-31,Shadow Dragon Ducky,Regular_F,0.72
+2026-08-31,Shadow Dragon Ducky,Regular_FR,1
+2026-08-31,Shadow Dragon Ducky,Regular_NP,0.5
+2026-08-31,Slime,M_F,83.9
+2026-08-31,Slime,M_FR,85
+2026-08-31,Slime,M_NP,82
+2026-08-31,Slime,M_R,83
+2026-08-31,Slime,N_F,19.5
+2026-08-31,Slime,N_FR,20.5
+2026-08-31,Slime,N_NP,18.5
+2026-08-31,Slime,N_R,19.5
+2026-08-31,Slime,Regular_F,4.7
+2026-08-31,Slime,Regular_FR,5.1
+2026-08-31,Slime,Regular_NP,4.35
+2026-08-31,Strawberry Tortle,M_F,448.9
+2026-08-31,Strawberry Tortle,M_FR,450
+2026-08-31,Strawberry Tortle,M_NP,447
+2026-08-31,Strawberry Tortle,M_R,448
+2026-08-31,Strawberry Tortle,N_F,109
+2026-08-31,Strawberry Tortle,N_FR,110
+2026-08-31,Strawberry Tortle,N_NP,108
+2026-08-31,Strawberry Tortle,N_R,109
+2026-08-31,Strawberry Tortle,Regular_F,26.45
+2026-08-31,Strawberry Tortle,Regular_FR,27
+2026-08-31,Strawberry Tortle,Regular_NP,26
+2026-08-31,Sugar Axolotl,M_F,256.9
+2026-08-31,Sugar Axolotl,M_FR,258
+2026-08-31,Sugar Axolotl,M_NP,255
+2026-08-31,Sugar Axolotl,M_R,256
+2026-08-31,Sugar Axolotl,N_F,63.2
+2026-08-31,Sugar Axolotl,N_FR,64
+2026-08-31,Sugar Axolotl,N_NP,62.25
+2026-08-31,Sugar Axolotl,N_R,63.2
+2026-08-31,Sugar Axolotl,Regular_F,15.45
+2026-08-31,Sugar Axolotl,Regular_FR,16
+2026-08-31,Sugar Axolotl,Regular_NP,15
+2026-08-31,Sugar Glider,M_F,330.9
+2026-08-31,Sugar Glider,M_FR,332
+2026-08-31,Sugar Glider,M_NP,337
+2026-08-31,Sugar Glider,M_R,330
+2026-08-31,Three Blind Mice,M_F,23.9
+2026-08-31,Three Blind Mice,M_FR,25
+2026-08-31,Three Blind Mice,M_NP,22
+2026-08-31,Three Blind Mice,M_R,23
+2026-08-31,Three Blind Mice,N_F,5.43
+2026-08-31,Three Blind Mice,N_FR,6.23
+2026-08-31,Three Blind Mice,N_NP,4.3
+2026-08-31,Three Blind Mice,N_R,5.43
+2026-08-31,Three Blind Mice,Regular_F,1.19
+2026-08-31,Three Blind Mice,Regular_FR,1.59
+2026-08-31,Three Blind Mice,Regular_NP,0.89
+2026-08-31,Tió De Nadal,M_F,320.9
+2026-08-31,Tió De Nadal,M_FR,322
+2026-08-31,Tió De Nadal,M_NP,327
+2026-08-31,Tió De Nadal,M_R,320
+2026-08-31,Tió De Nadal,N_F,79.2
+2026-08-31,Tió De Nadal,N_FR,80
+2026-08-31,Tió De Nadal,N_NP,78.25
+2026-08-31,Tió De Nadal,N_R,79.2
+2026-08-31,Tió De Nadal,Regular_F,19.45
+2026-08-31,Tió De Nadal,Regular_FR,20
+2026-08-31,Tió De Nadal,Regular_NP,19
+2026-08-31,Tortoiseshell Guinea Pig,M_F,378.9
+2026-08-31,Tortoiseshell Guinea Pig,M_FR,380
+2026-08-31,Tortoiseshell Guinea Pig,M_NP,377
+2026-08-31,Tortoiseshell Guinea Pig,M_R,378
+2026-08-31,Tortoiseshell Guinea Pig,N_F,92
+2026-08-31,Tortoiseshell Guinea Pig,N_FR,93
+2026-08-31,Tortoiseshell Guinea Pig,N_NP,91
+2026-08-31,Tortoiseshell Guinea Pig,N_R,92
+2026-08-31,Tortoiseshell Guinea Pig,Regular_F,22.45
+2026-08-31,Tortoiseshell Guinea Pig,Regular_FR,23
+2026-08-31,Tortoiseshell Guinea Pig,Regular_NP,22
+2026-08-31,Tri-Horned Treehopper,M_F,228.9
+2026-08-31,Tri-Horned Treehopper,M_FR,230
+2026-08-31,Tri-Horned Treehopper,M_NP,227
+2026-08-31,Tri-Horned Treehopper,M_R,228
+2026-08-31,Tri-Horned Treehopper,N_F,55
+2026-08-31,Tri-Horned Treehopper,N_FR,56
+2026-08-31,Tri-Horned Treehopper,N_NP,54
+2026-08-31,Tri-Horned Treehopper,N_R,55
+2026-08-31,Tri-Horned Treehopper,Regular_F,13.45
+2026-08-31,Tri-Horned Treehopper,Regular_FR,14
+2026-08-31,Tri-Horned Treehopper,Regular_NP,13
+2026-08-31,Undead Jousting Horse,M_F,1028.9
+2026-08-31,Undead Jousting Horse,M_FR,1030
+2026-08-31,Undead Jousting Horse,M_NP,1060
+2026-08-31,Undead Jousting Horse,M_R,1028
+2026-08-31,Undead Jousting Horse,N_F,259
+2026-08-31,Undead Jousting Horse,N_FR,260
+2026-08-31,Undead Jousting Horse,N_NP,258
+2026-08-31,Undead Jousting Horse,N_R,259
+2026-08-31,Undead Jousting Horse,Regular_F,71.25
+2026-08-31,Undead Jousting Horse,Regular_FR,72
+2026-08-31,Undead Jousting Horse,Regular_NP,71
+2026-08-31,Vampire Dragon,M_F,206.9
+2026-08-31,Vampire Dragon,M_FR,208
+2026-08-31,Vampire Dragon,M_NP,213
+2026-08-31,Vampire Dragon,M_R,206
+2026-08-31,Vampire Dragon,N_F,51
+2026-08-31,Vampire Dragon,N_FR,52
+2026-08-31,Vampire Dragon,N_NP,50
+2026-08-31,Vampire Dragon,N_R,51
+2026-08-31,Vampire Dragon,Regular_F,12.9
+2026-08-31,Vampire Dragon,Regular_FR,13.35
+2026-08-31,Vampire Dragon,Regular_NP,12.5
+2026-08-31,Velocirooster,M_F,238.9
+2026-08-31,Velocirooster,M_FR,240
+2026-08-31,Velocirooster,M_NP,237
+2026-08-31,Velocirooster,M_R,238
+2026-08-31,Velocirooster,N_F,58
+2026-08-31,Velocirooster,N_FR,59
+2026-08-31,Velocirooster,N_NP,57
+2026-08-31,Velocirooster,N_R,58
+2026-08-31,Velocirooster,Regular_F,14.45
+2026-08-31,Velocirooster,Regular_FR,15
+2026-08-31,Velocirooster,Regular_NP,14
+2026-08-31,Werewolf,M_F,406.9
+2026-08-31,Werewolf,M_FR,408
+2026-08-31,Werewolf,M_NP,416
+2026-08-31,Werewolf,M_R,406
+2026-08-31,Werewolf,N_F,101
+2026-08-31,Werewolf,N_FR,102
+2026-08-31,Werewolf,N_NP,100
+2026-08-31,Werewolf,N_R,101
+2026-08-31,Werewolf,Regular_F,27.45
+2026-08-31,Werewolf,Regular_FR,28
+2026-08-31,Werewolf,Regular_NP,27
+2026-08-31,Wood Pigeon,N_F,10.95
+2026-08-31,Wood Pigeon,N_NP,10.4
+2026-08-31,Wood Pigeon,N_R,10.95
+2026-08-31,Wood Pigeon,Regular_F,2.45
+2026-08-31,Wood Pigeon,Regular_FR,2.85
+2026-08-31,Zombie Wolf,M_F,41.9
+2026-08-31,Zombie Wolf,M_FR,43
+2026-08-31,Zombie Wolf,M_NP,40
+2026-08-31,Zombie Wolf,M_R,41
+2026-08-31,Zombie Wolf,N_F,9.95
+2026-08-31,Zombie Wolf,N_FR,10.5
+2026-08-31,Zombie Wolf,N_NP,9.4
+2026-08-31,Zombie Wolf,N_R,9.95
+2026-08-31,Zombie Wolf,Regular_F,2.18
+2026-08-31,Zombie Wolf,Regular_FR,2.48
+2026-08-31,Zombie Wolf,Regular_NP,1.93
