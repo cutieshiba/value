@@ -1,90 +1,116 @@
-let chartInstance = null;
-let selectedPetName = "";
-let activeType = 'Regular', hasFly = false, hasRide = false;
+// Global Application State
+let rawRecords = [];
+let uniqueBasePets = [];
 
-function toggleVariant(v) { 
-  activeType = activeType === v ? 'Regular' : v; 
-  updateToggleUI(); 
+// Shared Utility: Determine Combo Tag
+function getComboTag(type, fly, ride) {
+  let potionTag = "NP";
+  if (fly && ride) potionTag = "FR";
+  else if (fly) potionTag = "F";
+  else if (ride) potionTag = "R";
+  return `${type}_${potionTag}`;
 }
 
-function togglePotion(p) { 
-  if (p === 'F') hasFly = !hasFly; 
-  if (p === 'R') hasRide = !hasRide; 
-  updateToggleUI(); 
+// Direct Hardcoded Button Style Manager
+function updateButtonStyling(prefix, currentType, fly, ride) {
+  const btnM = document.getElementById(`${prefix}-toggle-M`);
+  const btnN = document.getElementById(`${prefix}-toggle-N`);
+  const btnF = document.getElementById(`${prefix}-toggle-F`);
+  const btnR = document.getElementById(`${prefix}-toggle-R`);
+
+  // Default Inactive Style (Dark Slate)
+  const defaultStyle = "background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;";
+
+  // Active Hardcoded Color Styles
+  const mStyle = "background-color: #a855f7; color: #ffffff; border: 1px solid #c084fc; font-weight: bold;";
+  const nStyle = "background-color: #22c55e; color: #ffffff; border: 1px solid #4ade80; font-weight: bold;";
+  const fStyle = "background-color: #3b82f6; color: #ffffff; border: 1px solid #60a5fa; font-weight: bold;";
+  const rStyle = "background-color: #ec4899; color: #ffffff; border: 1px solid #f472b6; font-weight: bold;";
+
+  if (btnM) btnM.style.cssText = currentType === 'M' ? mStyle : defaultStyle;
+  if (btnN) btnN.style.cssText = currentType === 'N' ? nStyle : defaultStyle;
+  if (btnF) btnF.style.cssText = fly ? fStyle : defaultStyle;
+  if (btnR) btnR.style.cssText = ride ? rStyle : defaultStyle;
 }
 
-function updateToggleUI() {
-  updateButtonStyling('toggle', activeType, hasFly, hasRide);
-  document.getElementById('activeComboTag').innerText = getComboTag(activeType, hasFly, hasRide);
-}
-
-function filterPetList() {
-  const q = document.getElementById("searchInput").value.trim().toLowerCase();
-  const container = document.getElementById("petSelectContainer");
-  if (!q) { container.classList.add("hidden"); return; }
-  const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
-  const select = document.getElementById("petSelect");
-  select.innerHTML = "";
-  filtered.forEach(p => {
-    const opt = document.createElement("option");
-    opt.value = p; opt.textContent = p;
-    select.appendChild(opt);
+// Tab Switch Routing
+function switchTab(tabIndex) {
+  [1, 2, 3].forEach(i => {
+    const content = document.getElementById(`tabContent-${i}`);
+    const btn = document.getElementById(`tabBtn-${i}`);
+    if (content) content.classList.add('hidden');
+    if (btn) {
+      btn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid transparent; color: #94a3b8;";
+    }
   });
-  container.classList.remove("hidden");
-}
 
-function onPetSelectClick() {
-  selectedPetName = document.getElementById("petSelect").value;
-  document.getElementById("searchInput").value = selectedPetName;
-  document.getElementById("petSelectContainer").classList.add("hidden");
-}
+  const activeContent = document.getElementById(`tabContent-${tabIndex}`);
+  const activeBtn = document.getElementById(`tabBtn-${tabIndex}`);
 
-function executeSearch() {
-  if (!selectedPetName) selectedPetName = document.getElementById("searchInput").value.trim();
-  if (!selectedPetName) return alert("Select a pet!");
-  const combo = getComboTag(activeType, hasFly, hasRide);
-  renderDashboard(selectedPetName, combo);
-}
-
-function renderDashboard(selectedPet, comboTag) {
-  document.getElementById('chartTitle').innerText = `${selectedPet} (${comboTag})`;
-  const records = rawRecords.filter(r => r.name.toLowerCase() === selectedPet.toLowerCase() && r.combo === comboTag);
-  records.sort((a, b) => new Date(a.date) - new Date(b.date));
-
-  const dates = records.map(r => r.date);
-  const values = records.map(r => r.val);
-
-  if (values.length > 0) {
-    document.getElementById('statCurrent').innerText = values[values.length - 1];
-    document.getElementById('statATH').innerText = Math.max(...values);
-    document.getElementById('statSnapshots').innerText = records.length;
-    
-    const trend = calculatePetTrend(selectedPet, comboTag);
-    const trendElem = document.getElementById('statTrend');
-    trendElem.innerText = trend.text;
-    trendElem.className = `text-xl font-bold mt-1 ${trend.color}`;
-
-    const ctx = document.getElementById('valueChart').getContext('2d');
-    if (chartInstance) chartInstance.destroy();
-    chartInstance = new Chart(ctx, {
-      type: 'line',
-      data: { labels: dates, datasets: [{ label: 'Value', data: values, borderColor: '#6366f1', fill: true }] },
-      options: { responsive: true, maintainAspectRatio: false }
-    });
+  if (activeContent) activeContent.classList.remove('hidden');
+  if (activeBtn) {
+    activeBtn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid #6366f1; color: #818cf8;";
   }
 }
 
-function inspectPetFromBackpack(petName, comboTag) {
-  selectedPetName = petName;
-  document.getElementById("searchInput").value = petName;
+// Global Valuation Helpers
+function getCurrentVal(petName, comboTag) {
+  const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
+  if (records.length === 0) return 0;
+  records.sort((a, b) => new Date(a.date) - new Date(b.date));
+  return records[records.length - 1].val;
+}
 
-  const parts = comboTag.split('_');
-  activeType = parts[0] || 'Regular';
-  const potions = parts[1] || 'NP';
-  hasFly = potions.includes('F');
-  hasRide = potions.includes('R');
+function calculatePetTrend(petName, comboTag) {
+  const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
+  if (records.length < 2) return { text: "➡️ Stable", color: "color: #94a3b8;" };
+  records.sort((a, b) => new Date(a.date) - new Date(b.date));
 
-  updateToggleUI();
-  switchTab(1);
-  renderDashboard(petName, comboTag);
+  const oldest = records[0].val;
+  const latest = records[records.length - 1].val;
+
+  if (latest > oldest * 1.03) return { text: "📈 Rising", color: "color: #34d399;" };
+  if (latest < oldest * 0.97) return { text: "📉 Dropping", color: "color: #f87171;" };
+  return { text: "➡️ Stable", color: "color: #cbd5e1;" };
+}
+
+// CSV Parser Initialization
+Papa.parse("history.csv", {
+  download: true,
+  skipEmptyLines: true,
+  complete: function(results) { processCSVData(results.data); },
+  error: function() {
+    document.getElementById('statusBadge').innerText = "Failed to load history.csv";
+  }
+});
+
+function processCSVData(rows) {
+  if (!rows || rows.length === 0) return;
+  let startIdx = isNaN(parseFloat(rows[0][rows[0].length - 1])) ? 1 : 0;
+
+  rawRecords = [];
+  const basePetSet = new Set();
+
+  for (let i = startIdx; i < rows.length; i++) {
+    const row = rows[i];
+    if (row.length >= 4) {
+      const date = row[0].trim();
+      const name = row.slice(1, row.length - 2).join(',').trim();
+      const combo = row[row.length - 2].trim();
+      const val = parseFloat(row[row.length - 1].trim());
+
+      if (name && !isNaN(val)) {
+        rawRecords.push({ date, name, combo, val });
+        basePetSet.add(name);
+      }
+    }
+  }
+
+  uniqueBasePets = Array.from(basePetSet).sort();
+  document.getElementById('statusBadge').innerText = `${rawRecords.length} Records Loaded`;
+  
+  if (typeof renderBackpackUI === 'function') renderBackpackUI();
+  if (typeof computeMarketTrends === 'function') computeMarketTrends();
+  if (typeof renderUpdateHistory === 'function') renderUpdateHistory();
+  if (window.lucide) lucide.createIcons();
 }
