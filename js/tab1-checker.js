@@ -1,23 +1,23 @@
 // ==========================================
 // Tab 1 Global State
 // ==========================================
-var activeType = 'Regular'; // 'Regular', 'M', or 'N'
-var hasFly = false; 
-var hasRide = false;
-var chartInstance = null;
-var selectedPetName = "";
+window.activeType = window.activeType || 'Regular'; // 'Regular', 'M', or 'N'
+window.hasFly = window.hasFly || false; 
+window.hasRide = window.hasRide || false;
+window.chartInstance = window.chartInstance || null;
+window.selectedPetName = window.selectedPetName || "";
 
 // ==========================================
 // 1. Button Toggles & UI Styling
 // ==========================================
 function toggleVariant(v) { 
-  activeType = (activeType === v) ? 'Regular' : v; 
+  window.activeType = (window.activeType === v) ? 'Regular' : v; 
   updateToggleUI(); 
 }
 
 function togglePotion(p) { 
-  if (p === 'F') hasFly = !hasFly; 
-  if (p === 'R') hasRide = !hasRide; 
+  if (p === 'F') window.hasFly = !window.hasFly; 
+  if (p === 'R') window.hasRide = !window.hasRide; 
   updateToggleUI(); 
 }
 
@@ -42,20 +42,28 @@ function updateToggleUI() {
     }
   }
 
-  styleButton(btnM, activeType === 'M', '#a855f7', '#c084fc'); // Purple
-  styleButton(btnN, activeType === 'N', '#22c55e', '#4ade80'); // Green
-  styleButton(btnF, hasFly,          '#3b82f6', '#60a5fa'); // Blue
-  styleButton(btnR, hasRide,         '#ec4899', '#f472b6'); // Pink
+  styleButton(btnM, window.activeType === 'M', '#a855f7', '#c084fc'); // Purple
+  styleButton(btnN, window.activeType === 'N', '#22c55e', '#4ade80'); // Green
+  styleButton(btnF, window.hasFly,          '#3b82f6', '#60a5fa'); // Blue
+  styleButton(btnR, window.hasRide,         '#ec4899', '#f472b6'); // Pink
 
-  // Update combo tag display label if present
+  // Update combo tag display label
   const tagDisplay = document.getElementById('activeComboTag');
-  if (tagDisplay && typeof getComboTag === 'function') {
-    tagDisplay.innerText = getComboTag(activeType, hasFly, hasRide);
+  if (tagDisplay) {
+    if (typeof getComboTag === 'function') {
+      tagDisplay.innerText = getComboTag(window.activeType, window.hasFly, window.hasRide);
+    } else {
+      let pTag = "NP";
+      if (window.hasFly && window.hasRide) pTag = "FR";
+      else if (window.hasFly) pTag = "F";
+      else if (window.hasRide) pTag = "R";
+      tagDisplay.innerText = `${window.activeType}_${pTag}`;
+    }
   }
 }
 
 // ==========================================
-// 2. Search & Dropdown Filter Handlers
+// 2. Search & Dropdown Handlers
 // ==========================================
 function filterPetList() {
   const input = document.getElementById("searchInput");
@@ -65,16 +73,18 @@ function filterPetList() {
   const container = document.getElementById("petSelectContainer");
   const select = document.getElementById("petSelect");
 
-  // Keep search target updated as user types
-  selectedPetName = input.value.trim();
+  window.selectedPetName = input.value.trim();
 
   if (!query) { 
     if (container) container.classList.add("hidden"); 
     return; 
   }
 
-  if (typeof uniqueBasePets !== 'undefined' && Array.isArray(uniqueBasePets) && select) {
-    const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(query));
+  // Fallback check for global pet list
+  const petList = window.uniqueBasePets || (typeof uniqueBasePets !== 'undefined' ? uniqueBasePets : []);
+
+  if (Array.isArray(petList) && petList.length > 0 && select) {
+    const filtered = petList.filter(p => String(p).toLowerCase().includes(query));
     select.innerHTML = "";
     
     filtered.forEach(p => {
@@ -94,14 +104,15 @@ function filterPetList() {
   }
 }
 
+// Called when user selects an item from the <select> list (handles onchange/onclick)
 function onPetSelectClick() {
   const select = document.getElementById("petSelect");
   if (!select || !select.value) return;
 
-  selectedPetName = select.value;
+  window.selectedPetName = select.value;
   
   const input = document.getElementById("searchInput");
-  if (input) input.value = selectedPetName;
+  if (input) input.value = window.selectedPetName;
   
   const container = document.getElementById("petSelectContainer");
   if (container) container.classList.add("hidden");
@@ -110,27 +121,26 @@ function onPetSelectClick() {
 function executeSearch() {
   const input = document.getElementById("searchInput");
   if (input && input.value.trim() !== "") {
-    selectedPetName = input.value.trim();
+    window.selectedPetName = input.value.trim();
   }
   
-  if (!selectedPetName) {
+  if (!window.selectedPetName) {
     alert("Please type or select a pet name first!");
     return;
   }
 
-  // Fallback helper if app.js isn't providing getComboTag
   let combo = "";
   if (typeof getComboTag === 'function') {
-    combo = getComboTag(activeType, hasFly, hasRide);
+    combo = getComboTag(window.activeType, window.hasFly, window.hasRide);
   } else {
     let potionTag = "NP";
-    if (hasFly && hasRide) potionTag = "FR";
-    else if (hasFly) potionTag = "F";
-    else if (hasRide) potionTag = "R";
-    combo = `${activeType}_${potionTag}`;
+    if (window.hasFly && window.hasRide) potionTag = "FR";
+    else if (window.hasFly) potionTag = "F";
+    else if (window.hasRide) potionTag = "R";
+    combo = `${window.activeType}_${potionTag}`;
   }
 
-  renderDashboard(selectedPetName, combo);
+  renderDashboard(window.selectedPetName, combo);
 }
 
 // ==========================================
@@ -140,22 +150,24 @@ function renderDashboard(petName, comboTag) {
   const titleElem = document.getElementById('chartTitle');
   if (titleElem) titleElem.innerText = `${petName} (${comboTag})`;
 
-  if (typeof rawRecords === 'undefined' || !Array.isArray(rawRecords)) {
-    alert("Data not loaded yet. Please wait or check your CSV file.");
+  const dataRecords = window.rawRecords || (typeof rawRecords !== 'undefined' ? rawRecords : null);
+
+  if (!dataRecords || !Array.isArray(dataRecords)) {
+    alert("Data not loaded yet. Please wait or check your CSV loading script.");
     return;
   }
 
-  const records = rawRecords.filter(r => 
-    r.name && r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag
+  const records = dataRecords.filter(r => 
+    r.name && String(r.name).toLowerCase() === String(petName).toLowerCase() && r.combo === comboTag
   );
 
   records.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const dates = records.map(r => r.date);
-  const values = records.map(r => r.val);
+  const values = records.map(r => Number(r.val) || 0);
 
   if (values.length > 0) {
-    // Populate Stat Counter Elements
+    // Populate Stat Counters
     const statCurr = document.getElementById('statCurrent');
     const statAth = document.getElementById('statATH');
     const statSnaps = document.getElementById('statSnapshots');
@@ -168,24 +180,24 @@ function renderDashboard(petName, comboTag) {
     if (typeof calculatePetTrend === 'function') {
       const trend = calculatePetTrend(petName, comboTag);
       const trendElem = document.getElementById('statTrend');
-      if (trendElem) {
+      if (trendElem && trend) {
         trendElem.innerText = trend.text;
         trendElem.style.cssText = `font-size: 1.25rem; font-weight: 700; margin-top: 0.25rem; ${trend.color}`;
       }
     }
 
-    // Chart.js Graph Rendering
+    // Render Chart.js Graph
     const chartCanvas = document.getElementById('valueChart');
     if (chartCanvas && window.Chart) {
       const ctx = chartCanvas.getContext('2d');
-      if (chartInstance) chartInstance.destroy();
+      if (window.chartInstance) window.chartInstance.destroy();
 
-      chartInstance = new Chart(ctx, {
+      window.chartInstance = new Chart(ctx, {
         type: 'line',
         data: {
           labels: dates,
           datasets: [{
-            label: 'Value',
+            label: 'Pet Value',
             data: values,
             borderColor: '#6366f1',
             backgroundColor: 'rgba(99, 102, 241, 0.1)',
@@ -210,25 +222,25 @@ function renderDashboard(petName, comboTag) {
 }
 
 // ==========================================
-// 4. Backpack Integration Route (Tab 2/3 Link)
+// 4. Backpack Link Navigation Route
 // ==========================================
 function inspectPetFromBackpack(petName, comboTag) {
-  selectedPetName = petName;
+  window.selectedPetName = petName;
   const searchInput = document.getElementById("searchInput");
   if (searchInput) searchInput.value = petName;
 
   const parts = comboTag.split('_');
-  activeType = parts[0] || 'Regular';
+  window.activeType = parts[0] || 'Regular';
   const potions = parts[1] || 'NP';
-  hasFly = potions.includes('F');
-  hasRide = potions.includes('R');
+  window.hasFly = potions.includes('F');
+  window.hasRide = potions.includes('R');
 
   updateToggleUI();
   if (typeof switchTab === 'function') switchTab(1);
   renderDashboard(petName, comboTag);
 }
 
-// Ensure Button Styling on Page Load
+// Initialize UI on load
 document.addEventListener("DOMContentLoaded", function() {
   updateToggleUI();
 });
