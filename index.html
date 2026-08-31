@@ -565,60 +565,87 @@
 
     // Offer Generator Logic
     function generateOfferSuggestions() {
-      if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
-      if (!targetSelectedPet) return alert("Select target pet!");
-      if (backpack.length === 0) return alert("Backpack is empty!");
+  if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
+  if (!targetSelectedPet) return alert("Select target pet!");
+  if (backpack.length === 0) return alert("Backpack is empty!");
 
-      const combo = getComboTag(targetActiveType, targetHasFly, targetHasRide);
-      const baseVal = getCurrentVal(targetSelectedPet, combo);
-      const trend = calculatePetTrend(targetSelectedPet, combo);
+  const combo = getComboTag(targetActiveType, targetHasFly, targetHasRide);
+  const baseVal = getCurrentVal(targetSelectedPet, combo);
+  const trend = calculatePetTrend(targetSelectedPet, combo);
 
-      // Display Target Summary with Trend Indicator
-      document.getElementById("targetValSummary").classList.remove("hidden");
-      document.getElementById("dispBaseVal").innerText = baseVal + " pts";
-      
-      const badge = document.getElementById("targetTrendBadge");
-      badge.innerText = `Market Trend: ${trend.text}`;
-      badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
+  if (baseVal === 0) return alert("Selected target pet variant has no valid price data.");
 
-      // Calculate Offers
-      const sortedBackpack = [...backpack].sort((a, b) => b.val - a.val);
-      renderOfferBox("winOfferContainer", sortedBackpack, baseVal * 0.95);
-      renderOfferBox("fairOfferContainer", sortedBackpack, baseVal * 1.0);
-      renderOfferBox("loseOfferContainer", sortedBackpack, baseVal * 1.08);
+  // Display Target Summary
+  document.getElementById("targetValSummary").classList.remove("hidden");
+  document.getElementById("dispBaseVal").innerText = baseVal + " pts";
+  
+  const badge = document.getElementById("targetTrendBadge");
+  badge.innerText = `Market Trend: ${trend.text}`;
+  badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
+
+  // Find distinct combinations from backpack
+  const allCombos = getAllCombinations(backpack);
+
+  // Categorize offers based on strict value ranges
+  const winOffers = allCombos.filter(c => c.totalVal >= baseVal * 0.85 && c.totalVal <= baseVal * 0.96);
+  const fairOffers = allCombos.filter(c => c.totalVal > baseVal * 0.96 && c.totalVal <= baseVal * 1.05);
+  const overpayOffers = allCombos.filter(c => c.totalVal > baseVal * 1.05 && c.totalVal <= baseVal * 1.20);
+
+  // Render top 3 unique options for each
+  renderOfferColumn("winOfferContainer", winOffers.slice(0, 3), "Win");
+  renderOfferColumn("fairOfferContainer", fairOffers.slice(0, 3), "Fair");
+  renderOfferColumn("loseOfferContainer", overpayOffers.slice(0, 3), "Overpay");
+}
+
+// Helper to generate subset combinations from inventory
+function getAllCombinations(items) {
+  let results = [];
+  
+  // Recursively find item subsets (limited to 6 items per offer max for Adopt Me trade grid)
+  function combine(start, currentCombo, currentVal) {
+    if (currentCombo.length > 0 && currentCombo.length <= 6) {
+      results.push({ items: [...currentCombo], totalVal: currentVal });
     }
+    if (currentCombo.length === 6) return;
 
-    function renderOfferBox(containerId, items, targetVal) {
-      const box = document.getElementById(containerId);
-      let offer = [];
-      let currentVal = 0;
-
-      for (let item of items) {
-        if (currentVal < targetVal) {
-          offer.push(item);
-          currentVal += item.val;
-        }
-      }
-
-      if (currentVal === 0) {
-        box.innerHTML = `<div class="text-rose-400 text-center py-2">Not enough inventory value.</div>`;
-        return;
-      }
-
-      let offerHTML = offer.map(i => `
-        <div class="bg-slate-900 p-1.5 rounded flex justify-between items-center">
-          <span>${i.name} <span class="text-[10px] text-brand-400">(${i.combo})</span></span>
-          <span class="text-emerald-400 font-semibold">${i.val}</span>
-        </div>
-      `).join("");
-
-      box.innerHTML = `
-        ${offerHTML}
-        <div class="pt-2 border-t border-slate-800 text-right font-bold text-slate-300">
-          Total: ${currentVal.toFixed(1)} pts
-        </div>
-      `;
+    for (let i = start; i < items.length; i++) {
+      combine(i + 1, [...currentCombo, items[i]], currentVal + items[i].val);
     }
+  }
+
+  combine(0, [], 0);
+  
+  // Sort combinations by closest match and deduplicate identical values
+  return results.sort((a, b) => a.totalVal - b.totalVal);
+}
+
+function renderOfferColumn(containerId, optionsList, typeLabel) {
+  const box = document.getElementById(containerId);
+
+  if (!optionsList || optionsList.length === 0) {
+    box.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">No suitable ${typeLabel} combinations found in backpack.</div>`;
+    return;
+  }
+
+  box.innerHTML = optionsList.map((opt, idx) => `
+    <div class="bg-slate-900/80 p-2.5 rounded-lg border border-slate-800 space-y-1.5 mb-2">
+      <div class="flex justify-between items-center border-b border-slate-800 pb-1">
+        <span class="text-[10px] font-bold text-brand-400 uppercase">Option ${idx + 1}</span>
+        <span class="text-xs font-bold ${typeLabel === 'Win' ? 'text-emerald-400' : typeLabel === 'Fair' ? 'text-blue-400' : 'text-amber-400'}">
+          ${opt.totalVal.toFixed(1)} pts
+        </span>
+      </div>
+      <div class="space-y-1">
+        ${opt.items.map(i => `
+          <div class="flex justify-between text-[11px] text-slate-300">
+            <span>${i.name} <span class="text-[9px] text-slate-500">(${i.combo})</span></span>
+            <span class="text-slate-400">${i.val}</span>
+          </div>
+        `).join("")}
+      </div>
+    </div>
+  `).join("");
+}
   </script>
 
 </body>
