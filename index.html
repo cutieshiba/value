@@ -1,173 +1,578 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="en" class="dark">
 <head>
   <meta charset="UTF-8">
-  <title>Pet Trade Evaluator</title>
-  <style>
-    body { font-family: sans-serif; background: #1e1e24; color: #fff; padding: 20px; }
-    
-    /* Scrollable Inventory Container */
-    .inventory-container {
-      max-height: 200px; /* Limits height so it won't fill up the screen */
-      overflow-y: auto;
-      border: 1px solid #444;
-      border-radius: 8px;
-      padding: 10px;
-      background: #2b2b36;
-      margin-bottom: 20px;
-    }
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Elvebredd Analytics & Trading Hub</title>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
+  <script src="https://unpkg.com/lucide@latest"></script>
 
-    .item {
-      display: flex;
-      justify-content: space-between;
-      padding: 6px 10px;
-      margin-bottom: 4px;
-      background: #3a3a49;
-      border-radius: 4px;
+  <script>
+    tailwind.config = {
+      darkMode: 'class',
+      theme: {
+        extend: {
+          colors: {
+            brand: { 50: '#eef2ff', 500: '#6366f1', 600: '#4f46e5', 700: '#4338ca', 900: '#312e81' },
+            darkbg: '#0f172a',
+            cardbg: '#1e293b'
+          }
+        }
+      }
     }
-
-    .trade-box {
-      border: 1px solid #555;
-      padding: 15px;
-      border-radius: 8px;
-      background: #252530;
-    }
-
-    .btn {
-      background: #4F46E5;
-      color: white;
-      border: none;
-      padding: 10px 15px;
-      border-radius: 6px;
-      cursor: pointer;
-      margin-top: 10px;
-    }
-    .btn:hover { background: #4338CA; }
-    
-    .result { margin-top: 15px; padding: 10px; background: #1f2937; border-radius: 6px; }
-  </style>
+  </script>
 </head>
-<body>
+<body class="bg-darkbg text-slate-100 min-h-screen font-sans antialiased selection:bg-brand-500 selection:text-white">
 
-  <h2>🎒 My Inventory (Scrollable)</h2>
-  <div class="inventory-container" id="inventory">
-    <!-- Populated via JS -->
-  </div>
-
-  <div class="trade-box">
-    <h2>🎯 Target Pet Evaluation</h2>
-    <label>Pet Name: <input type="text" id="targetName" value="Frost Dragon"></label><br><br>
-    <label>Base Value: <input type="number" id="targetValue" value="100"></label><br><br>
+  <div class="max-w-7xl mx-auto px-4 py-8">
     
-    <label>Demand: 
-      <select id="targetDemand">
-        <option value="high">High (+10% value)</option>
-        <option value="medium" selected>Medium (Base value)</option>
-        <option value="low">Low (-10% value)</option>
-      </select>
-    </label><br><br>
+    <header class="flex flex-col md:flex-row md:items-center justify-between pb-6 mb-6 border-b border-slate-800 gap-4">
+      <div>
+        <h1 class="text-3xl font-extrabold tracking-tight text-white flex items-center gap-3">
+          <i data-lucide="trending-up" class="text-brand-500 w-8 h-8"></i>
+          Adopt Me Pet Value Hub
+        </h1>
+        <p class="text-slate-400 text-sm mt-1">Real-time valuation, market trends, and smart offer generator</p>
+      </div>
+      <div id="statusBadge" class="self-start md:self-auto px-3 py-1.5 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-xs font-semibold flex items-center gap-2">
+        <span class="w-2 h-2 rounded-full bg-amber-400 animate-pulse"></span>
+        Loading CSV Data...
+      </div>
+    </header>
 
-    <label>Trajectory: 
-      <select id="targetTrajectory">
-        <option value="rising" selected>Rising (+10% future overpay)</option>
-        <option value="stable">Stable (0%)</option>
-        <option value="dropping">Dropping (-15% underpay discount)</option>
-      </select>
-    </label><br><br>
+    <nav class="flex border-b border-slate-800 mb-8 space-x-2 overflow-x-auto">
+      <button id="tabBtn-1" onclick="switchTab(1)" class="py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap">
+        <i data-lucide="search" class="w-4 h-4"></i>
+        Tab 1: Value Checker & Graph
+      </button>
+      <button id="tabBtn-2" onclick="switchTab(2)" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap">
+        <i data-lucide="bar-chart-2" class="w-4 h-4"></i>
+        Tab 2: Market Analysis
+      </button>
+      <button id="tabBtn-3" onclick="switchTab(3)" class="py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap">
+        <i data-lucide="backpack" class="w-4 h-4"></i>
+        Tab 3: Backpack & Offer Suggester
+      </button>
+    </nav>
 
-    <button class="btn" onclick="evaluateTrade()">Suggest Best Offer</button>
+    <div id="tabContent-1" class="space-y-6">
+      <div class="grid grid-cols-1 lg:grid-cols-4 gap-6">
+        
+        <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">1. Search Pet</label>
+            <div class="relative">
+              <i data-lucide="search" class="absolute left-3 top-3 w-4 h-4 text-slate-400"></i>
+              <input type="text" id="searchInput" placeholder="Type pet name..." oninput="filterPetList()" 
+                     class="w-full bg-slate-900 border border-slate-700 rounded-lg pl-9 pr-3 py-2 text-sm text-white placeholder-slate-500 focus:outline-none focus:border-brand-500 transition">
+            </div>
+          </div>
 
-    <div class="result" id="tradeOutput">Select options and click Suggest Best Offer.</div>
+          <div id="petSelectContainer" class="hidden">
+            <select id="petSelect" onchange="onPetSelectClick()" size="6" 
+                    class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200 focus:outline-none focus:border-brand-500 scrollbar-thin scrollbar-thumb-slate-700">
+            </select>
+          </div>
+
+          <div id="toggleContainer">
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-2">2. Variant & Potions</label>
+            <div class="grid grid-cols-4 gap-2 text-xs font-bold">
+              <button id="toggle-M" onclick="toggleVariant('M')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">M</button>
+              <button id="toggle-N" onclick="toggleVariant('N')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">N</button>
+              <button id="toggle-F" onclick="togglePotion('F')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">F</button>
+              <button id="toggle-R" onclick="togglePotion('R')" class="py-2 rounded-lg bg-slate-800 text-slate-400 border border-slate-700 hover:border-slate-500 transition">R</button>
+            </div>
+            <div class="text-[11px] text-slate-500 mt-2 text-center">
+              Active Variant: <span id="activeComboTag" class="text-brand-500 font-semibold">Regular_NP</span>
+            </div>
+          </div>
+
+          <button id="executeSearchBtn" onclick="executeSearch()" class="w-full py-3 px-4 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg transition shadow-lg flex items-center justify-center gap-2 text-sm">
+            <i data-lucide="line-chart" class="w-4 h-4"></i>
+            Check Pet Value
+          </button>
+        </div>
+
+        <div class="lg:col-span-3 space-y-6">
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-3">
+            <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
+              <span class="text-xs font-medium text-slate-400">Current Value</span>
+              <div id="statCurrent" class="text-xl font-bold text-white mt-1">--</div>
+            </div>
+            <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
+              <span class="text-xs font-medium text-slate-400">All-Time High</span>
+              <div id="statATH" class="text-xl font-bold text-emerald-400 mt-1">--</div>
+            </div>
+            <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
+              <span class="text-xs font-medium text-slate-400">Overall Change</span>
+              <div id="statChange" class="text-xl font-bold text-white mt-1">--</div>
+            </div>
+            <div class="bg-cardbg p-3.5 rounded-xl border border-slate-800">
+              <span class="text-xs font-medium text-slate-400">Snapshots</span>
+              <div id="statSnapshots" class="text-xl font-bold text-brand-500 mt-1">--</div>
+            </div>
+          </div>
+
+          <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+            <div>
+              <h2 id="chartTitle" class="text-lg font-bold text-white">Select Pet & Click Check Value</h2>
+              <p id="chartSubtitle" class="text-xs text-slate-400">Historical market trajectory line graph</p>
+            </div>
+            <div class="relative h-[320px] w-full">
+              <canvas id="valueChart"></canvas>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tabContent-2" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
+          <h3 class="font-bold text-white mb-4">Top Market Gainers</h3>
+          <div id="topGainersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1"></div>
+        </div>
+        <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl flex flex-col">
+          <h3 class="font-bold text-white mb-4">Top Market Losers</h3>
+          <div id="topLosersList" class="space-y-2 text-sm max-h-96 overflow-y-auto pr-1"></div>
+        </div>
+      </div>
+    </div>
+
+    <div id="tabContent-3" class="space-y-6 hidden">
+      <div class="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        
+        <div class="lg:col-span-1 bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+          <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+            <i data-lucide="backpack" class="text-brand-500 w-5 h-5"></i>
+            Manage Your Backpack
+          </h3>
+          <p class="text-xs text-slate-400">Save owned pets here to automatically calculate trade offers.</p>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Add Pet to Inventory</label>
+            <input type="text" id="bpSearchInput" placeholder="Search pet..." oninput="filterBpPetList()" 
+                   class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+            <div id="bpPetSelectContainer" class="hidden mt-1">
+              <select id="bpPetSelect" onchange="onBpPetSelectClick()" size="5" 
+                      class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+              </select>
+            </div>
+          </div>
+
+          <div>
+            <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Variant & Potions</label>
+            <div class="grid grid-cols-4 gap-2 text-xs font-bold">
+              <button id="bp-toggle-M" onclick="toggleBpVariant('M')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
+              <button id="bp-toggle-N" onclick="toggleBpVariant('N')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
+              <button id="bp-toggle-F" onclick="toggleBpPotion('F')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
+              <button id="bp-toggle-R" onclick="toggleBpPotion('R')" class="py-1.5 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
+            </div>
+          </div>
+
+          <button onclick="addToBackpack()" class="w-full py-2.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-lg text-xs flex items-center justify-center gap-1.5 transition">
+            <i data-lucide="plus" class="w-4 h-4"></i> Add to Backpack
+          </button>
+
+          <div class="border-t border-slate-800 pt-3">
+            <div class="flex items-center justify-between mb-2">
+              <span class="text-xs font-bold uppercase text-slate-400">Your Inventory</span>
+              <button onclick="clearBackpack()" class="text-[10px] text-rose-400 hover:text-rose-300">Clear All</button>
+            </div>
+            
+            <div id="backpackItemsList" class="space-y-1.5 max-h-60 overflow-y-auto pr-2 border border-slate-800 p-2 rounded-lg bg-slate-900/50 scrollbar-thin scrollbar-thumb-slate-700">
+              <div class="text-slate-500 py-2 text-xs text-center">Backpack is empty. Add items above!</div>
+            </div>
+          </div>
+        </div>
+
+        <div class="lg:col-span-2 space-y-6">
+          <div class="bg-cardbg p-5 rounded-xl border border-slate-800 shadow-xl space-y-4">
+            <h3 class="text-sm font-bold uppercase tracking-wider text-white flex items-center gap-2">
+              <i data-lucide="sparkles" class="text-amber-400 w-5 h-5"></i>
+              Offer Suggester Engine
+            </h3>
+            
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Pet You Want</label>
+                <input type="text" id="targetSearchInput" placeholder="Target pet name..." oninput="filterTargetList()"
+                       class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-sm text-white focus:outline-none focus:border-brand-500">
+                <div id="targetSelectContainer" class="hidden mt-1">
+                  <select id="targetSelect" onchange="onTargetSelectClick()" size="4"
+                          class="w-full bg-slate-900 border border-slate-700 rounded-lg p-2 text-sm text-slate-200">
+                  </select>
+                </div>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Variant</label>
+                <div class="grid grid-cols-4 gap-1.5 text-xs font-bold">
+                  <button id="target-toggle-M" onclick="toggleTargetVariant('M')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">M</button>
+                  <button id="target-toggle-N" onclick="toggleTargetVariant('N')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">N</button>
+                  <button id="target-toggle-F" onclick="toggleTargetPotion('F')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">F</button>
+                  <button id="target-toggle-R" onclick="toggleTargetPotion('R')" class="py-2 rounded bg-slate-800 text-slate-400 border border-slate-700">R</button>
+                </div>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 border-t border-slate-800 pt-3">
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Target Demand Factor</label>
+                <select id="targetDemandSelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200">
+                  <option value="high" selected>High Demand (+10% Overpay needed)</option>
+                  <option value="medium">Medium Demand (Base Value)</option>
+                  <option value="low">Low Demand (-10% Underpay acceptable)</option>
+                </select>
+              </div>
+
+              <div>
+                <label class="block text-xs font-semibold uppercase text-slate-400 mb-1">Future Market Trajectory</label>
+                <select id="targetTrajectorySelect" class="w-full bg-slate-900 border border-slate-700 rounded-lg px-3 py-2 text-xs text-slate-200">
+                  <option value="rising" selected>📈 Rising (+10% Growth factor)</option>
+                  <option value="stable">➡️ Stable Market</option>
+                  <option value="dropping">📉 Dropping (-15% Value decay)</option>
+                </select>
+              </div>
+            </div>
+
+            <button onclick="generateOfferSuggestions()" class="w-full py-3 bg-brand-600 hover:bg-brand-500 text-white font-bold rounded-lg text-sm flex items-center justify-center gap-2 transition shadow-lg">
+              <i data-lucide="wand-2" class="w-4 h-4"></i> Generate Trade Offers From Backpack
+            </button>
+          </div>
+
+          <div id="targetValSummary" class="text-xs text-slate-400 hidden px-2 flex justify-between">
+            <span>Base Target Value: <strong id="dispBaseVal" class="text-white">0</strong></span>
+            <span>Adjusted Market Value (Demand + Future): <strong id="dispAdjVal" class="text-emerald-400">0</strong></span>
+          </div>
+
+          <div class="grid grid-cols-1 md:grid-cols-3 gap-4">
+            <div class="bg-cardbg p-4 rounded-xl border border-emerald-500/30 flex flex-col space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-emerald-400 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="trending-up" class="w-4 h-4"></i> Win Offer
+                </span>
+              </div>
+              <div id="winOfferContainer" class="flex-1 text-xs space-y-2">
+                <div class="text-slate-500 py-4 text-center">Select target & click generate.</div>
+              </div>
+            </div>
+
+            <div class="bg-cardbg p-4 rounded-xl border border-blue-500/30 flex flex-col space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-blue-400 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="scale" class="w-4 h-4"></i> Fair Offer
+                </span>
+              </div>
+              <div id="fairOfferContainer" class="flex-1 text-xs space-y-2">
+                <div class="text-slate-500 py-4 text-center">Select target & click generate.</div>
+              </div>
+            </div>
+
+            <div class="bg-cardbg p-4 rounded-xl border border-amber-500/30 flex flex-col space-y-3">
+              <div class="flex items-center justify-between border-b border-slate-800 pb-2">
+                <span class="text-xs font-bold text-amber-400 uppercase tracking-wider flex items-center gap-1">
+                  <i data-lucide="zap" class="w-4 h-4"></i> Overpay Offer
+                </span>
+              </div>
+              <div id="loseOfferContainer" class="flex-1 text-xs space-y-2">
+                <div class="text-slate-500 py-4 text-center">Select target & click generate.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+
   </div>
 
   <script>
-    // 1. Inventory Array
-    const inventory = [
-      { id: 1, name: "NFR Turtle", value: 32, demand: "High" },
-      { id: 2, name: "NFR Turtle", value: 32, demand: "High" },
-      { id: 3, name: "FR Cow", value: 15, demand: "High" },
-      { id: 4, name: "FR SSBD", value: 14, demand: "High" },
-      { id: 5, name: "FR Kangaroo", value: 11, demand: "Medium" },
-      { id: 6, name: "FR Frost Fury", value: 7, demand: "Medium" },
-      { id: 7, name: "NFR Dragon", value: 6, demand: "Low" },
-      { id: 8, name: "Ride Potion", value: 1, demand: "High" },
-      { id: 9, name: "Ride Potion", value: 1, demand: "High" },
-      { id: 10, name: "Ride Potion", value: 1, demand: "High" },
-      { id: 11, name: "Metal Ox", value: 0.5, demand: "Low" }
-    ];
+    // State Stores
+    let rawRecords = [];
+    let uniqueBasePets = [];
+    let chartInstance = null;
+    let selectedPetName = "";
 
-    // 2. Render Inventory into Scrollable Div
-    function renderInventory() {
-      const container = document.getElementById("inventory");
-      container.innerHTML = "";
-      inventory.forEach(item => {
-        container.innerHTML += `
-          <div class="item">
-            <span><strong>${item.name}</strong> (${item.demand} Demand)</span>
-            <span>Value: ${item.value}</span>
+    let activeType = 'Regular', hasFly = false, hasRide = false;
+    let backpack = JSON.parse(localStorage.getItem('user_backpack') || '[]');
+    let bpSelectedPet = "", bpActiveType = 'Regular', bpHasFly = false, bpHasRide = false;
+    let targetSelectedPet = "", targetActiveType = 'Regular', targetHasFly = false, targetHasRide = false;
+
+    // Tab Switching
+    function switchTab(tabIndex) {
+      [1, 2, 3].forEach(i => {
+        document.getElementById(`tabContent-${i}`).classList.add('hidden');
+        document.getElementById(`tabBtn-${i}`).className = "py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap";
+      });
+      document.getElementById(`tabContent-${tabIndex}`).classList.remove('hidden');
+      document.getElementById(`tabBtn-${tabIndex}`).className = "py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap";
+    }
+
+    // CSV Parse
+    Papa.parse("history.csv", {
+      download: true,
+      skipEmptyLines: true,
+      complete: function(results) { processCSVData(results.data); },
+      error: function() {
+        document.getElementById('statusBadge').innerText = "Failed to load history.csv";
+      }
+    });
+
+    function processCSVData(rows) {
+      if (!rows || rows.length === 0) return;
+      let startIdx = isNaN(parseFloat(rows[0][rows[0].length - 1])) ? 1 : 0;
+
+      rawRecords = [];
+      const basePetSet = new Set();
+
+      for (let i = startIdx; i < rows.length; i++) {
+        const row = rows[i];
+        if (row.length >= 4) {
+          const date = row[0].trim();
+          const name = row.slice(1, row.length - 2).join(',').trim();
+          const combo = row[row.length - 2].trim();
+          const val = parseFloat(row[row.length - 1].trim());
+
+          if (name && !isNaN(val)) {
+            rawRecords.push({ date, name, combo, val });
+            basePetSet.add(name);
+          }
+        }
+      }
+
+      uniqueBasePets = Array.from(basePetSet).sort();
+      document.getElementById('statusBadge').innerText = `${rawRecords.length} Records Loaded`;
+      renderBackpackUI();
+      lucide.createIcons();
+    }
+
+    // Helpers
+    function getCurrentVal(petName, comboTag) {
+      const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
+      if (records.length === 0) return 0;
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
+      return records[records.length - 1].val;
+    }
+
+    function getComboTag(type, fly, ride) {
+      let potionTag = "NP";
+      if (fly && ride) potionTag = "FR";
+      else if (fly) potionTag = "F";
+      else if (ride) potionTag = "R";
+      return `${type}_${potionTag}`;
+    }
+
+    // Tab 1 Toggles
+    function toggleVariant(v) { activeType = activeType === v ? 'Regular' : v; updateToggleUI(); }
+    function togglePotion(p) { if (p === 'F') hasFly = !hasFly; if (p === 'R') hasRide = !hasRide; updateToggleUI(); }
+    function updateToggleUI() {
+      document.getElementById('activeComboTag').innerText = getComboTag(activeType, hasFly, hasRide);
+    }
+
+    function filterPetList() {
+      const q = document.getElementById("searchInput").value.trim().toLowerCase();
+      const container = document.getElementById("petSelectContainer");
+      if (!q) { container.classList.add("hidden"); return; }
+      const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
+      const select = document.getElementById("petSelect");
+      select.innerHTML = "";
+      filtered.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        select.appendChild(opt);
+      });
+      container.classList.remove("hidden");
+    }
+
+    function onPetSelectClick() {
+      selectedPetName = document.getElementById("petSelect").value;
+      document.getElementById("searchInput").value = selectedPetName;
+      document.getElementById("petSelectContainer").classList.add("hidden");
+    }
+
+    function executeSearch() {
+      if (!selectedPetName) selectedPetName = document.getElementById("searchInput").value.trim();
+      if (!selectedPetName) return alert("Select a pet!");
+      const combo = getComboTag(activeType, hasFly, hasRide);
+      renderDashboard(selectedPetName, combo);
+    }
+
+    function renderDashboard(selectedPet, comboTag) {
+      document.getElementById('chartTitle').innerText = `${selectedPet} (${comboTag})`;
+      const records = rawRecords.filter(r => r.name.toLowerCase() === selectedPet.toLowerCase() && r.combo === comboTag);
+      records.sort((a, b) => new Date(a.date) - new Date(b.date));
+
+      const dates = records.map(r => r.date);
+      const values = records.map(r => r.val);
+
+      if (values.length > 0) {
+        document.getElementById('statCurrent').innerText = values[values.length - 1];
+        document.getElementById('statATH').innerText = Math.max(...values);
+        document.getElementById('statSnapshots').innerText = records.length;
+
+        const ctx = document.getElementById('valueChart').getContext('2d');
+        if (chartInstance) chartInstance.destroy();
+        chartInstance = new Chart(ctx, {
+          type: 'line',
+          data: { labels: dates, datasets: [{ label: 'Value', data: values, borderColor: '#6366f1', fill: true }] },
+          options: { responsive: true, maintainAspectRatio: false }
+        });
+      }
+    }
+
+    // Backpack Management
+    function toggleBpVariant(v) { bpActiveType = bpActiveType === v ? 'Regular' : v; }
+    function toggleBpPotion(p) { if (p === 'F') bpHasFly = !bpHasFly; if (p === 'R') bpHasRide = !bpHasRide; }
+    function filterBpPetList() {
+      const q = document.getElementById("bpSearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("bpPetSelectContainer");
+      if (!q) return container.classList.add("hidden");
+      const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
+      const select = document.getElementById("bpPetSelect");
+      select.innerHTML = "";
+      filtered.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        select.appendChild(opt);
+      });
+      container.classList.remove("hidden");
+    }
+    function onBpPetSelectClick() {
+      bpSelectedPet = document.getElementById("bpPetSelect").value;
+      document.getElementById("bpSearchInput").value = bpSelectedPet;
+      document.getElementById("bpPetSelectContainer").classList.add("hidden");
+    }
+
+    function addToBackpack() {
+      if (!bpSelectedPet) bpSelectedPet = document.getElementById("bpSearchInput").value.trim();
+      if (!bpSelectedPet) return alert("Select a pet first!");
+
+      const combo = getComboTag(bpActiveType, bpHasFly, bpHasRide);
+      const val = getCurrentVal(bpSelectedPet, combo);
+
+      backpack.push({ id: Date.now(), name: bpSelectedPet, combo, val });
+      localStorage.setItem('user_backpack', JSON.stringify(backpack));
+      renderBackpackUI();
+    }
+
+    function removeFromBackpack(id) {
+      backpack = backpack.filter(i => i.id !== id);
+      localStorage.setItem('user_backpack', JSON.stringify(backpack));
+      renderBackpackUI();
+    }
+
+    function clearBackpack() {
+      backpack = [];
+      localStorage.removeItem('user_backpack');
+      renderBackpackUI();
+    }
+
+    function renderBackpackUI() {
+      const list = document.getElementById("backpackItemsList");
+      if (backpack.length === 0) {
+        list.innerHTML = `<div class="text-slate-500 py-2 text-xs text-center">Backpack is empty. Add items above!</div>`;
+        return;
+      }
+      list.innerHTML = "";
+      backpack.forEach(item => {
+        list.innerHTML += `
+          <div class="flex items-center justify-between bg-slate-800 p-2 rounded text-xs">
+            <div>
+              <span class="font-bold text-white">${item.name}</span>
+              <span class="text-[10px] text-brand-400 ml-1">(${item.combo})</span>
+            </div>
+            <div class="flex items-center gap-2">
+              <span class="text-emerald-400 font-semibold">${item.val} pts</span>
+              <button onclick="removeFromBackpack(${item.id})" class="text-rose-400 hover:text-rose-300">✕</button>
+            </div>
           </div>
         `;
       });
     }
 
-    // 3. Trade Evaluation & Offer Suggestion Algorithm
-    function evaluateTrade() {
-      const baseVal = parseFloat(document.getElementById("targetValue").value);
-      const demand = document.getElementById("targetDemand").value;
-      const trajectory = document.getElementById("targetTrajectory").value;
-      const petName = document.getElementById("targetName").value;
+    // Target Selection
+    function toggleTargetVariant(v) { targetActiveType = targetActiveType === v ? 'Regular' : v; }
+    function toggleTargetPotion(p) { if (p === 'F') targetHasFly = !targetHasFly; if (p === 'R') targetHasRide = !targetHasRide; }
+    function filterTargetList() {
+      const q = document.getElementById("targetSearchInput").value.trim().toLowerCase();
+      const container = document.getElementById("targetSelectContainer");
+      if (!q) return container.classList.add("hidden");
+      const filtered = uniqueBasePets.filter(p => p.toLowerCase().includes(q));
+      const select = document.getElementById("targetSelect");
+      select.innerHTML = "";
+      filtered.forEach(p => {
+        const opt = document.createElement("option");
+        opt.value = p; opt.textContent = p;
+        select.appendChild(opt);
+      });
+      container.classList.remove("hidden");
+    }
+    function onTargetSelectClick() {
+      targetSelectedPet = document.getElementById("targetSelect").value;
+      document.getElementById("targetSearchInput").value = targetSelectedPet;
+      document.getElementById("targetSelectContainer").classList.add("hidden");
+    }
 
-      // Adjust value based on Demand
-      let demandMultiplier = 1.0;
-      if (demand === "high") demandMultiplier = 1.10;
-      if (demand === "low") demandMultiplier = 0.90;
+    // Offer Suggestion Engine (Incorporating Demand & Trajectory)
+    function generateOfferSuggestions() {
+      if (!targetSelectedPet) targetSelectedPet = document.getElementById("targetSearchInput").value.trim();
+      if (!targetSelectedPet) return alert("Select target pet!");
+      if (backpack.length === 0) return alert("Backpack is empty!");
 
-      // Adjust value based on Trajectory (Future Growth)
-      let trajectoryMultiplier = 1.0;
-      if (trajectory === "rising") trajectoryMultiplier = 1.10;
-      if (trajectory === "dropping") trajectoryMultiplier = 0.85;
+      const combo = getComboTag(targetActiveType, targetHasFly, targetHasRide);
+      const baseVal = getCurrentVal(targetSelectedPet, combo);
 
-      // Calculate Target True Value
-      const adjustedTargetValue = baseVal * demandMultiplier * trajectoryMultiplier;
+      // Multipliers
+      const demand = document.getElementById("targetDemandSelect").value;
+      const trajectory = document.getElementById("targetTrajectorySelect").value;
 
-      // Greedy offer suggestion algorithm
+      let demandMult = demand === 'high' ? 1.10 : (demand === 'low' ? 0.90 : 1.0);
+      let trajMult = trajectory === 'rising' ? 1.10 : (trajectory === 'dropping' ? 0.85 : 1.0);
+
+      const adjustedTargetValue = baseVal * demandMult * trajMult;
+
+      // Update Summary UI
+      document.getElementById("targetValSummary").classList.remove("hidden");
+      document.getElementById("dispBaseVal").innerText = baseVal;
+      document.getElementById("dispAdjVal").innerText = adjustedTargetValue.toFixed(1);
+
+      // Offer Calculations
+      const sortedBackpack = [...backpack].sort((a, b) => b.val - a.val);
+
+      renderOfferBox("winOfferContainer", sortedBackpack, adjustedTargetValue * 0.92);
+      renderOfferBox("fairOfferContainer", sortedBackpack, adjustedTargetValue * 1.0);
+      renderOfferBox("loseOfferContainer", sortedBackpack, adjustedTargetValue * 1.08);
+    }
+
+    function renderOfferBox(containerId, items, targetVal) {
+      const box = document.getElementById(containerId);
       let offer = [];
-      let currentOfferValue = 0;
+      let currentVal = 0;
 
-      // Sort inventory by value descending to offer highest value items first
-      const sortedInv = [...inventory].sort((a, b) => b.value - a.value);
-
-      for (let item of sortedInv) {
-        if (currentOfferValue < adjustedTargetValue) {
+      for (let item of items) {
+        if (currentVal < targetVal) {
           offer.push(item);
-          currentOfferValue += item.value;
+          currentVal += item.val;
         }
       }
 
-      // Display Results
-      const output = document.getElementById("tradeOutput");
-      if (currentOfferValue < adjustedTargetValue) {
-        output.innerHTML = `
-          <p><strong>Target:</strong> ${petName}</p>
-          <p><strong>Base Value:</strong> ${baseVal} | <strong>Adjusted Target Value:</strong> ${adjustedTargetValue.toFixed(1)}</p>
-          <p style="color: #ef4444;">⚠️ Your full inventory total (${currentOfferValue}) is not enough to match the adjusted value of this target pet.</p>
-        `;
-      } else {
-        const offerNames = offer.map(i => i.name).join(", ");
-        output.innerHTML = `
-          <p><strong>Target Pet:</strong> ${petName}</p>
-          <p><strong>Base Target Value:</strong> ${baseVal}</p>
-          <p><strong>Adjusted Target Value (Demand + Trajectory):</strong> <span style="color:#4ade80;">${adjustedTargetValue.toFixed(1)}</span></p>
-          <hr style="border-color: #444;">
-          <p><strong>Suggested Offer:</strong> ${offerNames}</p>
-          <p><strong>Total Offer Value:</strong> ${currentOfferValue.toFixed(1)}</p>
-          <p><strong>Verdict:</strong> ${currentOfferValue >= adjustedTargetValue ? "Fair / Solid Win Offer" : "Underpay"}</p>
-        `;
+      if (currentVal === 0) {
+        box.innerHTML = `<div class="text-rose-400 text-center py-2">Not enough inventory value.</div>`;
+        return;
       }
-    }
 
-    // Initialize UI on load
-    renderInventory();
+      let offerHTML = offer.map(i => `<div class="bg-slate-900 p-1.5 rounded flex justify-between"><span>${i.name}</span><span class="text-emerald-400">${i.val}</span></div>`).join("");
+      box.innerHTML = `
+        ${offerHTML}
+        <div class="pt-2 border-t border-slate-800 text-right font-bold text-slate-300">
+          Total: ${currentVal.toFixed(1)} pts
+        </div>
+      `;
+    }
   </script>
 
 </body>
