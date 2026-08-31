@@ -1,30 +1,50 @@
-// Tab 1 Local State
+// Tab 1 State
 let chartInstance = null;
 let selectedPetName = "";
 let activeType = 'Regular'; // 'Regular', 'M', or 'N'
 let hasFly = false; 
 let hasRide = false;
 
-// 1. Variant Toggle (Mega / Neon)
+// 1. Toggles (Called directly by button onclick)
 function toggleVariant(v) { 
-  // Toggle off if clicked twice, otherwise set variant
   activeType = (activeType === v) ? 'Regular' : v; 
   updateToggleUI(); 
 }
 
-// 2. Potion Toggle (Fly / Ride)
 function togglePotion(p) { 
   if (p === 'F') hasFly = !hasFly; 
   if (p === 'R') hasRide = !hasRide; 
   updateToggleUI(); 
 }
 
-// 3. Directly Apply Hardcoded Styles to Tab 1 Buttons
+// 2. Safe Color Switcher (Only changes background/text colors)
 function updateToggleUI() {
-  if (typeof updateButtonStyling === 'function') {
-    // Calls updateButtonStyling in app.js targeting "toggle-M", "toggle-N", "toggle-F", "toggle-R"
-    updateButtonStyling('toggle', activeType, hasFly, hasRide);
-  }
+  const btnM = document.getElementById("toggle-M");
+  const btnN = document.getElementById("toggle-N");
+  const btnF = document.getElementById("toggle-F");
+  const btnR = document.getElementById("toggle-R");
+
+  // Helper function to safely apply colors without breaking clicks
+  const applyColors = (btn, isActive, activeBg, activeBorder) => {
+    if (!btn) return;
+    if (isActive) {
+      btn.style.backgroundColor = activeBg;
+      btn.style.borderColor = activeBorder;
+      btn.style.color = "#ffffff";
+      btn.style.fontWeight = "bold";
+    } else {
+      btn.style.backgroundColor = "#1e293b";
+      btn.style.borderColor = "#334155";
+      btn.style.color = "#94a3b8";
+      btn.style.fontWeight = "normal";
+    }
+  };
+
+  // Apply colors directly to buttons
+  applyColors(btnM, activeType === 'M', '#a855f7', '#c084fc'); // Purple
+  applyColors(btnN, activeType === 'N', '#22c55e', '#4ade80'); // Green
+  applyColors(btnF, hasFly,          '#3b82f6', '#60a5fa'); // Blue
+  applyColors(btnR, hasRide,         '#ec4899', '#f472b6'); // Pink
 
   // Update combo tag display label if present
   const tagDisplay = document.getElementById('activeComboTag');
@@ -33,7 +53,7 @@ function updateToggleUI() {
   }
 }
 
-// 4. Search Bar Filtering & Dropdown
+// 3. Search & Select Handlers
 function filterPetList() {
   const query = document.getElementById("searchInput").value.trim().toLowerCase();
   const container = document.getElementById("petSelectContainer");
@@ -61,7 +81,6 @@ function filterPetList() {
   }
 }
 
-// 5. Select Pet from Dropdown
 function onPetSelectClick() {
   const select = document.getElementById("petSelect");
   if (!select || !select.value) return;
@@ -73,7 +92,6 @@ function onPetSelectClick() {
   if (container) container.classList.add("hidden");
 }
 
-// 6. Execute Search & Trigger Dashboard
 function executeSearch() {
   if (!selectedPetName) {
     selectedPetName = document.getElementById("searchInput").value.trim();
@@ -88,7 +106,7 @@ function executeSearch() {
   renderDashboard(selectedPetName, combo);
 }
 
-// 7. Render Dashboard Stats and Value Chart
+// 4. Dashboard & Chart Rendering
 function renderDashboard(petName, comboTag) {
   const titleElem = document.getElementById('chartTitle');
   if (titleElem) titleElem.innerText = `${petName} (${comboTag})`;
@@ -105,7 +123,6 @@ function renderDashboard(petName, comboTag) {
   const values = records.map(r => r.val);
 
   if (values.length > 0) {
-    // Populate Stat Counters
     const statCurr = document.getElementById('statCurrent');
     const statAth = document.getElementById('statATH');
     const statSnaps = document.getElementById('statSnapshots');
@@ -114,7 +131,6 @@ function renderDashboard(petName, comboTag) {
     if (statAth) statAth.innerText = Math.max(...values);
     if (statSnaps) statSnaps.innerText = records.length;
     
-    // Populate Trend Badge
     if (typeof calculatePetTrend === 'function') {
       const trend = calculatePetTrend(petName, comboTag);
       const trendElem = document.getElementById('statTrend');
@@ -124,7 +140,6 @@ function renderDashboard(petName, comboTag) {
       }
     }
 
-    // Render Line Chart (Chart.js)
     const chartCanvas = document.getElementById('valueChart');
     if (chartCanvas && window.Chart) {
       const ctx = chartCanvas.getContext('2d');
@@ -146,9 +161,7 @@ function renderDashboard(petName, comboTag) {
         options: {
           responsive: true,
           maintainAspectRatio: false,
-          plugins: {
-            legend: { display: false }
-          },
+          plugins: { legend: { display: false } },
           scales: {
             x: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } },
             y: { ticks: { color: '#94a3b8' }, grid: { color: '#334155' } }
@@ -161,7 +174,7 @@ function renderDashboard(petName, comboTag) {
   }
 }
 
-// 8. Inspect Action Triggered from Backpack (Tab 2 Routing)
+// 5. Backpack Inspection Route
 function inspectPetFromBackpack(petName, comboTag) {
   selectedPetName = petName;
   const searchInput = document.getElementById("searchInput");
@@ -178,7 +191,7 @@ function inspectPetFromBackpack(petName, comboTag) {
   renderDashboard(petName, comboTag);
 }
 
-// 9. Initialize Button States on Load
+// 6. Bind Buttons Safely on Page Load
 document.addEventListener("DOMContentLoaded", () => {
   updateToggleUI();
 });
