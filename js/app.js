@@ -11,29 +11,46 @@ function getComboTag(type, fly, ride) {
   return `${type}_${potionTag}`;
 }
 
-// Shared Utility: Button Class Updater
+// Direct Hardcoded Button Style Manager
 function updateButtonStyling(prefix, currentType, fly, ride) {
   const btnM = document.getElementById(`${prefix}-toggle-M`);
   const btnN = document.getElementById(`${prefix}-toggle-N`);
   const btnF = document.getElementById(`${prefix}-toggle-F`);
   const btnR = document.getElementById(`${prefix}-toggle-R`);
 
-  const defaultClass = "py-2 rounded border transition bg-slate-800 text-slate-400 border-slate-700";
+  // Default Inactive Style (Dark Slate)
+  const defaultStyle = "background-color: #1e293b; color: #94a3b8; border: 1px solid #334155;";
 
-  if (btnM) btnM.className = currentType === 'M' ? "py-2 rounded border transition btn-m-active" : defaultClass;
-  if (btnN) btnN.className = currentType === 'N' ? "py-2 rounded border transition btn-n-active" : defaultClass;
-  if (btnF) btnF.className = fly ? "py-2 rounded border transition btn-f-active" : defaultClass;
-  if (btnR) btnR.className = ride ? "py-2 rounded border transition btn-r-active" : defaultClass;
+  // Active Hardcoded Color Styles
+  const mStyle = "background-color: #a855f7; color: #ffffff; border: 1px solid #c084fc; font-weight: bold;";
+  const nStyle = "background-color: #22c55e; color: #ffffff; border: 1px solid #4ade80; font-weight: bold;";
+  const fStyle = "background-color: #3b82f6; color: #ffffff; border: 1px solid #60a5fa; font-weight: bold;";
+  const rStyle = "background-color: #ec4899; color: #ffffff; border: 1px solid #f472b6; font-weight: bold;";
+
+  if (btnM) btnM.style.cssText = currentType === 'M' ? mStyle : defaultStyle;
+  if (btnN) btnN.style.cssText = currentType === 'N' ? nStyle : defaultStyle;
+  if (btnF) btnF.style.cssText = fly ? fStyle : defaultStyle;
+  if (btnR) btnR.style.cssText = ride ? rStyle : defaultStyle;
 }
 
-// Tab Switching Routing
+// Tab Switch Routing
 function switchTab(tabIndex) {
   [1, 2, 3].forEach(i => {
-    document.getElementById(`tabContent-${i}`).classList.add('hidden');
-    document.getElementById(`tabBtn-${i}`).className = "py-3 px-5 text-sm font-bold border-b-2 border-transparent text-slate-400 hover:text-slate-200 flex items-center gap-2 transition whitespace-nowrap";
+    const content = document.getElementById(`tabContent-${i}`);
+    const btn = document.getElementById(`tabBtn-${i}`);
+    if (content) content.classList.add('hidden');
+    if (btn) {
+      btn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid transparent; color: #94a3b8;";
+    }
   });
-  document.getElementById(`tabContent-${tabIndex}`).classList.remove('hidden');
-  document.getElementById(`tabBtn-${tabIndex}`).className = "py-3 px-5 text-sm font-bold border-b-2 border-brand-500 text-brand-400 flex items-center gap-2 transition whitespace-nowrap";
+
+  const activeContent = document.getElementById(`tabContent-${tabIndex}`);
+  const activeBtn = document.getElementById(`tabBtn-${tabIndex}`);
+
+  if (activeContent) activeContent.classList.remove('hidden');
+  if (activeBtn) {
+    activeBtn.style.cssText = "padding: 0.75rem 1.25rem; font-size: 0.875rem; font-weight: 700; border-bottom: 2px solid #6366f1; color: #818cf8;";
+  }
 }
 
 // Global Valuation Helpers
@@ -46,18 +63,18 @@ function getCurrentVal(petName, comboTag) {
 
 function calculatePetTrend(petName, comboTag) {
   const records = rawRecords.filter(r => r.name.toLowerCase() === petName.toLowerCase() && r.combo === comboTag);
-  if (records.length < 2) return { text: "➡️ Stable", color: "text-slate-400", bg: "bg-slate-800" };
+  if (records.length < 2) return { text: "➡️ Stable", color: "color: #94a3b8;" };
   records.sort((a, b) => new Date(a.date) - new Date(b.date));
 
   const oldest = records[0].val;
   const latest = records[records.length - 1].val;
 
-  if (latest > oldest * 1.03) return { text: "📈 Rising", color: "text-emerald-400", bg: "bg-emerald-500/10 border border-emerald-500/30" };
-  if (latest < oldest * 0.97) return { text: "📉 Dropping", color: "text-rose-400", bg: "bg-rose-500/10 border border-rose-500/30" };
-  return { text: "➡️ Stable", color: "text-slate-300", bg: "bg-slate-800" };
+  if (latest > oldest * 1.03) return { text: "📈 Rising", color: "color: #34d399;" };
+  if (latest < oldest * 0.97) return { text: "📉 Dropping", color: "color: #f87171;" };
+  return { text: "➡️ Stable", color: "color: #cbd5e1;" };
 }
 
-// CSV Initialization
+// CSV Parser Initialization
 Papa.parse("history.csv", {
   download: true,
   skipEmptyLines: true,
@@ -92,7 +109,6 @@ function processCSVData(rows) {
   uniqueBasePets = Array.from(basePetSet).sort();
   document.getElementById('statusBadge').innerText = `${rawRecords.length} Records Loaded`;
   
-  // Trigger initializations across modular tab files
   if (typeof renderBackpackUI === 'function') renderBackpackUI();
   if (typeof computeMarketTrends === 'function') computeMarketTrends();
   if (typeof renderUpdateHistory === 'function') renderUpdateHistory();
