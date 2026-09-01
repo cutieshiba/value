@@ -2,8 +2,13 @@ let backpack = JSON.parse(localStorage.getItem('user_backpack') || '[]');
 let bpSelectedPet = "", bpActiveType = 'Regular', bpHasFly = false, bpHasRide = false;
 let targetSelectedPet = "", targetActiveType = 'Regular', targetHasFly = false, targetHasRide = false;
 
-// Store generated combos globally so we can complete trades cleanly
-let currentGeneratedCombos = [];
+// Dynamic Helper: Gets live value from database dynamically
+function getLivePetValue(petName, combo) {
+  if (typeof getCurrentVal === 'function') {
+    return Number(getCurrentVal(petName, combo)) || 0;
+  }
+  return 0;
+}
 
 function toggleBpVariant(v) { 
   bpActiveType = bpActiveType === v ? 'Regular' : v; 
@@ -48,8 +53,7 @@ function addToBackpack() {
   if (!bpSelectedPet) return alert("Select a pet first!");
 
   const combo = typeof getComboTag === 'function' ? getComboTag(bpActiveType, bpHasFly, bpHasRide) : `${bpActiveType}_${bpHasFly ? 'F' : ''}${bpHasRide ? 'R' : ''}`.replace('_$', '_NP');
-  const rawVal = typeof getCurrentVal === 'function' ? getCurrentVal(bpSelectedPet, combo) : 0;
-  const val = Number(rawVal) || 0;
+  const val = getLivePetValue(bpSelectedPet, combo);
 
   backpack.push({ id: Date.now(), name: bpSelectedPet, combo, val });
   localStorage.setItem('user_backpack', JSON.stringify(backpack));
@@ -75,10 +79,15 @@ function renderBackpackUI() {
     list.innerHTML = `<div class="text-slate-500 py-2 text-xs text-center">Backpack is empty. Add items above!</div>`;
     return;
   }
+  
   list.innerHTML = "";
   backpack.forEach(item => {
+    // ALWAYS fetch the live updated value from the database
+    const freshVal = getLivePetValue(item.name, item.combo);
+    item.val = freshVal; // Update in-memory value
+
     const trend = typeof calculatePetTrend === 'function' ? calculatePetTrend(item.name, item.combo) : { text: '--', color: 'text-slate-400' };
-    const formattedVal = (Number(item.val) || 0).toFixed(2);
+    const formattedVal = item.val.toFixed(2);
     
     list.innerHTML += `
       <div class="flex items-center justify-between bg-slate-800 p-2 rounded text-xs hover:bg-slate-700/60 transition mb-1">
@@ -94,6 +103,9 @@ function renderBackpackUI() {
       </div>
     `;
   });
+
+  // Save recalculated values back to localStorage
+  localStorage.setItem('user_backpack', JSON.stringify(backpack));
 }
 
 function toggleTargetVariant(v) {
@@ -144,7 +156,7 @@ function generateOfferSuggestions() {
   if (backpack.length === 0) return alert("Backpack is empty!");
 
   const combo = typeof getComboTag === 'function' ? getComboTag(targetActiveType, targetHasFly, targetHasRide) : `${targetActiveType}_NP`;
-  const baseVal = Number(typeof getCurrentVal === 'function' ? getCurrentVal(targetSelectedPet, combo) : 0) || 0;
+  const baseVal = getLivePetValue(targetSelectedPet, combo);
   const trend = typeof calculatePetTrend === 'function' ? calculatePetTrend(targetSelectedPet, combo) : { text: '--', bg: 'bg-slate-800', color: 'text-slate-400' };
 
   if (baseVal === 0) return alert("Selected target pet variant has no valid price data.");
@@ -170,14 +182,20 @@ function generateOfferSuggestions() {
 function getAllCombinations(items) {
   let results = [];
   
+  // Refresh live values across all backpack items before combining
+  const itemsWithLiveVals = items.map(item => {
+    const freshVal = getLivePetValue(item.name, item.combo);
+    return { ...item, val: freshVal };
+  });
+  
   function combine(start, currentCombo, currentVal) {
     if (currentCombo.length > 0 && currentCombo.length <= 6) {
       results.push({ items: [...currentCombo], totalVal: currentVal });
     }
     if (currentCombo.length === 6) return;
 
-    for (let i = start; i < items.length; i++) {
-      combine(i + 1, [...currentCombo, items[i]], currentVal + (Number(items[i].val) || 0));
+    for (let i = start; i < itemsWithLiveVals.length; i++) {
+      combine(i + 1, [...currentCombo, itemsWithLiveVals[i]], currentVal + itemsWithLiveVals[i].val);
     }
   }
 
@@ -198,7 +216,7 @@ function renderOfferColumn(containerId, optionsList, typeLabel, targetVal) {
     const formattedDiff = (diff >= 0 ? `+${diff.toFixed(2)}` : `${diff.toFixed(2)}`) + " pts";
     const diffColor = diff > 0 ? "text-amber-400" : diff < 0 ? "text-emerald-400" : "text-blue-400";
     
-    // Store JSON in attribute for execution upon completion
+    // Store JSON payload for trade completion
     const offerDataJSON = encodeURIComponent(JSON.stringify({
       offeredItemIds: opt.items.map(i => i.id),
       targetPetName: targetSelectedPet,
@@ -228,7 +246,7 @@ function renderOfferColumn(containerId, optionsList, typeLabel, targetVal) {
                   <span class="text-[9px] text-slate-500">(${i.combo})</span>
                   <span class="text-[9px] ${itemTrend.color}">${itemTrend.text ? itemTrend.text.split(' ')[0] : ''}</span>
                 </span>
-                <span class="text-slate-400">${(Number(i.val) || 0).toFixed(2)}</span>
+                <span class="text-slate-400">${i.val.toFixed(2)}</span>
               </div>
             `;
           }).join("")}
@@ -242,7 +260,6 @@ function renderOfferColumn(containerId, optionsList, typeLabel, targetVal) {
   }).join("");
 }
 
-// Handler to execute automatic item exchange in backpack
 function completeTrade(encodedData) {
   try {
     const data = JSON.parse(decodeURIComponent(encodedData));
@@ -250,19 +267,20 @@ function completeTrade(encodedData) {
     // 1. Remove offered items from backpack
     backpack = backpack.filter(item => !data.offeredItemIds.includes(item.id));
     
-    // 2. Add received target pet to backpack
+    // 2. Add received target pet to backpack using fresh value
+    const currentTargetVal = getLivePetValue(data.targetPetName, data.targetCombo);
     backpack.push({
       id: Date.now(),
       name: data.targetPetName,
       combo: data.targetCombo,
-      val: data.targetVal
+      val: currentTargetVal > 0 ? currentTargetVal : data.targetVal
     });
 
     // 3. Save state & refresh UI
     localStorage.setItem('user_backpack', JSON.stringify(backpack));
     renderBackpackUI();
     
-    // 4. Re-generate / clear offers
+    // 4. Re-generate / clear offer columns
     if (backpack.length > 0) {
       generateOfferSuggestions();
     } else {
@@ -276,7 +294,7 @@ function completeTrade(encodedData) {
   }
 }
 
-// Initialize backpack on DOM load
+// Initializing backpack state on window load
 document.addEventListener("DOMContentLoaded", function() {
   renderBackpackUI();
 });
