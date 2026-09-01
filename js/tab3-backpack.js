@@ -2,11 +2,45 @@ let backpack = JSON.parse(localStorage.getItem('user_backpack') || '[]');
 let bpSelectedPet = "", bpActiveType = 'Regular', bpHasFly = false, bpHasRide = false;
 let targetSelectedPet = "", targetActiveType = 'Regular', targetHasFly = false, targetHasRide = false;
 
-// Dynamic Helper: Gets live value from database dynamically
+// Robust Live Value Lookup: Safely extracts values from global functions or raw dataset objects
 function getLivePetValue(petName, combo) {
+  if (!petName) return 0;
+
+  // 1. First try global getCurrentVal function if defined
   if (typeof getCurrentVal === 'function') {
-    return Number(getCurrentVal(petName, combo)) || 0;
+    const val = Number(getCurrentVal(petName, combo));
+    if (!isNaN(val) && val > 0) return val;
   }
+
+  // 2. Direct dataset fallback (searches window.petData, window.valuesData, window.pets)
+  const dataset = window.petData || window.valuesData || window.pets || window.data || null;
+  if (dataset && typeof dataset === 'object') {
+    const cleanPet = petName.trim().toLowerCase();
+    const cleanCombo = combo.trim().toLowerCase();
+
+    // Locate matching pet key inside dataset ignoring case
+    const petKey = Object.keys(dataset).find(k => k.trim().toLowerCase() === cleanPet);
+    if (petKey && dataset[petKey]) {
+      const petEntry = dataset[petKey];
+
+      // Direct entry numeric check
+      if (typeof petEntry === 'number') return petEntry;
+
+      // Object entry variant check
+      if (typeof petEntry === 'object') {
+        const comboKey = Object.keys(petEntry).find(k => k.trim().toLowerCase() === cleanCombo);
+        if (comboKey) return Number(petEntry[comboKey]) || 0;
+        
+        // Secondary fallback: check short codes (e.g. "fr", "r", "f", "np")
+        const potions = (combo.includes('F') ? 'f' : '') + (combo.includes('R') ? 'r' : '');
+        const shortCombo = (combo.toLowerCase().includes('neon') ? 'neon_' : combo.toLowerCase().includes('mega') ? 'mega_' : '') + (potions || 'np');
+        
+        const shortKey = Object.keys(petEntry).find(k => k.trim().toLowerCase() === shortCombo);
+        if (shortKey) return Number(petEntry[shortKey]) || 0;
+      }
+    }
+  }
+
   return 0;
 }
 
@@ -52,7 +86,7 @@ function addToBackpack() {
   if (!bpSelectedPet) bpSelectedPet = document.getElementById("bpSearchInput").value.trim();
   if (!bpSelectedPet) return alert("Select a pet first!");
 
-  const combo = typeof getComboTag === 'function' ? getComboTag(bpActiveType, bpHasFly, bpHasRide) : `${bpActiveType}_${bpHasFly ? 'F' : ''}${bpHasRide ? 'R' : ''}`.replace('_$', '_NP');
+  const combo = typeof getComboTag === 'function' ? getComboTag(bpActiveType, bpHasFly, bpHasRide) : `${bpActiveType}_${bpHasFly ? 'F' : ''}${bpHasRide ? 'R' : ''}`.replace(/_$/, '_NP');
   const val = getLivePetValue(bpSelectedPet, combo);
 
   backpack.push({ id: Date.now(), name: bpSelectedPet, combo, val });
@@ -82,9 +116,9 @@ function renderBackpackUI() {
   
   list.innerHTML = "";
   backpack.forEach(item => {
-    // ALWAYS fetch the live updated value from the database
+    // Dynamically recalculate live values from database
     const freshVal = getLivePetValue(item.name, item.combo);
-    item.val = freshVal; // Update in-memory value
+    item.val = freshVal; 
 
     const trend = typeof calculatePetTrend === 'function' ? calculatePetTrend(item.name, item.combo) : { text: '--', color: 'text-slate-400' };
     const formattedVal = item.val.toFixed(2);
@@ -104,7 +138,7 @@ function renderBackpackUI() {
     `;
   });
 
-  // Save recalculated values back to localStorage
+  // Keep saved local storage updated
   localStorage.setItem('user_backpack', JSON.stringify(backpack));
 }
 
@@ -114,7 +148,8 @@ function toggleTargetVariant(v) {
     updateButtonStyling('target-toggle', targetActiveType, targetHasFly, targetHasRide);
   }
   const comboTag = typeof getComboTag === 'function' ? getComboTag(targetActiveType, targetHasFly, targetHasRide) : `${targetActiveType}_NP`;
-  document.getElementById('targetActiveTag').innerText = comboTag;
+  const el = document.getElementById('targetActiveTag');
+  if (el) el.innerText = comboTag;
 }
 
 function toggleTargetPotion(p) {
@@ -124,7 +159,8 @@ function toggleTargetPotion(p) {
     updateButtonStyling('target-toggle', targetActiveType, targetHasFly, targetHasRide);
   }
   const comboTag = typeof getComboTag === 'function' ? getComboTag(targetActiveType, targetHasFly, targetHasRide) : `${targetActiveType}_NP`;
-  document.getElementById('targetActiveTag').innerText = comboTag;
+  const el = document.getElementById('targetActiveTag');
+  if (el) el.innerText = comboTag;
 }
 
 function filterTargetList() {
@@ -161,12 +197,17 @@ function generateOfferSuggestions() {
 
   if (baseVal === 0) return alert("Selected target pet variant has no valid price data.");
 
-  document.getElementById("targetValSummary").classList.remove("hidden");
-  document.getElementById("dispBaseVal").innerText = baseVal.toFixed(2) + " pts";
+  const summaryEl = document.getElementById("targetValSummary");
+  if (summaryEl) summaryEl.classList.remove("hidden");
+  
+  const dispVal = document.getElementById("dispBaseVal");
+  if (dispVal) dispVal.innerText = baseVal.toFixed(2) + " pts";
   
   const badge = document.getElementById("targetTrendBadge");
-  badge.innerText = `Market Trend: ${trend.text}`;
-  badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
+  if (badge) {
+    badge.innerText = `Market Trend: ${trend.text}`;
+    badge.className = `px-2.5 py-1 rounded-full text-[11px] font-semibold ${trend.bg} ${trend.color}`;
+  }
 
   const allCombos = getAllCombinations(backpack);
 
@@ -182,7 +223,7 @@ function generateOfferSuggestions() {
 function getAllCombinations(items) {
   let results = [];
   
-  // Refresh live values across all backpack items before combining
+  // Dynamic fetch across backpack items
   const itemsWithLiveVals = items.map(item => {
     const freshVal = getLivePetValue(item.name, item.combo);
     return { ...item, val: freshVal };
@@ -205,6 +246,7 @@ function getAllCombinations(items) {
 
 function renderOfferColumn(containerId, optionsList, typeLabel, targetVal) {
   const box = document.getElementById(containerId);
+  if (!box) return;
 
   if (!optionsList || optionsList.length === 0) {
     box.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">No suitable ${typeLabel} combinations found.</div>`;
@@ -216,7 +258,6 @@ function renderOfferColumn(containerId, optionsList, typeLabel, targetVal) {
     const formattedDiff = (diff >= 0 ? `+${diff.toFixed(2)}` : `${diff.toFixed(2)}`) + " pts";
     const diffColor = diff > 0 ? "text-amber-400" : diff < 0 ? "text-emerald-400" : "text-blue-400";
     
-    // Store JSON payload for trade completion
     const offerDataJSON = encodeURIComponent(JSON.stringify({
       offeredItemIds: opt.items.map(i => i.id),
       targetPetName: targetSelectedPet,
@@ -267,7 +308,7 @@ function completeTrade(encodedData) {
     // 1. Remove offered items from backpack
     backpack = backpack.filter(item => !data.offeredItemIds.includes(item.id));
     
-    // 2. Add received target pet to backpack using fresh value
+    // 2. Add received target pet to backpack with live value
     const currentTargetVal = getLivePetValue(data.targetPetName, data.targetCombo);
     backpack.push({
       id: Date.now(),
@@ -280,13 +321,12 @@ function completeTrade(encodedData) {
     localStorage.setItem('user_backpack', JSON.stringify(backpack));
     renderBackpackUI();
     
-    // 4. Re-generate / clear offer columns
+    // 4. Update offer containers
     if (backpack.length > 0) {
       generateOfferSuggestions();
     } else {
-      document.getElementById("winOfferContainer").innerHTML = `<div class="text-slate-500 text-center py-4 text-xs font-semibold text-emerald-400">Trade completed! Backpack is now empty.</div>`;
-      document.getElementById("fairOfferContainer").innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">No suitable Fair combinations found.</div>`;
-      document.getElementById("loseOfferContainer").innerHTML = `<div class="text-slate-500 text-center py-4 text-xs">No suitable Overpay combinations found.</div>`;
+      const winContainer = document.getElementById("winOfferContainer");
+      if (winContainer) winContainer.innerHTML = `<div class="text-slate-500 text-center py-4 text-xs font-semibold text-emerald-400">Trade completed! Backpack is now empty.</div>`;
     }
 
   } catch (err) {
@@ -294,7 +334,7 @@ function completeTrade(encodedData) {
   }
 }
 
-// Initializing backpack state on window load
+// Initialize on page load
 document.addEventListener("DOMContentLoaded", function() {
   renderBackpackUI();
 });
