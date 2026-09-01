@@ -26,20 +26,29 @@ def load_latest_historical_values(csv_filename):
     return latest_records
 
 
-async def click_potion_toggle(page, letter):
+async def set_potion_state(page, target_f, target_r):
     """
-    Clicks the F or R toggle button and waits briefly for the JS UI state to settle.
+    Explicitly sets the Fly and Ride potion buttons to match target_f and target_r.
+    Ensures state is accurate rather than assuming previous state.
     """
-    xpath = f"//*[self::button or self::div or self::span][normalize-space()='{letter}']"
-    try:
-        btn = page.locator(xpath).first
-        if await btn.is_visible(timeout=1000):
-            await btn.click(force=True)
-            await page.wait_for_timeout(800)
-            return True
-    except Exception as e:
-        print(f"Failed to click potion button '{letter}': {e}")
-    return False
+    for letter, target in [("F", target_f), ("R", target_r)]:
+        xpath = f"//*[self::button or self::div or self::span][normalize-space()='{letter}']"
+        try:
+            btn = page.locator(xpath).first
+            if await btn.is_visible(timeout=1500):
+                # Check if class or attribute indicates selected state
+                class_attr = (await btn.get_attribute("class")) or ""
+                is_active = "active" in class_attr.lower() or "selected" in class_attr.lower() or "bg-" in class_attr.lower()
+
+                # Toggle if current visual state does not match desired state
+                if is_active != target:
+                    await btn.click(force=True)
+                    await page.wait_for_timeout(600)
+                elif not is_active and target:
+                    await btn.click(force=True)
+                    await page.wait_for_timeout(600)
+        except Exception as e:
+            print(f"Note setting potion '{letter}' to {target}: {e}")
 
 
 async def scroll_and_harvest(page, combo_tag, raw_data, baseline_map, max_scrolls=500, force_full_scroll=False):
@@ -150,9 +159,6 @@ async def scrape_elvebredd():
             ("NP", False, False)
         ]
 
-        current_fly = False
-        current_ride = False
-
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
         raw_data = {}
         baseline_map = {}
@@ -173,16 +179,9 @@ async def scrape_elvebredd():
                 combo_tag = f"{variant}_{pot_label}"
                 print(f"Processing combo: {combo_tag} (Fly={target_f}, Ride={target_r})")
 
-                # Toggle buttons to hit target state
-                if current_fly != target_f:
-                    if await click_potion_toggle(page, "F"):
-                        current_fly = target_f
-
-                if current_ride != target_r:
-                    if await click_potion_toggle(page, "R"):
-                        current_ride = target_r
-
-                await page.wait_for_timeout(800)
+                # Explicitly align potion states
+                await set_potion_state(page, target_f, target_r)
+                await page.wait_for_timeout(1000)
 
                 # Harvest
                 await scroll_and_harvest(
@@ -194,7 +193,7 @@ async def scrape_elvebredd():
                     force_full_scroll=is_first_category
                 )
 
-                # Save baseline map from the initial full scan
+                # Save baseline map from initial full scan
                 if is_first_category:
                     for (item_name, c_tag), val in raw_data.items():
                         if c_tag == combo_tag:
@@ -206,7 +205,6 @@ async def scrape_elvebredd():
         csv_filename = "history.csv"
         previous_records = load_latest_historical_values(csv_filename)
         
-        # Group scraped results by pet/item name
         pet_combos_map = {}
         for (name, combo_tag), scraped_val in raw_data.items():
             if name not in pet_combos_map:
@@ -225,13 +223,11 @@ async def scrape_elvebredd():
                 
                 _, prev_val = previous_records.get((name, combo_tag), (None, None))
                 
-                # Append ONLY if the item is brand new OR its value has changed
                 if prev_val != single_val:
                     rows_to_append.append(f"{today_date},{name},{combo_tag},{single_val}\n")
             else:
                 for combo_tag, scraped_val in combo_dict.items():
                     _, prev_val = previous_records.get((name, combo_tag), (None, None))
-                    # Append ONLY if the item/variant is brand new OR its value has changed
                     if prev_val != scraped_val:
                         rows_to_append.append(f"{today_date},{name},{combo_tag},{scraped_val}\n")
 
