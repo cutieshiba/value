@@ -5,10 +5,6 @@ from playwright.async_api import async_playwright
 
 
 def load_latest_historical_values(csv_filename):
-    """
-    Reads existing CSV history and maps (item_name, combo_tag) -> (date, value).
-    This ensures we only append records when a value ACTUALLY changes, or when a new item appears.
-    """
     latest_records = {}
     if not os.path.exists(csv_filename):
         return latest_records
@@ -27,51 +23,34 @@ def load_latest_historical_values(csv_filename):
 
 
 async def set_potion_state(page, target_f, target_r):
-    """
-    Explicitly sets the Fly and Ride potion buttons to match target_f and target_r.
-    Ensures state is accurate rather than assuming previous state.
-    """
+    """Toggles F and R buttons reliably based on target active state."""
     for letter, target in [("F", target_f), ("R", target_r)]:
         xpath = f"//*[self::button or self::div or self::span][normalize-space()='{letter}']"
         try:
             btn = page.locator(xpath).first
             if await btn.is_visible(timeout=1500):
-                # Check if class or attribute indicates selected state
                 class_attr = (await btn.get_attribute("class")) or ""
-                is_active = "active" in class_attr.lower() or "selected" in class_attr.lower() or "bg-" in class_attr.lower()
-
-                # Toggle if current visual state does not match desired state
+                is_active = any(kw in class_attr.lower() for kw in ["active", "selected", "bg-"])
+                
                 if is_active != target:
                     await btn.click(force=True)
                     await page.wait_for_timeout(600)
-                elif not is_active and target:
-                    await btn.click(force=True)
-                    await page.wait_for_timeout(600)
         except Exception as e:
-            print(f"Note setting potion '{letter}' to {target}: {e}")
+            print(f"Error setting potion state '{letter}': {e}")
 
 
-async def scroll_and_harvest(page, combo_tag, raw_data, baseline_map, max_scrolls=500, force_full_scroll=False):
-    """
-    Scrolls inside the drawer container.
-    - If force_full_scroll is True (1st category), scrolls all the way to the bottom to index everything.
-    - Otherwise, stops early if 15 consecutive items match the baseline values from the 1st category.
-    """
-    # Reset scroll position of the drawer container directly to top
+async def scroll_and_harvest(page, combo_tag, raw_data, max_scrolls=500):
+    """Performs a full scroll to harvest all items without early exit skipping."""
     await page.evaluate("""
         () => {
             const drawer = document.querySelector("div[class*='drawer'], div[class*='modal'], div[class*='scroll'], div[class*='grid']");
-            if (drawer) {
-                drawer.scrollTop = 0;
-            }
+            if (drawer) { drawer.scrollTop = 0; }
             window.scrollTo(0, 0);
         }
     """)
     await page.mouse.move(800, 500)
     await page.mouse.wheel(0, -50000)
     await page.wait_for_timeout(1000)
-
-    consecutive_baseline_matches = 0
 
     for step in range(max_scrolls):
         cards = await page.query_selector_all("div[class*='grid'] > div, div[class*='card'], div[class*='item']")
@@ -97,22 +76,9 @@ async def scroll_and_harvest(page, combo_tag, raw_data, baseline_map, max_scroll
 
                     if len(name) > 1 and not is_ui_text and any(char.isdigit() for char in val):
                         raw_data[(name, combo_tag)] = val
-
-                        # On subsequent runs, check if this item matches baseline (first category)
-                        if not force_full_scroll and name in baseline_map:
-                            if baseline_map[name] == val:
-                                consecutive_baseline_matches += 1
-                            else:
-                                consecutive_baseline_matches = 0
             except Exception:
                 continue
 
-        # EARLY EXIT CONDITION (Applies to 2nd category onwards):
-        if not force_full_scroll and consecutive_baseline_matches >= 15:
-            print(f"[{combo_tag}] Reached identical baseline items ({consecutive_baseline_matches} matches). Stopping scroll early at step {step + 1}.")
-            break
-
-        # Fast mouse wheel step
         await page.mouse.move(800, 500)
         await page.mouse.wheel(0, 300)
         await page.wait_for_timeout(100)
@@ -120,13 +86,10 @@ async def scroll_and_harvest(page, combo_tag, raw_data, baseline_map, max_scroll
 
 async def scrape_elvebredd():
     async with async_playwright() as p:
-        browser = await p.chromium.launch(
-            headless=True,
-            args=["--disable-blink-features=AutomationControlled"]
-        )
+        browser = await p.chromium.launch(headless=True, args=["--disable-blink-features=AutomationControlled"])
         context = await browser.new_context(
             viewport={"width": 1600, "height": 1000},
-            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/122.0.0.0 Safari/537.36"
+            user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36"
         )
         page = await context.new_page()
 
@@ -134,22 +97,10 @@ async def scrape_elvebredd():
         await page.goto("https://elvebredd.com/ValueCalculator.html", wait_until="domcontentloaded", timeout=60000)
         await page.wait_for_timeout(4000)
 
-        # Expand item drawer
+        # Open drawer
         add_slot = page.locator("[aria-label*='Add']").first
-        add_box = await add_slot.bounding_box()
-
-        if add_box:
-            base_x = add_box["x"] + (add_box["width"] / 2)
-            base_y = add_box["y"] + (add_box["height"] / 2)
-            await add_slot.click(force=True)
-            await page.wait_for_timeout(3000)
-
-            expand_y = base_y - 120
-            await page.mouse.click(base_x, expand_y)
-            await page.wait_for_timeout(2000)
-        else:
-            await add_slot.click(force=True)
-            await page.wait_for_timeout(3000)
+        await add_slot.click(force=True)
+        await page.wait_for_timeout(3000)
 
         variants = ["Regular", "N", "M"]
         potion_states = [
@@ -161,8 +112,6 @@ async def scrape_elvebredd():
 
         today_date = datetime.utcnow().strftime("%Y-%m-%d")
         raw_data = {}
-        baseline_map = {}
-        is_first_category = True
 
         for variant in variants:
             # Switch variant tab
@@ -173,72 +122,37 @@ async def scrape_elvebredd():
                     await tab_btn.click(force=True)
                     await page.wait_for_timeout(1000)
             except Exception as e:
-                print(f"Variant tab switch note ({variant}): {e}")
+                print(f"Variant tab note ({variant}): {e}")
 
             for pot_label, target_f, target_r in potion_states:
                 combo_tag = f"{variant}_{pot_label}"
                 print(f"Processing combo: {combo_tag} (Fly={target_f}, Ride={target_r})")
 
-                # Explicitly align potion states
                 await set_potion_state(page, target_f, target_r)
                 await page.wait_for_timeout(1000)
 
-                # Harvest
-                await scroll_and_harvest(
-                    page,
-                    combo_tag,
-                    raw_data,
-                    baseline_map,
-                    max_scrolls=500,
-                    force_full_scroll=is_first_category
-                )
+                await scroll_and_harvest(page, combo_tag, raw_data, max_scrolls=300)
 
-                # Save baseline map from initial full scan
-                if is_first_category:
-                    for (item_name, c_tag), val in raw_data.items():
-                        if c_tag == combo_tag:
-                            baseline_map[item_name] = val
-                    print(f"Baseline created with {len(baseline_map)} total items recorded.")
-                    is_first_category = False
-
-        # --- DEDUPLICATION LOGIC ---
+        # --- REVISED DEDUPLICATION LOGIC ---
         csv_filename = "history.csv"
         previous_records = load_latest_historical_values(csv_filename)
-        
-        pet_combos_map = {}
-        for (name, combo_tag), scraped_val in raw_data.items():
-            if name not in pet_combos_map:
-                pet_combos_map[name] = {}
-            pet_combos_map[name][combo_tag] = scraped_val
-
         rows_to_append = []
 
-        for name, combo_dict in pet_combos_map.items():
-            unique_values = set(combo_dict.values())
+        # Retain explicit combo tags (Regular_R, Regular_FR, etc.) without collapsing
+        for (name, combo_tag), scraped_val in raw_data.items():
+            _, prev_val = previous_records.get((name, combo_tag), (None, None))
+            
+            # Record if new item/variant combo OR if value changed
+            if prev_val != scraped_val:
+                rows_to_append.append(f"{today_date},{name},{combo_tag},{scraped_val}\n")
 
-            # Collapse to 1 entry if all recorded variants have the exact same value
-            if len(unique_values) == 1:
-                single_val = list(unique_values)[0]
-                combo_tag = "Regular_NP"
-                
-                _, prev_val = previous_records.get((name, combo_tag), (None, None))
-                
-                if prev_val != single_val:
-                    rows_to_append.append(f"{today_date},{name},{combo_tag},{single_val}\n")
-            else:
-                for combo_tag, scraped_val in combo_dict.items():
-                    _, prev_val = previous_records.get((name, combo_tag), (None, None))
-                    if prev_val != scraped_val:
-                        rows_to_append.append(f"{today_date},{name},{combo_tag},{scraped_val}\n")
-
-        # Append new records to history.csv
         if rows_to_append:
             rows_to_append.sort()
             with open(csv_filename, "a", encoding="utf-8") as f:
                 f.writelines(rows_to_append)
-            print(f"SUCCESS: Appended {len(rows_to_append)} changed/new value records to {csv_filename}!")
+            print(f"SUCCESS: Saved {len(rows_to_append)} records (including Regular_R entries) to {csv_filename}!")
         else:
-            print("No value changes or new items detected today. Database remains unchanged.")
+            print("No value changes or new records found.")
 
         await browser.close()
 
